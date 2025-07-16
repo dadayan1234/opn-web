@@ -222,11 +222,4 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
 3. Check network tab untuk API calls
 4. Review [ENVIRONMENT_CONFIG.md](./ENVIRONMENT_CONFIG.md)
 
-## 📝 License
-
-[Add your license information here]
-
-## 🤝 Contributing
-
-[Add contributing guidelines here]
 
