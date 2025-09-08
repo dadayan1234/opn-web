@@ -10,6 +10,8 @@ import { MemberAttendanceForm } from "./member-attendance-form"
 import { UserCheck, Save } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { saveAttendanceData } from "@/utils/attendance-utils"
+import { useAttendanceMutations } from "@/hooks/useEvents"
+
 
 interface AttendancePopupProps {
   eventId: string | number
@@ -29,6 +31,8 @@ export function AttendancePopup({
   const { toast } = useToast()
   const [isSaving, setIsSaving] = useState(false)
   const [attendanceData, setAttendanceData] = useState<Array<{ member_id: number; status: string; notes: string }>>([])
+  const { createOrUpdateAttendance } = useAttendanceMutations(eventId);
+
 
   // Update attendanceData when onAttendanceChange is called
   const handleAttendanceChange = (data: Array<{ member_id: number; status: string; notes: string }>) => {
@@ -42,99 +46,37 @@ export function AttendancePopup({
     handleSaveAttendance?: () => Promise<void>,
     getAttendanceData?: () => Array<{ member_id: number; status: string; notes: string }>
   }>(null)
-
+  
   // Function to handle saving attendance
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      console.log("Saving attendance data...");
-
-      // Try to get data from the form ref first
       let dataToSave = attendanceData;
-
-      // If we have a ref and it has the getAttendanceData method, use that
-      if (formRef.current && formRef.current.getAttendanceData) {
+      if (formRef.current?.getAttendanceData) {
         const refData = formRef.current.getAttendanceData();
-        if (refData && refData.length > 0) {
-          dataToSave = refData;
-          console.log("Using data from form ref:", dataToSave);
-        }
+        if (refData?.length) dataToSave = refData;
       }
 
-      // If we have data to save, use our utility function to save it to localStorage
-      if (dataToSave && dataToSave.length > 0) {
-        try {
-          // Save data using our utility function
-          const saveResult = saveAttendanceData(eventId, dataToSave);
-
-          if (!saveResult) {
-            console.error("[AttendancePopup] Failed to save attendance data");
-            toast({
-              title: "Error",
-              description: "Gagal menyimpan data kehadiran ke penyimpanan lokal",
-              variant: "destructive"
-            });
-            setIsSaving(false);
-            return;
-          }
-
-          console.log(`[AttendancePopup] Successfully saved attendance data to localStorage`);
-
-          // Show success toast
-          toast({
-            title: "Berhasil",
-            description: "Data kehadiran berhasil disimpan",
-          });
-
-          // Close the dialog after successful save
-          setTimeout(() => {
-            onClose();
-          }, 1000);
-        } catch (storageError) {
-          console.error("[AttendancePopup] Error saving to localStorage:", storageError);
-          toast({
-            title: "Error",
-            description: "Gagal menyimpan data kehadiran ke penyimpanan lokal",
-            variant: "destructive"
-          });
-          throw storageError;
-        }
-      } else {
-        // Try to call the handleSaveAttendance method as a fallback
-        if (formRef.current && formRef.current.handleSaveAttendance) {
-          console.log("Calling handleSaveAttendance as fallback...");
-          await formRef.current.handleSaveAttendance();
-
-          // Show success toast
-          toast({
-            title: "Berhasil",
-            description: "Data kehadiran berhasil disimpan",
-          });
-
-          // Close the dialog after successful save
-          setTimeout(() => {
-            onClose();
-          }, 1000);
-        } else {
-          console.error("No attendance data to save and no save method available");
-          toast({
-            title: "Error",
-            description: "Tidak ada data kehadiran untuk disimpan",
-            variant: "destructive"
-          });
-        }
+      if (!dataToSave || dataToSave.length === 0) {
+        toast({ title: "Error", description: "Tidak ada data kehadiran untuk disimpan", variant: "destructive" });
+        return;
       }
+
+      for (const record of dataToSave) {
+        await createOrUpdateAttendance.mutateAsync([record]);
+      }
+
+      toast({ title: "Berhasil", description: "Semua data kehadiran berhasil disimpan" });
+      setTimeout(() => onClose(), 1000);
+
     } catch (error) {
       console.error("Error saving attendance:", error);
-      toast({
-        title: "Error",
-        description: "Gagal menyimpan data kehadiran",
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: "Gagal menyimpan data kehadiran", variant: "destructive" });
     } finally {
       setIsSaving(false);
     }
-  }
+  };
+
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

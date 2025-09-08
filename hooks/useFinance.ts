@@ -1,3 +1,5 @@
+import { title } from 'process';
+import { title } from 'process';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Finance, financeApi, FinanceHistoryResponse as ApiFinanceHistoryResponse } from '@/lib/api-service'; // Updated path
 import { uploadsApi } from '@/lib/api-uploads';
@@ -9,6 +11,7 @@ export interface FinanceTransaction {
   amount: string;
   category: string;
   date: string;
+  title: string;
   description: string;
   balance_before: string;
   balance_after: string;
@@ -28,6 +31,7 @@ export interface FinanceData {
   amount: number;
   category: "Pemasukan" | "Pengeluaran";
   date: string;
+  title: string;
   description: string;
 }
 

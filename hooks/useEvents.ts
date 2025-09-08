@@ -440,57 +440,74 @@ export function useAttendanceMutations(eventId: number | string) {
   const { toast } = useToast()
 
   const createOrUpdateAttendance = useMutation({
-    // Ensure the input type matches the expected AttendanceFormData[] from lib/api.ts
-    mutationFn: (attendanceData: AttendanceFormData[]) => {
+    mutationFn: async (attendanceData: AttendanceFormData[]) => {
       console.log(`[useAttendanceMutations] Saving attendance for event ${eventId}:`, attendanceData);
-      return eventApi.createUpdateAttendance(eventId, attendanceData);
+
+      const token = localStorage.getItem("token")
+      if (!token) {
+        throw new Error("Token tidak tersedia. Silakan login kembali.")
+      }
+
+      const url = `https://beopn.penaku.site/api/v1/events/${eventId}/attendance`
+
+      // Kirim satu per satu
+      for (const record of attendanceData) {
+        const payload = [{
+          member_id: record.member_id,
+          status: record.status || "Hadir",
+          notes: record.notes || ""
+        }]
+
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        })
+
+        if (!res.ok) {
+          const text = await res.text().catch(() => "")
+          console.error(`Gagal update attendance untuk member ${record.member_id}`, text)
+          throw new Error(`Gagal update kehadiran untuk member ${record.member_id}`)
+        }
+      }
+
+      return true
     },
     onSuccess: () => {
       console.log(`[useAttendanceMutations] Successfully saved attendance for event ${eventId}`);
 
-      // Invalidate attendance queries to refetch the list
-      queryClient.invalidateQueries({ queryKey: eventKeys.attendance(eventId) });
+      // Invalidate agar daftar kehadiran diperbarui
+      queryClient.invalidateQueries({ queryKey: eventKeys.attendance(eventId) })
+      queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) })
 
-      // Also invalidate the event detail to ensure all data is refreshed
-      queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
-
-      // Show success toast
       toast({
         title: "Berhasil",
         description: "Data kehadiran berhasil disimpan",
-      });
+      })
     },
     onError: (error) => {
       console.error(`[useAttendanceMutations] Error saving attendance for event ${eventId}:`, error);
 
-      // Show detailed error message
       let errorMessage = "Terjadi kesalahan saat menyimpan data kehadiran";
-
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 401) {
-          errorMessage = "Anda tidak terautentikasi. Silakan login kembali.";
-        } else if (error.response?.status === 403) {
-          errorMessage = "Anda tidak memiliki izin untuk mengubah data kehadiran.";
-        } else if (error.response?.status === 404) {
-          errorMessage = "Acara tidak ditemukan. Silakan periksa ID acara.";
-        } else if (error.response?.status && error.response.status >= 500) {
-          errorMessage = `Terjadi kesalahan pada server (${error.response.status}). Silakan coba lagi nanti.`;
-        }
+      if (error instanceof Error) {
+        errorMessage = error.message
       }
 
-      // Show error toast
       toast({
         title: "Gagal",
         description: errorMessage,
         variant: "destructive",
-      });
+      })
     }
   })
 
-  return {
-    createOrUpdateAttendance
-  }
+  return { createOrUpdateAttendance }
 }
+
 
 // Hook for creating, updating, and deleting events
 export function useEventMutations() {

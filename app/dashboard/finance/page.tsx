@@ -30,6 +30,7 @@ interface TransactionFormData {
   amount: string;
   type: "income" | "expense";
   date: Date;
+  title: string;
   description: string;
 }
 
@@ -62,6 +63,7 @@ export default function FinancePage() {
       amount: Number(data.amount),
       category: data.type === "income" ? "Pemasukan" : "Pengeluaran",
       date: data.date.toISOString(),
+      title: data.title,
       description: data.description
     }
 
@@ -80,6 +82,7 @@ export default function FinancePage() {
       amount: Number(data.amount),
       category: data.type === "income" ? "Pemasukan" : "Pengeluaran",
       date: data.date.toISOString(),
+      title: data.title,
       description: data.description
     }
 
@@ -246,7 +249,10 @@ export default function FinancePage() {
                     <TableCell className="min-w-[200px] max-w-[300px]">
                       <div>
                         <TruncatedDescription
-                          description={transaction.description}
+                          description={`
+                            <strong>${transaction.title || "Tanpa Judul"}</strong><br/>
+                            ${transaction.description}
+                          `}
                           maxLength={30}
                           isRichText={true}
                           title={`Deskripsi Transaksi - ${format(new Date(transaction.date), "dd MMM yyyy")}`}
@@ -334,6 +340,7 @@ export default function FinancePage() {
               defaultValues={{
                 date: new Date(transactionToEdit.date),
                 description: transactionToEdit.description,
+                title: transactionToEdit.title,
                 amount: String(transactionToEdit.amount),
                 type: transactionToEdit.category === "Pemasukan" ? "income" : "expense"
               }}

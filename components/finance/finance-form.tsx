@@ -12,6 +12,7 @@ import { AlertCircle, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 import { type Finance, type FinanceFormData } from "@/lib/api-service" // Updated path
 import { useFinanceMutations } from "@/hooks/useFinance"
+import { title } from "process"
 
 interface FinanceFormProps {
   finance?: Finance
@@ -29,6 +30,7 @@ export function FinanceForm({ finance, isEditing = false, onSuccess }: FinanceFo
     amount: "", // Start as string for input, will convert to number on submit
     category: "Pemasukan", // Default category - matches backend expectation
     date: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
+    title: "",
     description: "",
   })
 
@@ -42,6 +44,7 @@ export function FinanceForm({ finance, isEditing = false, onSuccess }: FinanceFo
         amount: finance.amount, // Keep as string for the input field
         category: finance.category,
         date: finance.date.substring(0, 16), // Format for datetime-local input
+        title: finance.title,
         description: finance.description,
       })
     }
@@ -77,6 +80,7 @@ export function FinanceForm({ finance, isEditing = false, onSuccess }: FinanceFo
         amount: Number(formData.amount),
         category: formData.category as "Pemasukan" | "Pengeluaran", // Cast to expected type
         date: new Date(formData.date).toISOString(), // Format date as ISO string
+        title: formData.title,
         description: formData.description,
       }
 
@@ -165,6 +169,20 @@ export function FinanceForm({ finance, isEditing = false, onSuccess }: FinanceFo
           />
         </div>
 
+        {/* Title */}
+        <div className="space-y-2">
+          <Label htmlFor="title">Judul Transaksi</Label>
+          <Input
+            id="title"
+            name="title"
+            type="text"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Contoh: Bayar Listrik, Gaji, dll"
+            required
+          />
+        </div>
+
         {/* Description */}
         <div className="space-y-2">
           <Label htmlFor="description">Deskripsi</Label>
@@ -177,9 +195,8 @@ export function FinanceForm({ finance, isEditing = false, onSuccess }: FinanceFo
             required
           />
         </div>
-
-
       </div>
+
 
       <div className="flex justify-end gap-4">
         <Button

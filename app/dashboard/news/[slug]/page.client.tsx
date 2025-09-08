@@ -19,6 +19,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { TipTapContent } from "@/components/ui/tiptap-editor"
 import "./news-detail.css"
 
+
+
 export default function NewsDetailPageClient({ slug }: { slug: string }) {
   const router = useRouter()
   const newsId = slug

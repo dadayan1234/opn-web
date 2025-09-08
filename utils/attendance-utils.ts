@@ -7,6 +7,7 @@
  * @param data The data to validate
  * @returns Cleaned and validated attendance data array
  */
+
 export function validateAttendanceData(data: any): Array<{ member_id: number; status: string; notes: string }> {
   // If data is null or undefined, return empty array
   if (!data) return [];

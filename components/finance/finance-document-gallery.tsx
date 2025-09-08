@@ -32,6 +32,35 @@ export function FinanceDocumentGallery({
   const [error, setError] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const { toast } = useToast()
+  const token = localStorage.getItem("token"); // atau sesuai mekanisme auth yang dipakai
+
+async function fetchImage(url: string): Promise<string> {
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Accept": "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error("Gagal mengambil gambar");
+  }
+
+  const blob = await response.blob();
+  return URL.createObjectURL(blob); // bikin URL sementara untuk <img>
+}
+
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (documentUrl) {
+      fetchImage(documentUrl)
+        .then(url => setImageSrc(url))
+        .catch(err => console.error(err));
+    }
+  }, [documentUrl]);
+
 
   // Reset state when modal opens
   useEffect(() => {
@@ -47,6 +76,16 @@ export function FinanceDocumentGallery({
       console.log("Document gallery opened with URL:", documentUrl)
     }
   }, [open, documentUrl])
+
+  async function handleDownload(url: string) {
+    const blobUrl = await fetchImage(url);
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = "bukti-transaksi.jpg"; // atau parse dari url asli
+    a.click();
+    URL.revokeObjectURL(blobUrl);
+  }
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null
@@ -318,39 +357,9 @@ export function FinanceDocumentGallery({
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <img
-                        src={documentUrl}
+                        src={imageSrc || "/placeholder.svg"}
                         alt="Bukti transaksi"
                         className="max-w-full max-h-full object-contain"
-                        onError={(e) => {
-                          console.error("Error loading image:", documentUrl);
-
-                          // Try to fix the URL if it's missing the API prefix
-                          const target = e.target as HTMLImageElement;
-
-                          if (documentUrl) {
-                            // Check if URL is relative and doesn't have the proper API prefix
-                            if (documentUrl.startsWith('/uploads/') && !documentUrl.includes('/api/v1/')) {
-                              const fixedUrl = `/api/v1${documentUrl}`;
-                              console.log("Fixing document URL format. New URL:", fixedUrl);
-                              target.src = fixedUrl;
-                              return;
-                            }
-
-                            // Check if URL is absolute but missing the API path
-                            if (documentUrl.includes('beopn.mysesa.site') && !documentUrl.includes('/api/v1/')) {
-                              const fixedUrl = documentUrl.replace('beopn.mysesa.site/', 'beopn.mysesa.site/api/v1/');
-                              console.log("Fixing document URL format. New URL:", fixedUrl);
-                              target.src = fixedUrl;
-                              return;
-                            }
-
-                            // Log the URL format for debugging
-                            console.warn("Document URL format issue. Current URL:", documentUrl);
-                          }
-
-                          // If all fixes fail, show placeholder
-                          target.src = "/placeholder.svg";
-                        }}
                       />
                     </div>
                   )}
@@ -362,17 +371,12 @@ export function FinanceDocumentGallery({
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-white text-black hover:bg-gray-100"
-                        onClick={() => {
-                          if (documentUrl) {
-                            // Open the document URL in a new tab
-                            window.open(documentUrl, '_blank');
-                          }
-                        }}
+                        onClick={() => documentUrl && handleDownload(documentUrl)}
                       >
                         <Download className="h-4 w-4 mr-2" />
                         Unduh
                       </Button>
+
                       <Button
                         variant="outline"
                         size="sm"

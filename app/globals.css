@@ -464,3 +464,22 @@
   margin: 0;
   display: inline;
 }
+
+
+/* Tambahkan ke global.css */
+.rdp-calendar-wrapper .rdp-head_row,
+.rdp-calendar-wrapper .rdp-row {
+  display: flex !important;
+  width: 100% !important;
+  justify-content: space-between !important;
+}
+
+.rdp-calendar-wrapper .rdp-head_cell,
+.rdp-calendar-wrapper .rdp-cell {
+  width: calc(100% / 7) !important;
+  flex: 0 0 calc(100% / 7) !important;
+  text-align: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}

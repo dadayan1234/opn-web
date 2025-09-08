@@ -210,11 +210,21 @@ export function FinanceList() {
                           {format(parseISO(finance.date), "dd MMM yyyy", { locale: id })}
                         </TableCell>
                         <TableCell className="min-w-[200px] max-w-[300px]">
-                          <TruncatedDescription
-                            description={finance.description}
-                            maxLength={30}
-                            title={`Deskripsi Transaksi - ${format(parseISO(finance.date), "dd MMM yyyy", { locale: id })}`}
-                          />
+                          <div>
+                            {/* Title bold */}
+                            <p className="font-semibold text-base">{finance.title}</p>
+
+                            {/* Description abu-abu, max 20 char */}
+                            <p
+                              className="text-sm text-muted-foreground"
+                              dangerouslySetInnerHTML={{
+                                __html:
+                                  finance.description.length > 20
+                                    ? finance.description.slice(0, 20) + "..."
+                                    : finance.description,
+                              }}
+                            />
+                          </div>
                         </TableCell>
                         <TableCell>
                           <span

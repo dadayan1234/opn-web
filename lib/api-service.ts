@@ -854,19 +854,7 @@ export const newsApi = {
       const timestamp = Date.now();
 
       const response = await withRetry(() =>
-        apiClient.get<NewsItem>(`${API_CONFIG.ENDPOINTS.NEWS}/${id}/`, {
-          signal,
-          params: {
-            _t: timestamp // Add timestamp to prevent caching
-          },
-          // Add additional headers for debugging
-          headers: {
-            'X-Request-ID': `news-item-${id}-${timestamp}`,
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-            'Expires': '0'
-          }
-        })
+        apiClient.get<NewsItem>(`${API_CONFIG.ENDPOINTS.NEWS}${id}`)
       )
 
       if (!response || !response.data) {
@@ -2030,6 +2018,7 @@ export interface AttendanceFormData {
 export interface Finance {
   id: number
   amount: string
+  title: string
   category: string
   date: string
   description: string
@@ -2045,6 +2034,7 @@ export interface FinanceFormData {
   amount: number
   category: string
   date: string
+  title: string
   description: string
 }
 
