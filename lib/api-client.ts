@@ -49,78 +49,65 @@ apiClient.interceptors.request.use(
 );
 
 apiClient.interceptors.response.use(
-  (response: AxiosResponse) => {
-    return response;
-  },
+  (response: AxiosResponse) => response,
   async (error: unknown) => {
     if (isCancel(error)) {
-      return Promise.reject({
-        isCanceled: true,
-        message: 'Request was canceled',
-        originalError: error
-      });
+      // Jangan spam log untuk cancel
+      return Promise.resolve();
     }
 
     if (axios.isAxiosError(error)) {
       const axiosError = error;
       const originalRequest = axiosError.config as AxiosRequestConfig & { _retry?: boolean };
-      
+
       if (axiosError.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
-        
         try {
           const refreshToken = typeof window !== "undefined" ? localStorage.getItem("refreshToken") : null;
-          
+
           if (!refreshToken) {
             removeAuthTokens();
-            if (typeof window !== "undefined") {
-              window.location.href = '/login';
-            }
+            if (typeof window !== "undefined") window.location.href = "/login";
             return Promise.reject(error);
           }
 
           const response = await fetch(`${API_CONFIG.BACKEND_URL}/api/v1/auth/refresh`, {
-            method: 'POST',
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${refreshToken}`
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${refreshToken}`,
             },
           });
 
           if (response.ok) {
             const data = await response.json();
             setAuthTokens(data.access_token, data.refresh_token);
-            
+
             if (originalRequest.headers) {
               originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
             }
-            
+
             return apiClient(originalRequest);
           } else {
             removeAuthTokens();
-            if (typeof window !== "undefined") {
-              window.location.href = '/login';
-            }
+            if (typeof window !== "undefined") window.location.href = "/login";
           }
-        } catch (refreshError) {
+        } catch {
           removeAuthTokens();
-          if (typeof window !== "undefined") {
-            window.location.href = '/login';
-          }
+          if (typeof window !== "undefined") window.location.href = "/login";
         }
       }
 
       if (axiosError.response?.status === 401) {
         removeAuthTokens();
-        if (typeof window !== "undefined") {
-          window.location.href = '/login';
-        }
+        if (typeof window !== "undefined") window.location.href = "/login";
       }
     }
 
     return Promise.reject(error);
   }
 );
+
 
 uploadsApiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
@@ -160,3 +147,5 @@ uploadsApiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+

@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   const id = params.id;
-  return handleApiRoute(request, `/news/${id}/`);
+  return handleApiRoute(request, `/news/${id}`);
 }
 
 // PUT /api/v1/news/[id]
@@ -20,7 +20,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   const id = params.id;
-  return handleApiRoute(request, `/news/${id}/`);
+  return handleApiRoute(request, `/news/${id}`);
 }
 
 // DELETE /api/v1/news/[id]

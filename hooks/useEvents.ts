@@ -511,122 +511,69 @@ export function useAttendanceMutations(eventId: number | string) {
 
 // Hook for creating, updating, and deleting events
 export function useEventMutations() {
-  try {
-    const queryClient = useQueryClient()
-    const { toast } = useToast()
+  const queryClient = useQueryClient()
+  const { toast } = useToast()
 
-  // Create event mutation with improved error handling
+  // CREATE
   const createEvent = useMutation({
     mutationFn: async (data: EventFormData) => {
-      try {
-        console.log('Creating event with data:', data)
-        return await eventApi.createEvent(data)
-      } catch (error) {
-        console.error('Error in createEvent mutation:', error)
-        // Rethrow the error to be handled by onError
-        throw error
-      }
+      console.log('Creating event with data:', data)
+      return await eventApi.createEvent(data)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() })
+      // queryClient.invalidateQueries({ queryKey: eventKeys.search() }) // refresh pencarian juga
       toast({
         title: "Berhasil",
         description: "Acara berhasil dibuat",
       })
     },
     onError: (error: unknown) => {
-      // Use the extractErrorMessage function we added to lib/api.ts
       const errorMessage = extractErrorMessage(error)
-
-      console.log('Extracted error message:', errorMessage)
-
-      // Show a user-friendly toast
       toast({
         title: "Gagal Membuat Acara",
         description: errorMessage,
         variant: "destructive",
       })
-
-      // Return the error for the component to handle
-      return error
     },
   })
 
-  // Update event mutation - improved to handle minutes updates better
+  // UPDATE
   const updateEvent = useMutation({
     mutationFn: async ({ id, data }: { id: number | string; data: Partial<EventFormData> }) => {
-      try {
-        // Log the data being sent to the API
-        console.log('Sending update data to API:', { id, data })
-
-        // Special handling for minutes-only updates
-        if (Object.keys(data).length === 1 && 'minutes' in data) {
-          console.log('Detected minutes-only update, using optimized approach')
-          try {
-            // Try to use the PATCH endpoint first (more specific for minutes updates)
-            return await eventApi.updateEvent(id, data)
-          } catch (error) {
-            console.error('Error in minutes update:', error)
-            throw error
-          }
-        } else {
-          // For regular updates, use the standard approach
-          return await eventApi.updateEvent(id, data)
-        }
-      } catch (error) {
-        // Log the error for debugging
-        console.error('Error in updateEvent mutation:', error)
-        throw error
-      }
+      console.log('Updating event:', { id, data })
+      return await eventApi.updateEvent(id, data)
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: eventKeys.detail(data.id) })
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() })
+      // queryClient.invalidateQueries({ queryKey: eventKeys.search() })
       toast({
         title: "Berhasil",
         description: "Acara berhasil diperbarui",
       })
     },
     onError: (error: unknown) => {
-      console.error('Error updating event:', error)
-
-      // Use the extractErrorMessage function we added to lib/api.ts
       const errorMessage = extractErrorMessage(error)
-
-      console.log('Extracted error message for update:', errorMessage)
-
-      // Show a user-friendly toast
       toast({
         title: "Gagal Memperbarui Acara",
         description: errorMessage,
         variant: "destructive",
       })
-
-      // Return the error for the component to handle
-      return error
     },
   })
 
-  // Delete event mutation with optimistic update
+  // DELETE (dengan optimistic update)
   const deleteEvent = useMutation({
     mutationFn: async (id: number | string) => {
-      try {
-        console.log('Deleting event with ID:', id)
-        return await eventApi.deleteEvent(id)
-      } catch (error) {
-        console.error('Error in deleteEvent mutation:', error)
-        // Rethrow the error to be handled by onError
-        throw error
-      }
+      console.log('Deleting event with ID:', id)
+      return await eventApi.deleteEvent(id)
     },
     onMutate: async (id) => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: eventKeys.lists() })
 
-      // Snapshot the previous value
       const previousEvents = queryClient.getQueryData(eventKeys.lists())
 
-      // Optimistically update to the new value
       queryClient.setQueryData(eventKeys.lists(), (old: any) => {
         if (!old) return old
         return {
@@ -644,31 +591,19 @@ export function useEventMutations() {
       })
     },
     onError: (error, _, context) => {
-      console.error('Error deleting event:', error)
-
-      // If the mutation fails, use the context returned from onMutate to roll back
       if (context?.previousEvents) {
         queryClient.setQueryData(eventKeys.lists(), context.previousEvents)
       }
-
-      // Use the extractErrorMessage function we added to lib/api.ts
       const errorMessage = extractErrorMessage(error)
-
-      console.log('Extracted error message for delete:', errorMessage)
-
-      // Show a user-friendly toast
       toast({
         title: "Gagal Menghapus Acara",
         description: errorMessage,
         variant: "destructive",
       })
-
-      // Return the error for the component to handle
-      return error
     },
     onSettled: () => {
-      // Always refetch after error or success
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() })
+      // queryClient.invalidateQueries({ queryKey: eventKeys.search() })
     },
   })
 
@@ -721,16 +656,6 @@ export function useEventMutations() {
     updateEvent,
     deleteEvent,
     uploadPhotos,
-  }
-  } catch (error) {
-    console.error('Error in useEventMutations:', error)
-    // Return dummy mutations that do nothing to prevent app from crashing
-    return {
-      createEvent: { mutate: () => {}, mutateAsync: async () => ({}), isPending: false },
-      updateEvent: { mutate: () => {}, mutateAsync: async () => ({}), isPending: false },
-      deleteEvent: { mutate: () => {}, mutateAsync: async () => ({}), isPending: false },
-      uploadPhotos: { mutate: () => {}, mutateAsync: async () => ({}), isPending: false },
-    }
   }
 }
 

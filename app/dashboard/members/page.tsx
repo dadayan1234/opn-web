@@ -109,29 +109,30 @@ export default function MembersPage() {
   }
 
   // Handle edit member
+  // Handle edit member
   const handleEditMember = (data: any) => {
     if (!selectedMember) return
 
-    // If it's a BiodataFormData, use updateBiodata
-    if (!data.member_info) {
-      updateBiodata.mutate(data, {
+    updateBiodata.mutate(
+      { ...data, memberId: selectedMember.id },
+      {
         onSuccess: () => {
           setIsEditDialogOpen(false)
           setSelectedMember(null)
-          // Use setTimeout to delay the refetch to avoid race conditions
           setTimeout(() => {
             handleRefetch()
           }, 300)
         },
         onError: (error) => {
-          // Close the dialog even if there's an error
           setIsEditDialogOpen(false)
           setSelectedMember(null)
           console.error("Error updating member:", error)
         }
-      })
-    }
+      }
+    )
   }
+
+
 
   // Handle delete member
   const handleDeleteMember = () => {

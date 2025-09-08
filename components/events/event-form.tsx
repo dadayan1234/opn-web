@@ -22,6 +22,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 
+
 // Define the form schema with validation
 const eventFormSchema = z.object({
   title: z.string().min(1, { message: "Judul acara harus diisi" }),
@@ -115,6 +116,7 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
       // Call the onSuccess callback if provided
       if (onSuccess) {
         onSuccess(newEvent)
+        router.refresh()
       } else {
         // Navigate to the event detail page
         router.push(`/dashboard/events/${newEvent.id}`)
@@ -201,6 +203,7 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
       // Call the onSuccess callback if provided
       if (onSuccess) {
         onSuccess(updatedEvent)
+        router.refresh()
       }
     } catch (error) {
       console.error("Error updating event:", error)
@@ -505,26 +508,6 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
                 onAttendanceChange={(records) => {
                   console.log('Attendance records updated:', records);
                   // You can add additional logic here if needed
-                }}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="minutes" className="space-y-4 mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Notulensi Rapat</CardTitle>
-              <CardDescription>
-                Kelola notulensi rapat untuk acara ini
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <MeetingMinutesForm
-                eventId={event.id}
-                onSubmit={(data) => {
-                  console.log('Meeting minutes submitted:', data);
-                  // Handle the submission here
                 }}
               />
             </CardContent>

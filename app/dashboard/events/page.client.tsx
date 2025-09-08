@@ -1,17 +1,15 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-// Badge styling is now handled via CSS classes
 import { format, parseISO } from "date-fns"
-import { Calendar, Plus, Loader2, Eye, Edit2, Trash2, ChevronLeft, ChevronRight, UserCheck } from "lucide-react"
+import { Calendar, Plus, Loader2, Eye, Edit2, Trash2, ChevronLeft, ChevronRight, UserCheck, Search, Grid3X3, List, MapPin, Clock } from "lucide-react"
 
 import { useEvents, useSearchEvents, useEventMutations } from "@/hooks/useEvents"
-import type { Event } from "@/lib/api-service" // Updated path
+import type { Event } from "@/lib/api-service"
 import { EventSearchForm, type EventSearchParams } from "@/components/events/event-search-form"
 import {
   AlertDialog,
@@ -104,10 +102,8 @@ export default function EventsPageClient() {
 
     deleteEvent.mutate(eventToDelete.id, {
       onSuccess: () => {
-        // Rely on invalidateQueries in the hook's onSettled callback
         setIsDeleteDialogOpen(false)
         setEventToDelete(null)
-        // refetch() // Removed redundant refetch
       },
     })
   }
@@ -120,8 +116,6 @@ export default function EventsPageClient() {
   }
 
   const handleNextPage = () => {
-    // Check if there are more pages to navigate to
-    // We'll assume there are more pages if the current page has a full set of items
     if (events.length >= itemsPerPage) {
       setCurrentPage(currentPage + 1)
     }
@@ -147,27 +141,45 @@ export default function EventsPageClient() {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="container mx-auto py-6 space-y-6">
-        <div className="flex justify-between items-center">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-10 w-32" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <Card key={index} className="overflow-hidden">
-              <CardHeader className="pb-2">
-                <Skeleton className="h-6 w-3/4" />
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-2/3" />
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Skeleton className="h-9 w-20" />
-                <Skeleton className="h-9 w-20" />
-              </CardFooter>
-            </Card>
-          ))}
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse space-y-8">
+            {/* Header Skeleton */}
+            <div className="flex justify-between items-center">
+              <div className="space-y-3">
+                <div className="h-10 bg-gray-200 rounded-2xl w-64"></div>
+                <div className="h-6 bg-gray-200 rounded-xl w-96"></div>
+              </div>
+              <div className="h-12 bg-gray-200 rounded-2xl w-40"></div>
+            </div>
+            
+            {/* Search Section Skeleton */}
+            <div className="bg-white/70 rounded-3xl p-6 space-y-4">
+              <div className="h-12 bg-gray-200 rounded-2xl w-full"></div>
+              <div className="flex space-x-4">
+                <div className="h-10 bg-gray-200 rounded-xl w-32"></div>
+                <div className="h-10 bg-gray-200 rounded-xl w-32"></div>
+              </div>
+            </div>
+            
+            {/* Grid Skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="bg-white/80 rounded-3xl p-6 space-y-4">
+                  <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                  <div className="flex justify-between">
+                    <div className="h-8 bg-gray-200 rounded w-20"></div>
+                    <div className="flex space-x-2">
+                      <div className="h-8 w-8 bg-gray-200 rounded"></div>
+                      <div className="h-8 w-8 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -176,324 +188,395 @@ export default function EventsPageClient() {
   // Show error state
   if (isError) {
     return (
-      <div className="container mx-auto py-6">
-        <Alert variant="destructive">
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            {error instanceof Error ? error.message : "Gagal memuat data acara. Silakan coba lagi."}
-          </AlertDescription>
-        </Alert>
-        <div className="mt-4">
-          <Button onClick={() => refetch()}>Coba Lagi</Button>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-red-50 flex items-center justify-center">
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20 max-w-md mx-4">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 mb-6">
+              <Calendar className="h-10 w-10 text-red-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-3">Terjadi Kesalahan</h2>
+            <p className="text-gray-600 mb-8 leading-relaxed">
+              {error instanceof Error ? error.message : "Gagal memuat data acara. Silakan coba lagi."}
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-2xl font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
+              Coba Lagi
+            </button>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto py-4 sm:py-6 space-y-4 sm:space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-        <h1 className="text-2xl sm:text-3xl font-medium">Daftar Acara</h1>
-        <button
-          onClick={() => router.push("/dashboard/events/new")}
-          className="flex items-center text-blue-600 py-2 px-3 sm:px-4 rounded text-sm sm:text-base"
-          style={{
-            backgroundColor: '#e0f2fe',
-            border: 'none',
-            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-            fontWeight: 400
-          }}
-        >
-          <Plus className="mr-1 sm:mr-2 h-4 w-4" />
-          Buat Acara Baru
-        </button>
-      </div>
-
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-        <div className="w-full">
-          <EventSearchForm
-            onSearch={handleSearch}
-            isSearching={isSearching}
-            onReset={handleResetSearch}
-          />
-        </div>
-        <div className="flex items-center space-x-2 self-end sm:self-auto">
-          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "grid" | "table")}>
-            <TabsList>
-              <TabsTrigger value="grid">Grid</TabsTrigger>
-              <TabsTrigger value="table">Table</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-      </div>
-
-      {isSearching && (
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2">Mencari...</span>
-        </div>
-      )}
-
-      {!isSearching && displayedEvents.length === 0 && (
-        <div className="text-center py-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
-            <Calendar className="h-8 w-8 text-muted-foreground" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Daftar Acara
+            </h1>
+            <p className="text-gray-600 text-lg">Kelola dan pantau semua acara Anda dalam satu tempat</p>
           </div>
-          <h2 className="text-xl font-medium mb-2">Tidak ada acara</h2>
-          <p className="text-muted-foreground mb-6">
-            {Object.keys(searchFilters).length > 0 ? "Tidak ada acara yang sesuai dengan pencarian Anda." : "Belum ada acara yang dibuat."}
-          </p>
-          {Object.keys(searchFilters).length > 0 ? (
-            <Button variant="outline" onClick={handleResetSearch}>
-              Hapus Pencarian
-            </Button>
-          ) : (
-            <button
-              onClick={() => router.push("/dashboard/events/new")}
-              className="flex items-center text-white font-medium py-2 px-4 rounded"
-              style={{
-                backgroundColor: '#2563eb',
-                border: 'none',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-              }}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Buat Acara Baru
-            </button>
-          )}
+          
+          <button
+            onClick={() => router.push("/dashboard/events/new")}
+            className="group relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative flex items-center space-x-2">
+              <Plus className="h-5 w-5" />
+              <span>Buat Acara Baru</span>
+            </div>
+          </button>
         </div>
-      )}
 
-      {!isSearching && displayedEvents.length > 0 && viewMode === "grid" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {displayedEvents.map((event) => (
-            <Card key={event.id} className="overflow-hidden">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg">{event.title}</CardTitle>
-                <CardDescription className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  {formatEventDate(event.date)}
-                  {event.time && ` • ${event.time}`}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground line-clamp-2">{event.description}</p>
-                <div className="flex items-center mt-2">
-                  {/* Use custom badge variants for better readability */}
-                  <button
-                    className="font-medium py-1 px-3 rounded"
-                    style={{
-                      backgroundColor: event.status === "selesai" ? "#dcfce7" : "#dbeafe",
-                      border: "none",
-                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                      color: event.status === "selesai" ? "#166534" : "#1e40af"
+        {/* Search and Filter Section */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-white/20 space-y-6">
+          
+          {/* EventSearchForm - Filter Asli */}
+          <div>
+            <EventSearchForm
+              onSearch={handleSearch}
+              isSearching={isSearching}
+              onReset={handleResetSearch}
+            />
+          </div>
+          
+          {/* View Toggle */}
+          <div className="flex justify-end">
+            <div className="flex items-center bg-white rounded-2xl p-1 shadow-sm border border-gray-200">
+              <button
+                onClick={() => setViewMode("grid")}
+                className={`p-3 rounded-xl transition-all duration-300 ${
+                  viewMode === "grid" 
+                    ? "bg-blue-100 text-blue-600 shadow-sm" 
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <Grid3X3 className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => setViewMode("table")}
+                className={`p-3 rounded-xl transition-all duration-300 ${
+                  viewMode === "table" 
+                    ? "bg-blue-100 text-blue-600 shadow-sm" 
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <List className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Loading Search State */}
+        {isSearching && (
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center">
+              <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+              <span className="text-lg text-gray-600">Mencari acara...</span>
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isSearching && displayedEvents.length === 0 && (
+          <div className="text-center py-16">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 mb-6">
+              <Calendar className="h-10 w-10 text-blue-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-3">Tidak ada acara ditemukan</h2>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              {Object.keys(searchFilters).length > 0 
+                ? "Tidak ada acara yang sesuai dengan pencarian Anda." 
+                : "Belum ada acara yang dibuat."}
+            </p>
+            {Object.keys(searchFilters).length > 0 ? (
+              <button
+                onClick={handleResetSearch}
+                className="bg-white text-blue-600 px-6 py-3 rounded-2xl border border-blue-200 hover:bg-blue-50 transition-all duration-300 shadow-sm"
+              >
+                Hapus Pencarian
+              </button>
+            ) : (
+              <button 
+                onClick={() => router.push("/dashboard/events/new")}
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-2xl font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+              >
+                <Plus className="mr-2 h-5 w-5 inline" />
+                Buat Acara Pertama
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Events Display */}
+        {!isSearching && displayedEvents.length > 0 && (
+          <>
+            {/* Grid View */}
+            {viewMode === "grid" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {displayedEvents.map((event) => (
+                  <div
+                    key={event.id}
+                    className="group bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg hover:shadow-2xl border border-white/20 hover:border-blue-200/50 transition-all duration-500 transform hover:-translate-y-2"
+                  >
+                    {/* Event Header */}
+                    <div className="mb-6">
+                      <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors duration-300">
+                        {event.title}
+                      </h3>
+                      
+                      {/* Date and Time */}
+                      <div className="flex items-center text-gray-600 mb-2">
+                        <Calendar className="h-4 w-4 mr-2 text-blue-500" />
+                        <span className="text-sm">{formatEventDate(event.date)}</span>
+                        {event.time && (
+                          <>
+                            <Clock className="h-4 w-4 ml-4 mr-2 text-blue-500" />
+                            <span className="text-sm">{event.time}</span>
+                          </>
+                        )}
+                      </div>
+                      
+                      {/* Location */}
+                      {event.location && (
+                        <div className="flex items-center text-gray-600 mb-4">
+                          <MapPin className="h-4 w-4 mr-2 text-blue-500" />
+                          <span className="text-sm">{event.location}</span>
+                        </div>
+                      )}
+                      
+                      {/* Description */}
+                      <p className="text-gray-600 text-sm line-clamp-2 mb-4">
+                        {event.description}
+                      </p>
+                      
+                      {/* Status Badge */}
+                      <div className="flex items-center mb-6">
+                        <span 
+                          className="px-4 py-2 rounded-full text-xs font-medium"
+                          style={{
+                            backgroundColor: event.status === "selesai" ? "#dcfce7" : "#dbeafe",
+                            color: event.status === "selesai" ? "#166534" : "#1e40af",
+                            border: event.status === "selesai" ? "1px solid #bbf7d0" : "1px solid #bfdbfe"
+                          }}
+                        >
+                          {event.status === "akan datang" ? "Akan Datang" : event.status === "selesai" ? "Selesai" : event.status}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex justify-between items-center">
+                      <button 
+                        onClick={() => router.push(`/dashboard/events/${event.id}`)}
+                        className="flex items-center px-4 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors duration-300"
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Detail
+                      </button>
+                      
+                      <div className="flex space-x-2">
+                        <button 
+                          onClick={() => router.push(`/dashboard/events/${event.id}/edit`)}
+                          className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteEvent(event)}
+                          className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Table View */}
+            {viewMode === "table" && (
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-white/20 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+                        <TableHead className="text-gray-800 font-semibold py-6">Nama Acara</TableHead>
+                        <TableHead className="text-gray-800 font-semibold py-6 hidden sm:table-cell">Tanggal</TableHead>
+                        <TableHead className="text-gray-800 font-semibold py-6 hidden md:table-cell">Lokasi</TableHead>
+                        <TableHead className="text-gray-800 font-semibold py-6">Status</TableHead>
+                        <TableHead className="text-right text-gray-800 font-semibold py-6">Aksi</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="divide-y divide-gray-100">
+                      {displayedEvents.map((event) => (
+                        <TableRow key={event.id} className="hover:bg-blue-50/50 transition-colors duration-300">
+                          <TableCell className="py-6">
+                            <div>
+                              <div className="font-semibold text-gray-800 mb-1">{event.title}</div>
+                              <div className="text-sm text-gray-600 line-clamp-1">{event.description}</div>
+                              <div className="sm:hidden text-xs text-gray-500 mt-2">
+                                {formatEventDate(event.date)}
+                                {event.time && ` • ${event.time}`}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-6 hidden sm:table-cell">
+                            <div className="text-gray-700">
+                              <div className="font-medium">{formatEventDate(event.date)}</div>
+                              {event.time && <div className="text-sm text-gray-500">{event.time}</div>}
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-6 hidden md:table-cell">
+                            <div className="text-gray-600">{event.location}</div>
+                          </TableCell>
+                          <TableCell className="py-6">
+                            <span 
+                              className="px-3 py-2 rounded-full text-xs font-medium"
+                              style={{
+                                backgroundColor: event.status === "selesai" ? "#dcfce7" : "#dbeafe",
+                                color: event.status === "selesai" ? "#166534" : "#1e40af",
+                                border: event.status === "selesai" ? "1px solid #bbf7d0" : "1px solid #bfdbfe"
+                              }}
+                            >
+                              {event.status === "akan datang" ? "Akan Datang" : event.status === "selesai" ? "Selesai" : event.status}
+                            </span>
+                          </TableCell>
+                          <TableCell className="py-6">
+                            <div className="flex justify-end space-x-2">
+                              <button 
+                                onClick={() => router.push(`/dashboard/events/${event.id}`)}
+                                className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </button>
+                              <button 
+                                onClick={() => router.push(`/dashboard/events/${event.id}/edit`)}
+                                className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-300"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteEvent(event)}
+                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-300"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
+
+            {/* Pagination - Only show when not using search filters */}
+            {Object.keys(searchFilters).length === 0 && (
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
+                <div className="flex items-center space-x-4">
+                  <span className="text-gray-600">
+                    Menampilkan {displayedEvents.length} acara
+                  </span>
+                  <Select
+                    value={String(itemsPerPage)}
+                    onValueChange={(value) => {
+                      setItemsPerPage(Number(value))
+                      setCurrentPage(1)
                     }}
                   >
-                    {event.status === "akan datang" ? "Akan Datang" : event.status === "selesai" ? "Selesai" : event.status}
+                    <SelectTrigger className="w-20 bg-white border-gray-200 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1 || isLoading}
+                    className="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Sebelumnya</span>
+                  </button>
+                  
+                  <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl font-medium">
+                    Halaman {currentPage}
+                  </span>
+                  
+                  <button
+                    onClick={handleNextPage}
+                    disabled={displayedEvents.length < itemsPerPage || isLoading}
+                    className="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span className="hidden sm:inline">Selanjutnya</span>
+                    <ChevronRight className="h-4 w-4 ml-2" />
                   </button>
                 </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/events/${event.id}`)}>
-                  <Eye className="mr-2 h-4 w-4" />
-                  Detail
-                </Button>
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => router.push(`/dashboard/events/${event.id}/edit`)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                    <span className="sr-only">Edit</span>
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleDeleteEvent(event)}>
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">Delete</span>
-                  </Button>
-                </div>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      )}
+              </div>
+            )}
+          </>
+        )}
 
-      {!isSearching && displayedEvents.length > 0 && viewMode === "table" && (
-        <div className="rounded-md border responsive-table">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nama Acara</TableHead>
-                <TableHead className="hidden sm:table-cell">Tanggal</TableHead>
-                <TableHead className="hidden md:table-cell">Lokasi</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Aksi</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {displayedEvents.map((event) => (
-                <TableRow key={event.id}>
-                  <TableCell className="font-medium">
-                    {event.title}
-                    <div className="sm:hidden text-xs text-muted-foreground mt-1">
-                      {formatEventDate(event.date)}
-                      {event.time && ` • ${event.time}`}
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    {formatEventDate(event.date)}
-                    {event.time && ` • ${event.time}`}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">{event.location}</TableCell>
-                  <TableCell>
-                    <button
-                      className="py-1 px-2 sm:px-3 rounded text-xs sm:text-sm"
-                      style={{
-                        backgroundColor: event.status === "selesai" ? "#dcfce7" : "#dbeafe",
-                        color: event.status === "selesai" ? "#166534" : "#1e40af",
-                        border: "none",
-                        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-                        fontWeight: 400
-                      }}
-                    >
-                      {event.status === "akan datang" ? "Akan Datang" : event.status === "selesai" ? "Selesai" : event.status}
-                    </button>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1 sm:space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 sm:h-9 sm:w-9"
-                        onClick={() => handleOpenAttendance(event)}
-                      >
-                        <UserCheck className="h-4 w-4" />
-                        <span className="sr-only">Attendance</span>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 sm:h-9 sm:w-9"
-                        onClick={() => router.push(`/dashboard/events/${event.id}`)}
-                      >
-                        <Eye className="h-4 w-4" />
-                        <span className="sr-only">View</span>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 sm:h-9 sm:w-9"
-                        onClick={() => router.push(`/dashboard/events/${event.id}/edit`)}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 sm:h-9 sm:w-9"
-                        onClick={() => handleDeleteEvent(event)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete</span>
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+        {/* Delete Confirmation Modal */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent className="rounded-3xl border-0 shadow-2xl">
+            <AlertDialogHeader className="text-center pb-6">
+              <AlertDialogTitle className="text-2xl font-bold text-gray-800 mb-2">
+                Hapus Acara
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-600 text-lg leading-relaxed">
+                Apakah Anda yakin ingin menghapus acara "{eventToDelete?.title}"? Tindakan ini tidak dapat dibatalkan.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex flex-col sm:flex-row gap-3 pt-6">
+              <AlertDialogCancel className="flex-1 rounded-2xl border-gray-200 hover:bg-gray-50">
+                Batal
+              </AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={confirmDeleteEvent} 
+                disabled={deleteEvent.isPending}
+                className="flex-1 bg-red-600 hover:bg-red-700 rounded-2xl"
+              >
+                {deleteEvent.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Menghapus...
+                  </>
+                ) : (
+                  "Hapus"
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-      {Object.keys(searchFilters).length === 0 && displayedEvents.length > 0 && (
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Menampilkan {displayedEvents.length} acara
-            </p>
-            <Select
-              value={String(itemsPerPage)}
-              onValueChange={(value) => {
-                setItemsPerPage(Number(value))
-                setCurrentPage(1)
-              }}
-            >
-              <SelectTrigger className="h-8 w-[60px] sm:h-9 sm:w-[70px] text-xs sm:text-sm">
-                <SelectValue placeholder={itemsPerPage} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="5">5</SelectItem>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 sm:flex-initial justify-center"
-              onClick={handlePreviousPage}
-              disabled={currentPage === 1 || isLoading}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span className="ml-1 hidden sm:inline">Sebelumnya</span>
-            </Button>
-
-            {/* Page number indicator */}
-            <span className="text-sm mx-2">
-              Halaman {currentPage}
-            </span>
-
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 sm:flex-initial justify-center"
-              onClick={handleNextPage}
-              disabled={displayedEvents.length < itemsPerPage || isLoading}
-            >
-              <span className="mr-1 hidden sm:inline">Selanjutnya</span>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Acara</AlertDialogTitle>
-            <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus acara ini? Tindakan ini tidak dapat dibatalkan.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteEvent} disabled={deleteEvent.isPending}>
-              {deleteEvent.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Menghapus...
-                </>
-              ) : (
-                "Hapus"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Attendance Popup */}
-      {attendanceEvent && (
-        <AttendancePopup
-          eventId={attendanceEvent.id}
-          eventName={attendanceEvent.title}
-          open={isAttendanceOpen}
-          onClose={handleCloseAttendance}
-        />
-      )}
+        {/* Attendance Popup */}
+        {attendanceEvent && (
+          <AttendancePopup
+            eventId={attendanceEvent.id}
+            eventName={attendanceEvent.title}
+            open={isAttendanceOpen}
+            onClose={handleCloseAttendance}
+          />
+        )}
+      </div>
     </div>
   )
 }

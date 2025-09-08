@@ -91,7 +91,7 @@ export function FinanceForm({ finance, isEditing = false, onSuccess }: FinanceFo
           data: apiData,
         })
       } else {
-        // Create new finance record
+        // Create new finance calenda
         createFinance.mutate(apiData)
       }
 

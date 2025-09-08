@@ -950,7 +950,7 @@ export const newsApi = {
   updateNewsItem: async (id: number | string, newsData: NewsFormData): Promise<NewsItem> => {
     try {
       const response = await withRetry(() =>
-        apiClient.put<NewsItem>(`/news/${id}/`, newsData) // Use imported apiClient
+        apiClient.put<NewsItem>(`/news/${id}`, newsData) // Use imported apiClient
       )
       return response.data
     } catch (error) {
@@ -1295,48 +1295,42 @@ export const memberApi = {
   // Upload member photo
   uploadMemberPhoto: async (memberId: number | string, file: File): Promise<any> => {
     try {
-      console.log(`[API] Uploading photo for member ID ${memberId}`);
+      console.log(`[API] Uploading photo for user ID ${memberId}`);
 
-      // Get the auth token - apiClient will automatically add this in its interceptor
-      // but we'll check it here for validation
+      // Ambil auth token (walau apiClient sudah ada interceptor)
       const authToken = getAuthToken();
       if (!authToken) {
-        console.error('[API] No authentication token available for member photo upload');
+        console.error('[API] No authentication token available for user photo upload');
         throw new Error('Authentication required. Please log in again.');
       }
 
-      console.log(`[API] Auth token available for member photo upload: ${authToken.substring(0, 15)}...`);
+      console.log(`[API] Auth token available: ${authToken.substring(0, 15)}...`);
 
-      // Create FormData object
+      // Buat FormData
       const formData = new FormData();
+      formData.append('file', file); // ✅ singular, sesuai backend
 
-      // Use 'files' as the field name to match backend API
-      // The backend expects a field named 'files' (plural)
-      formData.append('files', file);
+      // Endpoint sesuai backend
+      const endpoint = `/uploads/users/${memberId}/photo`;
+      console.log(`[API] Using endpoint: ${endpoint}`);
 
-      // Use the correct endpoint URL format for uploads
-      const endpoint = `/uploads/members/${memberId}/photos`;
-      console.log(`[API] Using endpoint for member photo upload: ${endpoint}`);
+      // POST ke backend
+      const response = await apiClient.post<any>(endpoint, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 60000,
+      });
 
-      // Use apiClient directly instead of axios to ensure consistent headers and error handling
-      const response = await apiClient.post<any>(
-        endpoint,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          timeout: 60000 // Increase timeout for uploads
-        }
-      );
-
-      console.log(`[API] Member photo upload response:`, response.data);
+      console.log(`[API] User photo upload response:`, response.data);
       return response.data;
     } catch (error) {
-      console.error(`[API] Error uploading member photo:`, error);
+      console.error(`[API] Error uploading user photo:`, error);
       throw error;
     }
   },
+
+
 
   // Create a new user with username and password
   createUser: async (userData: { user_data: { username: string; password: string }; biodata: BiodataFormData }): Promise<any> => {
@@ -1744,8 +1738,7 @@ export const memberApi = {
             username: memberData.username || updateResponse.data.email?.split('@')[0] || '',
             role: memberData.role || 'Member',
             full_name: updateResponse.data.full_name,
-            division: updateResponse.data.division,
-            position: position, // Use the position we stored earlier
+            division: updateResponse.data.division, // Use the position we stored earlier
             email: updateResponse.data.email,
             member_info: updateResponse.data
           } as Member;
@@ -1775,8 +1768,7 @@ export const memberApi = {
           username: memberData.username || createResponse.data.email?.split('@')[0] || '',
           role: memberData.role || 'Member',
           full_name: createResponse.data.full_name,
-          division: createResponse.data.division,
-          position: position, // Use the position we stored earlier
+          division: createResponse.data.division, // Use the position we stored earlier
           email: createResponse.data.email,
           member_info: createResponse.data
         } as Member;
@@ -1798,8 +1790,7 @@ export const memberApi = {
             username: memberData.username || updateResponse.data.email?.split('@')[0] || '',
             role: memberData.role || 'Member',
             full_name: updateResponse.data.full_name,
-            division: updateResponse.data.division,
-            position: position, // Use the position we stored earlier
+            division: updateResponse.data.division, // Use the position we stored earlier
             email: updateResponse.data.email,
             member_info: updateResponse.data
           } as Member;
@@ -1874,49 +1865,34 @@ export const memberApi = {
   },
 
   // Update biodata for current user
-  updateBiodata: async (biodataData: BiodataFormData): Promise<MemberInfo> => {
+  updateBiodata: async (biodataData: BiodataFormData, memberId: number): Promise<MemberInfo> => {
     try {
-      // Create a new object with only the fields expected by the API
-      const apiData = {
+      // Hanya sertakan field yang ada
+      const apiData: Record<string, any> = {
         full_name: biodataData.full_name,
         email: biodataData.email,
         phone_number: biodataData.phone_number,
         division: biodataData.division,
         birth_place: biodataData.birth_place,
         address: biodataData.address,
-        photo_url: biodataData.photo_url,
         birth_date: biodataData.birth_date
-      };
+      }
 
-      // Log the API data for debugging
-      console.log('[API] Updating biodata with formatted data:', apiData);
-      console.log('[API] Request payload:', JSON.stringify(apiData));
+      // Tambahkan photo_url hanya jika ada
+      if (biodataData.photo_url) {
+        apiData.photo_url = biodataData.photo_url
+      }
+
+      console.log("[API] Updating biodata with data:", apiData)
 
       const response = await withRetry(() =>
-        apiClient.put<MemberInfo>('/members/biodata/', apiData)
+        apiClient.put<MemberInfo>(`/members/biodata/${memberId}`, apiData)
       )
-      console.log('[API] Successfully updated biodata');
 
-      // Return the response data
-      const responseData = response.data;
-
-      return responseData;
+      return response.data
     } catch (error) {
-      // Log detailed error information
-      if (error instanceof Error) {
-        console.error('[API] Error updating biodata:', {
-          name: error.name,
-          message: error.message,
-          stack: error.stack,
-          // Additional axios error properties if available
-          response: (error as any).response?.data,
-          status: (error as any).response?.status,
-          headers: (error as any).response?.headers
-        });
-      } else {
-        console.error('[API] Unknown error updating biodata:', error);
-      }
-      throw error;
+      console.error("[API] Error updating biodata:", error)
+      throw error
     }
   },
 
@@ -1961,6 +1937,7 @@ export const memberApi = {
     }
   },
 }
+
 
 // --- Type Definitions ---
 // (Copied from lib/api.ts)
@@ -2158,7 +2135,7 @@ export interface BiodataFormData {
   birth_place: string
   birth_date: string
   address: string
-  photo_url: string
+  photo_url?: string
 }
 
 export interface MemberResponse {

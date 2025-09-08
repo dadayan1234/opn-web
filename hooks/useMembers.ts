@@ -136,22 +136,19 @@ export function useMemberMutations() {
     }
   })
 
-  const updateBiodata = useMutation({
-    mutationFn: (data: BiodataFormData) => memberApi.updateBiodata(data),
+    const updateBiodata = useMutation({
+    mutationFn: (data: BiodataFormData & { memberId: number }) => {
+      return memberApi.updateBiodata(data, data.memberId)
+    },
     onSuccess: () => {
-      // Invalidate profile query to refetch the data
       queryClient.invalidateQueries({ queryKey: memberKeys.profile() })
-      // Invalidate members list to reflect changes
       queryClient.invalidateQueries({ queryKey: memberKeys.lists() })
-
-      // Show success toast
       toast({
         title: "Berhasil",
         description: "Biodata berhasil diperbarui",
       })
     },
     onError: (error) => {
-      // Show error toast
       toast({
         title: "Gagal",
         description: "Terjadi kesalahan saat memperbarui biodata",
@@ -160,6 +157,7 @@ export function useMemberMutations() {
       console.error("Error updating biodata:", error)
     }
   })
+
 
   const deleteUser = useMutation({
     mutationFn: (userId: number | string) => memberApi.deleteUser(userId),
