@@ -483,3 +483,26 @@
   align-items: center !important;
   justify-content: center !important;
 }
+
+.login-page * {
+  color: rgb(230, 248, 255) !important;
+}
+
+/* Override khusus form field */
+.login-page input,
+.login-page textarea,
+.login-page select {
+  color: #505050 !important; /* hampir hitam */
+}
+
+.login-page input::placeholder,
+.login-page textarea::placeholder {
+  color: #666 !important; /* abu placeholder */
+}
+
+/* Override ikon dalam form (misalnya icon user & password) */
+.login-page form svg {
+  color: #111 !important;
+  stroke: #111 !important;
+  fill: none !important; /* biar gak ketutup warna */
+}

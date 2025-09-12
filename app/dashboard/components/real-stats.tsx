@@ -2,8 +2,78 @@
 
 import { useState, useEffect } from "react"
 import { Calendar, Users, FileText } from "lucide-react"
-import { StatCard } from "@/components/dashboard/stat-card"
-import { apiClient } from "@/lib/api-client"
+
+// Simple Enhanced StatCard Component
+function StatCard({ 
+  title, 
+  value, 
+  description, 
+  trend, 
+  percentage, 
+  icon: Icon, 
+  isLoading, 
+  className = ""
+}) {
+  return (
+    <div className={`
+      relative group
+      bg-white/80 backdrop-blur-sm
+      rounded-xl border border-gray-200/50
+      p-6 
+      transition-all duration-300 ease-out
+      hover:shadow-lg hover:shadow-gray-200/50
+      hover:border-gray-300/60
+      hover:-translate-y-0.5
+      ${className}
+    `}>
+      
+      {/* Simple gradient overlay on hover */}
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      
+      <div className="relative">
+        {/* Header with icon */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-2.5 rounded-lg bg-gray-50/80 group-hover:bg-white/90 transition-colors duration-300">
+            <Icon className="w-5 h-5 text-gray-600 group-hover:text-gray-700 transition-colors duration-300" />
+          </div>
+          
+          {/* Simple trend indicator */}
+          {trend && (
+            <div className="flex items-center space-x-1">
+              <div className={`w-2 h-2 rounded-full ${trend === 'up' ? 'bg-emerald-500' : 'bg-red-500'}`} />
+              {percentage > 0 && (
+                <span className="text-xs text-gray-500 font-medium">{percentage}%</span>
+              )}
+            </div>
+          )}
+        </div>
+        
+        {/* Main content */}
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
+            {title}
+          </h3>
+          
+          {isLoading ? (
+            <div className="space-y-2">
+              <div className="h-8 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 bg-gray-100 rounded w-2/3 animate-pulse" />
+            </div>
+          ) : (
+            <>
+              <div className="text-2xl font-bold text-gray-900 group-hover:text-gray-950 transition-colors duration-300">
+                {value}
+              </div>
+              <p className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors duration-300">
+                {description}
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function RealStats() {
   const [isLoading, setIsLoading] = useState(true)
@@ -174,7 +244,7 @@ export function RealStats() {
 
             // Clear tokens
             localStorage.removeItem('token')
-            localStorage.removeItem('refreshToken')
+            localStorage.removeToken('refreshToken')
 
             // Redirect to login
             window.location.href = '/login'
@@ -219,6 +289,8 @@ export function RealStats() {
         percentage={0}
         icon={Calendar}
         isLoading={isLoading}
+        accentColor="blue"
+        className="hover:bg-blue-50/40"
       />
       <StatCard
         title="Acara Aktif"
@@ -228,6 +300,8 @@ export function RealStats() {
         percentage={0}
         icon={Users}
         isLoading={isLoading}
+        accentColor="emerald"
+        className="hover:bg-emerald-50/40"
       />
       <StatCard
         title="Total Foto"
@@ -237,6 +311,8 @@ export function RealStats() {
         percentage={0}
         icon={FileText}
         isLoading={isLoading}
+        accentColor="orange"
+        className="hover:bg-orange-50/40"
       />
     </>
   )

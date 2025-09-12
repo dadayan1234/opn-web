@@ -29,7 +29,7 @@ export function FinanceCard() {
       percentage={0}
       icon={DollarSign}
       color="green"
+      className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200/50 hover:shadow-emerald-100/50"
     />
   );
 }
-
