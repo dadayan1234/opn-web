@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { useEventMutations } from "@/hooks/useEvents"
 import { DeleteConfirmationDialog } from "@/components/dashboard/delete-confirmation-dialog"
 import { apiClient } from "@/lib/api-client"
+import { useEvents } from "@/hooks/useEvents"
 
 interface Event {
   id: number
@@ -36,6 +37,7 @@ interface PaginationMeta {
 export function EventsList() {
   const router = useRouter()
   const { toast } = useToast()
+  const itemsPerPage = 10 // Define number of items per page
   const [events, setEvents] = useState<Event[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -43,7 +45,10 @@ export function EventsList() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0) // Add a refresh key to force re-fetch
   const [currentPage, setCurrentPage] = useState(1)
+  // const [paginationMeta, setPaginationMeta] = useState<PaginationMeta | null>(null)
   const [paginationMeta, setPaginationMeta] = useState<PaginationMeta | null>(null)
+
+  // ambil data & meta dari useEvents
 
   // Get event mutations
   const { deleteEvent } = useEventMutations()

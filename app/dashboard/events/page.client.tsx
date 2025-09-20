@@ -1,14 +1,14 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { format, parseISO } from "date-fns"
 import { Calendar, Plus, Loader2, Eye, Edit2, Trash2, ChevronLeft, ChevronRight, UserCheck, Search, Grid3X3, List, MapPin, Clock } from "lucide-react"
 
-import { useEvents, useSearchEvents, useEventMutations } from "@/hooks/useEvents"
+import { useEvents, useSearchEvents, useEventMutations, PaginationMeta } from "@/hooks/useEvents"
 import type { Event } from "@/lib/api-service"
 import { EventSearchForm, type EventSearchParams } from "@/components/events/event-search-form"
 import {
@@ -40,18 +40,26 @@ export default function EventsPageClient() {
   // State for attendance popup
   const [attendanceEvent, setAttendanceEvent] = useState<Event | null>(null)
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0) // opsional kalau mau trigger refetch manual
 
-  // Get events data
+
   const {
-    data: events = [],
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useEvents(currentPage, itemsPerPage)
+  data: eventsResponse,
+  isLoading,
+  isFetching,
+  isError,
+  error,
+  refetch
+    } = Object.keys(searchFilters).length > 0
+      ? useSearchEvents(searchFilters)
+      : useEvents(currentPage, itemsPerPage)
+
+  const events = eventsResponse?.data ?? []
+  const paginationMeta = eventsResponse?.meta ?? null
+
 
   // Get event mutations
-  const { deleteEvent } = useEventMutations()
+  const { deleteEvent, createEvent, updateEvent } = useEventMutations()
 
   // Search events with filters
   const { data: searchResults = [], isLoading: isSearching } = useSearchEvents(
@@ -65,6 +73,18 @@ export default function EventsPageClient() {
     }
   )
 
+    // ✅ PERBAIKAN: Pisahkan hasil dari kedua hook
+  const mainEventsQuery = useEvents(currentPage, itemsPerPage, { refetchOnMount: false });
+  const searchEventsQuery = useSearchEvents(searchFilters, { refetchOnMount: false, enabled: Object.keys(searchFilters).length > 0 });
+
+
+  useEffect(() => {
+  if (paginationMeta && currentPage > paginationMeta.total_pages) {
+    setCurrentPage(paginationMeta.total_pages || 1)
+  }
+}, [paginationMeta, currentPage])
+
+
   // Handle search form submission
   const handleSearch = (filters: EventSearchParams) => {
     setSearchFilters(filters)
@@ -77,7 +97,8 @@ export default function EventsPageClient() {
   }
 
   // Determine which events to display
-  const displayedEvents = Object.keys(searchFilters).length > 0 ? searchResults : events
+  const displayedEvents: Event[] = eventsResponse?.data ?? []
+
 
   // Format date for display
   const formatEventDate = (dateString?: string) => {
@@ -98,17 +119,20 @@ export default function EventsPageClient() {
   }
 
   const confirmDeleteEvent = () => {
-    if (!eventToDelete) return
+  if (!eventToDelete) return
 
-    deleteEvent.mutate(eventToDelete.id, {
-      onSuccess: () => {
-        setIsDeleteDialogOpen(false)
-        setEventToDelete(null)
-      },
-    })
-  }
+  deleteEvent.mutate(eventToDelete.id, {
+    onSuccess: () => {
+      setIsDeleteDialogOpen(false)
+      setEventToDelete(null)
+      setSearchFilters({}) // ✅ reset ke list utama
+    },
+  })
+}
+
 
   // Handle pagination
+// Handle pagination
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1)
@@ -116,10 +140,11 @@ export default function EventsPageClient() {
   }
 
   const handleNextPage = () => {
-    if (events.length >= itemsPerPage) {
+    if (paginationMeta && currentPage < paginationMeta.total_pages) {
       setCurrentPage(currentPage + 1)
     }
   }
+
 
   // Function to change page directly
   const handlePageChange = (page: number) => {
@@ -137,6 +162,10 @@ export default function EventsPageClient() {
     setAttendanceEvent(null)
     setIsAttendanceOpen(false)
   }
+// console.log("eventsResponse:", eventsResponse)
+// console.log("paginationMeta:", paginationMeta)
+// console.log("isLoading:", isLoading, "isFetching:", isFetching)
+
 
   // Show loading state
   if (isLoading) {
@@ -275,7 +304,7 @@ export default function EventsPageClient() {
         </div>
 
         {/* Loading Search State */}
-        {isSearching && (
+        {displayedEvents.length === 0 && !isLoading && isFetching && (
           <div className="flex items-center justify-center py-16">
             <div className="text-center">
               <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
@@ -285,7 +314,10 @@ export default function EventsPageClient() {
         )}
 
         {/* Empty State */}
-        {!isSearching && displayedEvents.length === 0 && (
+        {!isSearching &&
+          displayedEvents.length === 0 &&
+          !isLoading &&
+          !isFetching && (
           <div className="text-center py-16">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 mb-6">
               <Calendar className="h-10 w-10 text-blue-600" />
@@ -507,28 +539,37 @@ export default function EventsPageClient() {
                 </div>
                 
                 <div className="flex items-center space-x-3">
+                  {/* Tombol Sebelumnya */}
                   <button
                     onClick={handlePreviousPage}
-                    disabled={currentPage === 1 || isLoading}
+                    disabled={isLoading || isFetching || currentPage <= 1}
                     className="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ChevronLeft className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Sebelumnya</span>
                   </button>
-                  
+
+                  {/* Info halaman */}
                   <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl font-medium">
-                    Halaman {currentPage}
+                    Halaman {currentPage} dari {paginationMeta?.total_pages ?? 1}
                   </span>
-                  
+
+                  {/* Tombol Selanjutnya */}
                   <button
                     onClick={handleNextPage}
-                    disabled={displayedEvents.length < itemsPerPage || isLoading}
+                    disabled={
+                      isLoading ||
+                      isFetching ||
+                      !paginationMeta ||
+                      currentPage >= (paginationMeta.total_pages ?? 1)
+                    }
                     className="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <span className="hidden sm:inline">Selanjutnya</span>
                     <ChevronRight className="h-4 w-4 ml-2" />
                   </button>
                 </div>
+
               </div>
             )}
           </>

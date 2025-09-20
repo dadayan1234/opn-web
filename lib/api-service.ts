@@ -2,6 +2,7 @@ import axios, { type AxiosResponse } from "axios";
 import { API_CONFIG } from './config';
 import { apiClient } from './api-client'; // Import the consolidated client
 import { setAuthTokens, removeAuthTokens, getAuthToken } from './auth-utils'; // Import auth utils
+import { EventsResponse } from "@/hooks/useEvents";
 
 // Helper function to implement retry logic with exponential backoff
 async function withRetry<T>(
@@ -233,7 +234,42 @@ const eventApiOriginal = {
 
 export const eventApi = {
   ...eventApiOriginal,
-  // Create event
+
+  // ✅ Override getEvents supaya return data + meta
+  getEvents: async (
+    page = 1,
+    limit = 10,
+    signal?: AbortSignal
+  ): Promise<EventsResponse> => {
+    // panggil eventApiOriginal.getEvents tapi ambil langsung response.data
+    console.log(`[API] Fetching events with page=${page} and limit=${limit}`);
+    const response = await withRetry(() =>
+      apiClient.get<any>("/events/", {
+        params: { page, limit },
+        signal,
+      })
+    );
+
+    if (
+      response.data &&
+      typeof response.data === 'object' &&
+      Array.isArray(response.data.data)
+    ) {
+      console.log(`[API] Received events with meta:`, response.data.meta);
+      return response.data as EventsResponse; // return full object
+    }
+
+    if (Array.isArray(response.data)) {
+      console.log(`[API] Received events in old array format`);
+      return {
+        data: response.data as Event[],
+        meta: { page, limit, total_pages: 1 },
+      };
+    }
+
+    console.error(`[API] Unexpected events response format:`, response.data);
+    return { data: [], meta: { page, limit, total_pages: 1 } };
+  },
   createEvent: async (eventData: EventFormData): Promise<Event> => {
     try {
       const apiEventData: any = { ...eventData };

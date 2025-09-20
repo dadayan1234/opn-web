@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { eventApi, type EventFormData, type Event } from "@/lib/api-service" // Updated path
-import { useEventMutations } from "@/hooks/useEvents"
+import { useEventMutations, useEvents, eventKeys } from "@/hooks/useEvents"
 import { useEventAttendance } from "@/hooks/useEventAttendance"
 import { format, parse, isValid } from "date-fns"
 import { MemberAttendanceForm } from "@/components/events/member-attendance-form"
@@ -21,6 +21,10 @@ import { MeetingMinutesForm } from "@/components/events/meeting-minutes-form"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
+import { useQueryClient } from "@tanstack/react-query"
+
+
+
 
 
 // Define the form schema with validation
@@ -44,6 +48,7 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("details")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const queryClient = useQueryClient()
 
   // Get event mutations from custom hook
   const { createEvent, updateEvent } = useEventMutations()
@@ -102,8 +107,10 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
         status: formData.status,
       }
 
-      // Create the event
       const newEvent = await createEvent.mutateAsync(eventData)
+      // Create the event
+      await queryClient.refetchQueries({ queryKey: eventKeys.lists() })
+
 
       // Show success message
       toast({
@@ -193,6 +200,7 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
         id: event.id,
         data: changedFields,
       })
+      await queryClient.refetchQueries({ queryKey: eventKeys.lists() })
 
       // Show success message
       toast({

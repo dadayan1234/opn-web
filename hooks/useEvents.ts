@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useState } from "react"
-import { useQuery, useMutation, useQueryClient, type UseQueryOptions } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient, type UseQueryOptions, UseQueryResult } from "@tanstack/react-query"
 import axios from "axios"
 // Corrected type imports: Removed PaginatedResponse, replaced Attendee with EventAttendance
 // Added missing AttendanceFormData import
@@ -14,10 +14,13 @@ export const eventKeys = {
   all: ["events"] as const,
   lists: () => [...eventKeys.all, "list"] as const,
   list: (filters: Record<string, any>) => [...eventKeys.lists(), filters] as const,
+  search: (filters: Record<string, any>) => [...eventKeys.all, "search", filters] as const,
   details: () => [...eventKeys.all, "detail"] as const,
   detail: (id: number | string) => [...eventKeys.details(), id] as const,
   attendance: (eventId: number | string) => [...eventKeys.detail(eventId), "attendance"] as const,
 }
+
+
 
 // Define pagination metadata interface
 export interface PaginationMeta {
@@ -34,30 +37,46 @@ export interface EventsResponse {
 }
 
 // Hook for fetching events with pagination and improved error handling
+// useEvents.ts
+// useEvents.ts
+
 export function useEvents(
   page = 1,
   limit = 10,
-  options?: Omit<UseQueryOptions<Event[], Error>, 'queryKey' | 'queryFn'>
-) {
+  options?: Omit<UseQueryOptions<EventsResponse, Error>, "queryKey" | "queryFn">
+): UseQueryResult<EventsResponse, Error> {
   const { toast } = useToast()
-  const [paginationMeta, setPaginationMeta] = useState<PaginationMeta | null>(null)
 
-  const query = useQuery<Event[], Error>({
+  return useQuery<EventsResponse, Error>({
     queryKey: eventKeys.list({ page, limit }),
     queryFn: async ({ signal }) => {
       try {
-        console.log('Fetching events with page:', page, 'limit:', limit)
-        const events = await eventApi.getEvents(page, limit, signal)
+        const raw = await eventApi.getEvents(page, limit, signal)
+        console.log("[useEvents] raw response:", raw)
 
-        // Check if we have pagination metadata in the response
-        // This is handled in the API service now, but we can still access it
-        // through the raw response if needed
+        // ✅ format { data, meta }
+        if (raw && typeof raw === "object" && "data" in raw && "meta" in raw) {
+          return raw as EventsResponse
+        }
 
-        return events
+        // ✅ kalau array → bungkus jadi EventsResponse
+        if (Array.isArray(raw)) {
+          const meta: PaginationMeta = {
+            page,
+            limit,
+            total_pages: Math.max(1, Math.ceil(raw.length / limit)),
+            total: raw.length,
+          }
+          return { data: raw, meta }
+        }
+
+        // ❌ fallback aman
+        return {
+          data: [],
+          meta: { page, limit, total_pages: 1, total: 0 },
+        }
       } catch (error) {
-        console.error('Error fetching events:', error)
-
-        // Show a toast notification for network errors
+        // kalau jaringan error
         if (axios.isAxiosError(error) && !error.response) {
           toast({
             title: "Kesalahan Jaringan",
@@ -66,106 +85,79 @@ export function useEvents(
           })
         }
 
-        // Return empty array for certain errors to prevent UI from breaking
+        // kalau 404 → tetap return kosong, jangan lempar error
         if (axios.isAxiosError(error) && error.response?.status === 404) {
-          return []
+          return {
+            data: [],
+            meta: { page, limit, total_pages: 1, total: 0 },
+          }
         }
 
-        // Rethrow the error to be handled by the component
         throw error
       }
     },
-    // Type error as unknown for proper type guarding
-    retry: (failureCount, error: unknown) => {
-      // Don't retry if the request was canceled
-      if (axios.isCancel(error)) {
-        return false
-      }
-      // Don't retry 404 errors
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        return false
-      }
-      // Otherwise retry once
-      return failureCount < 1
-    },
-    staleTime: 30000,
+
+    // 🟢 biar cache lama dipakai saat refetch, jadi UI tidak blank
+    placeholderData: (prev) => prev,
+
+    staleTime: 0,
     refetchOnWindowFocus: false,
     ...options,
   })
-
-  return query
 }
 
 // Hook for searching events with improved error handling
 export function useSearchEvents(
-  searchParams: {
-    keyword?: string
-    date?: string
-    time?: string
-    status?: "akan datang" | "selesai" | string
-    startDate?: string
-    endDate?: string
-    page?: number
-    limit?: number
-  },
-  options?: Omit<UseQueryOptions<Event[], Error>, 'queryKey' | 'queryFn'>
-) {
-  const { toast } = useToast()
-  const [paginationMeta, setPaginationMeta] = useState<PaginationMeta | null>(null)
+  filters: Record<string, any>,
+  options?: Omit<UseQueryOptions<EventsResponse, Error>, "queryKey" | "queryFn">
+): UseQueryResult<EventsResponse, Error> {
+  const { toast } = useToast();
 
-  const query = useQuery<Event[], Error>({
-    queryKey: eventKeys.list(searchParams),
+  return useQuery<EventsResponse, Error>({
+    queryKey: eventKeys.search(filters),
     queryFn: async ({ signal }) => {
       try {
-        console.log('Searching events with params:', searchParams)
-        const events = await eventApi.searchEvents({
-          ...searchParams,
-          page: searchParams.page || 1,
-          limit: searchParams.limit || 10
-        }, signal)
+        const raw = await eventApi.searchEvents(filters, signal);
+        console.log("[useSearchEvents] raw response:", raw);
 
-        return events
+        // ✅ Perbaikan: Jika respons adalah array, bungkus ke format yang benar
+        if (Array.isArray(raw)) {
+          const meta: PaginationMeta = {
+            page: 1, // Anggap ini halaman pertama
+            limit: raw.length,
+            total_pages: 1,
+            total_count: raw.length,
+          };
+          return { data: raw, meta };
+        }
+
+        // ✅ Jika respons sudah dalam format yang benar, kembalikan langsung
+        if (raw && typeof raw === "object" && "data" in raw && "meta" in raw) {
+          return raw as EventsResponse;
+        }
+
+        // ❌ Fallback jika format tidak dikenali
+        return {
+          data: [],
+          meta: { page: 1, limit: 10, total_pages: 1, total_count: 0 },
+        };
       } catch (error) {
-        console.error('Error searching events:', error)
-
-        // Show a toast notification for network errors
         if (axios.isAxiosError(error) && !error.response) {
           toast({
             title: "Kesalahan Jaringan",
-            description: "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
+            description: "Tidak dapat terhubung ke server.",
             variant: "destructive",
-          })
+          });
         }
-
-        // Return empty array for certain errors to prevent UI from breaking
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
-          return []
-        }
-
-        // Rethrow the error to be handled by the component
-        throw error
+        // Jika terjadi kesalahan, kembalikan array kosong untuk menghindari error
+        return { data: [], meta: { page: 1, limit: 10, total_pages: 1, total_count: 0 } };
       }
     },
-    enabled: Object.values(searchParams).some((value) => !!value),
-    // Type error as unknown for proper type guarding
-    retry: (failureCount, error: unknown) => {
-      // Don't retry if the request was canceled
-      if (axios.isCancel(error)) {
-        return false
-      }
-      // Don't retry 404 errors
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        return false
-      }
-      // Otherwise retry once
-      return failureCount < 1
-    },
-    staleTime: 30000,
+    placeholderData: (prev) => prev,
+    staleTime: 0,
     refetchOnWindowFocus: false,
     ...options,
-  })
-
-  return query
+  });
 }
 
 // Hook for fetching a single event with improved error handling
@@ -517,22 +509,22 @@ export function useEventMutations() {
   // CREATE
   const createEvent = useMutation({
     mutationFn: async (data: EventFormData) => {
-      console.log('Creating event with data:', data)
       return await eventApi.createEvent(data)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: eventKeys.lists() })
-      // queryClient.invalidateQueries({ queryKey: eventKeys.search() }) // refresh pencarian juga
+      queryClient.invalidateQueries({
+        queryKey: eventKeys.lists(),
+        exact: false, // refresh semua halaman list
+      })
       toast({
         title: "Berhasil",
         description: "Acara berhasil dibuat",
       })
     },
     onError: (error: unknown) => {
-      const errorMessage = extractErrorMessage(error)
       toast({
         title: "Gagal Membuat Acara",
-        description: errorMessage,
+        description: extractErrorMessage(error),
         variant: "destructive",
       })
     },
@@ -541,48 +533,60 @@ export function useEventMutations() {
   // UPDATE
   const updateEvent = useMutation({
     mutationFn: async ({ id, data }: { id: number | string; data: Partial<EventFormData> }) => {
-      console.log('Updating event:', { id, data })
       return await eventApi.updateEvent(id, data)
     },
     onSuccess: (data) => {
+      // refresh detail event dan semua list
       queryClient.invalidateQueries({ queryKey: eventKeys.detail(data.id) })
-      queryClient.invalidateQueries({ queryKey: eventKeys.lists() })
-      // queryClient.invalidateQueries({ queryKey: eventKeys.search() })
+      queryClient.invalidateQueries({ queryKey: eventKeys.lists(), exact: false })
       toast({
         title: "Berhasil",
         description: "Acara berhasil diperbarui",
       })
     },
     onError: (error: unknown) => {
-      const errorMessage = extractErrorMessage(error)
       toast({
         title: "Gagal Memperbarui Acara",
-        description: errorMessage,
+        description: extractErrorMessage(error),
         variant: "destructive",
       })
     },
   })
 
-  // DELETE (dengan optimistic update)
+  // DELETE (optimistic update)
   const deleteEvent = useMutation({
     mutationFn: async (id: number | string) => {
-      console.log('Deleting event with ID:', id)
       return await eventApi.deleteEvent(id)
     },
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: eventKeys.lists() })
 
-      const previousEvents = queryClient.getQueryData(eventKeys.lists())
+      const queries = queryClient.getQueriesData<EventsResponse>({
+        queryKey: eventKeys.lists(),
+      })
 
-      queryClient.setQueryData(eventKeys.lists(), (old: any) => {
-        if (!old) return old
-        return {
+      const previousEvents = queries.map(([key, data]) => [key, data] as const)
+
+      queries.forEach(([key, old]) => {
+        if (!old) return
+        queryClient.setQueryData<EventsResponse>(key, {
           ...old,
           data: old.data.filter((event: Event) => event.id !== id),
-        }
+        })
       })
 
       return { previousEvents }
+    },
+    onError: (error, _, context) => {
+      // rollback kalau gagal
+      context?.previousEvents?.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data)
+      })
+      toast({
+        title: "Gagal Menghapus Acara",
+        description: extractErrorMessage(error),
+        variant: "destructive",
+      })
     },
     onSuccess: () => {
       toast({
@@ -590,24 +594,15 @@ export function useEventMutations() {
         description: "Acara berhasil dihapus",
       })
     },
-    onError: (error, _, context) => {
-      if (context?.previousEvents) {
-        queryClient.setQueryData(eventKeys.lists(), context.previousEvents)
-      }
-      const errorMessage = extractErrorMessage(error)
-      toast({
-        title: "Gagal Menghapus Acara",
-        description: errorMessage,
-        variant: "destructive",
-      })
-    },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: eventKeys.lists() })
-      // queryClient.invalidateQueries({ queryKey: eventKeys.search() })
+      queryClient.invalidateQueries({
+        queryKey: eventKeys.lists(),
+        exact: false,
+      })
     },
   })
 
-  // Upload photos mutation
+  // UPLOAD PHOTOS
   const uploadPhotos = useMutation({
     mutationFn: ({
       eventId,
@@ -618,31 +613,21 @@ export function useEventMutations() {
       files: File[]
       onProgress?: (percentage: number) => void
     }) => {
-      // Log the event ID for debugging
-      console.log('[useEvents] uploadPhotos mutation called with eventId:', eventId, 'Type:', typeof eventId)
-
-      // Ensure eventId is a valid number
       const numericEventId = Number(eventId)
-      console.log('[useEvents] Converted event ID:', numericEventId, 'isNaN:', isNaN(numericEventId))
-
       if (isNaN(numericEventId) || numericEventId <= 0) {
-        console.error('[useEvents] Invalid event ID (not a valid positive number):', eventId)
-        throw new Error('ID acara tidak valid. Silakan coba lagi atau muat ulang halaman.')
+        throw new Error("ID acara tidak valid. Silakan coba lagi atau muat ulang halaman.")
       }
-
-      // Call the API with the validated numeric event ID
       return eventApi.uploadEventPhotos(numericEventId, files, onProgress)
     },
     onSuccess: (_, { eventId }) => {
-      console.log('[useEvents] Upload photos success for event ID:', eventId)
       queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) })
+      queryClient.invalidateQueries({ queryKey: eventKeys.lists(), exact: false })
       toast({
         title: "Berhasil",
         description: "Foto berhasil diunggah",
       })
     },
     onError: (error) => {
-      console.error('[useEvents] Upload photos error:', error)
       toast({
         title: "Error",
         description: extractErrorMessage(error),
@@ -651,13 +636,9 @@ export function useEventMutations() {
     },
   })
 
-  return {
-    createEvent,
-    updateEvent,
-    deleteEvent,
-    uploadPhotos,
-  }
+  return { createEvent, updateEvent, deleteEvent, uploadPhotos }
 }
+
 
 // Hook for optimistic event operations
 export function useOptimisticEvent(eventId: number | string) {
