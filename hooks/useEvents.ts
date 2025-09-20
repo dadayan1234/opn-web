@@ -54,12 +54,12 @@ export function useEvents(
         const raw = await eventApi.getEvents(page, limit, signal)
         console.log("[useEvents] raw response:", raw)
 
-        // ✅ format { data, meta }
+        // format { data, meta }
         if (raw && typeof raw === "object" && "data" in raw && "meta" in raw) {
           return raw as EventsResponse
         }
 
-        // ✅ kalau array → bungkus jadi EventsResponse
+        // kalau array → bungkus jadi EventsResponse
         if (Array.isArray(raw)) {
           const meta: PaginationMeta = {
             page,
@@ -70,7 +70,7 @@ export function useEvents(
           return { data: raw, meta }
         }
 
-        // ❌ fallback aman
+        //fallback aman
         return {
           data: [],
           meta: { page, limit, total_pages: 1, total: 0 },
@@ -97,7 +97,7 @@ export function useEvents(
       }
     },
 
-    // 🟢 biar cache lama dipakai saat refetch, jadi UI tidak blank
+    // biar cache lama dipakai saat refetch, jadi UI tidak blank
     placeholderData: (prev) => prev,
 
     staleTime: 0,
