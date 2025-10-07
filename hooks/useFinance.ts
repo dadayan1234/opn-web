@@ -1,5 +1,4 @@
 import { title } from 'process';
-import { title } from 'process';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Finance, financeApi, FinanceHistoryResponse as ApiFinanceHistoryResponse } from '@/lib/api-service'; // Updated path
 import { uploadsApi } from '@/lib/api-uploads';
@@ -120,18 +119,10 @@ export function useFinanceMutations() {
     }
   });
 
-  const deleteFinance = useMutation<void, Error, number | string>({
-    mutationFn: async (id: number | string) => {
-      console.log(`Deleting finance record ${id}`);
-      // Use the statically imported financeApi
-      try {
-        // Removed dynamic import: const { financeApi } = await import('@/lib/api');
-        await financeApi.deleteFinance(id);
-      } catch (error) {
-        console.error('Error deleting finance record:', error);
-        throw error;
-      }
-    }
+    const deleteFinance = useMutation<void, Error, number | string>({
+    // Cukup panggil fungsinya secara langsung. 
+    // React Query akan menangani promise (resolve/reject) secara otomatis.
+    mutationFn: (id: number | string) => financeApi.deleteFinance(id)
   });
 
 

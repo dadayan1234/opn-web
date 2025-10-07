@@ -672,19 +672,25 @@ export const financeApi = {
     }
   },
 
-  // Delete finance record
-  deleteFinance: async (id: number | string): Promise<void> => {
-    try {
-      await withRetry(() =>
-        apiClient.delete(`/finance/${id}`) // Use imported apiClient
-      )
-    } catch (error) {
-      console.error('Error deleting finance record:', error)
-      throw error
-    }
-  },
-}
+  // Ganti fungsi lama Anda dengan yang ini
+deleteFinance: async (id: number | string): Promise<void> => {
+  try {
+    // Kita tetap panggil seperti biasa
+    await withRetry(() => apiClient.delete(`/finance/${id}`));
+    
+    // INI BAGIAN PENTING:
+    // Jika baris 'await' di atas selesai tanpa melempar error,
+    // artinya request ke backend berhasil. Kita tidak peduli lagi dengan
+    // apa yang dikembalikan atau bagaimana interceptor memprosesnya.
+    // Cukup selesaikan fungsi di sini.
+    return;
 
+  } catch (error) {
+    // Blok ini hanya akan berjalan jika ada error *sebenarnya* (misal: network error, status 500, dll)
+    console.error('Error deleting finance record:', error);
+    throw error;
+  }
+}}
 // Auth API service (Modified to use apiClient and auth-utils)
 export const authApi = {
   login: async (email: string, password: string): Promise<{ token: string; refreshToken: string }> => {

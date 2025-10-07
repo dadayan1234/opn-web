@@ -17,6 +17,7 @@ import { FinanceDocumentGallery } from "./components/finance-document-gallery"
 import { TipTapContent } from "@/components/ui/tiptap-editor"
 import { TruncatedDescription } from "@/components/finance/truncated-description"
 import "./finance.css"
+import { useQueryClient } from "@tanstack/react-query";
 
 // Local interface for displaying transactions in the UI
 interface Transaction extends FinanceTransaction {
@@ -41,11 +42,13 @@ export default function FinancePage() {
   const [selectedFinanceId, setSelectedFinanceId] = useState<number | null>(null)
   const [selectedDocumentUrl, setSelectedDocumentUrl] = useState<string | null>(null)
 
+  const queryClient = useQueryClient();
+
   const { data: financeSummary, isLoading } = useFinanceData();
   const {
     data: transactionsData,
     isLoading: isLoadingTransactions,
-    refetch
+    // refetch
   } = useFinanceHistory();
 
   const transactions: Transaction[] = (transactionsData?.transactions || []).map(t => ({
@@ -53,6 +56,13 @@ export default function FinancePage() {
     type: t.category === "Pemasukan" ? "income" : "expense"
   }));
   const { createFinance, updateFinance, deleteFinance } = useFinanceMutations();
+
+  // Fungsi untuk menginvalidasi query
+  const invalidateFinanceQueries = () => {
+    // Invalidate kedua query agar data summary dan history diperbarui
+    queryClient.invalidateQueries({ queryKey: ['finance-summary'] }); // Asumsi queryKey untuk summary
+    queryClient.invalidateQueries({ queryKey: ['finance-history'] });
+  }
 
   const handleAddTransaction = (data: TransactionFormData) => {
     const financeData: FinanceData = {
@@ -66,7 +76,7 @@ export default function FinancePage() {
     createFinance.mutate(financeData, {
       onSuccess: () => {
         setIsDialogOpen(false)
-        refetch()
+        invalidateFinanceQueries()
       }
     })
   }
@@ -89,7 +99,7 @@ export default function FinancePage() {
       onSuccess: () => {
         setIsEditDialogOpen(false)
         setTransactionToEdit(null)
-        refetch()
+        invalidateFinanceQueries()
       }
     })
   }
@@ -101,7 +111,7 @@ export default function FinancePage() {
       onSuccess: () => {
         setIsDeleteAlertOpen(false)
         setTransactionToDelete(null)
-        refetch()
+        invalidateFinanceQueries()
       }
     })
   }
@@ -128,7 +138,8 @@ export default function FinancePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white/20">
+        {/* ✨ Perubahan: Latar belakang diubah menjadi putih solid untuk kontras yang lebih baik */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white rounded-2xl p-6 shadow-sm border">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               Manajemen Keuangan
@@ -165,14 +176,15 @@ export default function FinancePage() {
 
         {/* Summary Cards */}
         <div className="grid gap-6 md:grid-cols-3">
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
+          {/* ✨ Perubahan: Latar belakang diubah menjadi putih solid dan padding disesuaikan */}
+          <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
             <CardHeader className="bg-gradient-to-br from-slate-600 to-slate-700 text-white pb-3">
               <CardTitle className="flex items-center text-lg font-semibold">
                 <Wallet className="mr-3 h-5 w-5" />
                 Saldo Saat Ini
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="p-6">
               {isLoading ? (
                 <Skeleton className="h-10 w-full rounded-lg" />
               ) : (
@@ -183,14 +195,15 @@ export default function FinancePage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
+          {/* ✨ Perubahan: Latar belakang diubah menjadi putih solid dan padding disesuaikan */}
+          <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
             <CardHeader className="bg-gradient-to-br from-emerald-500 to-green-600 text-white pb-3">
               <CardTitle className="flex items-center text-lg font-semibold">
                 <TrendingUp className="mr-3 h-5 w-5" />
                 Total Pemasukan
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="p-6">
               {isLoading ? (
                 <Skeleton className="h-10 w-full rounded-lg" />
               ) : (
@@ -201,14 +214,15 @@ export default function FinancePage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
+          {/* ✨ Perubahan: Latar belakang diubah menjadi putih solid dan padding disesuaikan */}
+          <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
             <CardHeader className="bg-gradient-to-br from-rose-500 to-red-600 text-white pb-3">
               <CardTitle className="flex items-center text-lg font-semibold">
                 <TrendingDown className="mr-3 h-5 w-5" />
                 Total Pengeluaran
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="p-6">
               {isLoading ? (
                 <Skeleton className="h-10 w-full rounded-lg" />
               ) : (
@@ -221,10 +235,11 @@ export default function FinancePage() {
         </div>
 
         {/* Transaction History */}
-        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-100 pb-4">
+        {/* ✨ Perubahan: Latar belakang diubah menjadi putih solid */}
+        <Card className="bg-white border-0 shadow-lg rounded-2xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-100 p-6">
             <CardTitle className="text-2xl font-bold text-slate-800">Riwayat Transaksi</CardTitle>
-            <p className="text-slate-600 text-sm">Semua aktivitas keuangan Anda</p>
+            <p className="text-slate-600 text-sm mt-1">Semua aktivitas keuangan Anda</p>
           </CardHeader>
           <CardContent className="p-0">
             {isLoadingTransactions ? (
@@ -246,25 +261,26 @@ export default function FinancePage() {
                 <Table>
                   <TableHeader>
                     <TableRow className="border-b border-slate-100 hover:bg-transparent">
-                      <TableHead className="font-semibold text-slate-700 py-4">Tanggal</TableHead>
-                      <TableHead className="font-semibold text-slate-700">Deskripsi</TableHead>
-                      <TableHead className="font-semibold text-slate-700">Kategori</TableHead>
-                      <TableHead className="text-right font-semibold text-slate-700">Jumlah</TableHead>
-                      <TableHead className="text-right font-semibold text-slate-700">Aksi</TableHead>
+                      <TableHead className="font-semibold text-slate-700 py-4 px-6">Tanggal</TableHead>
+                      <TableHead className="font-semibold text-slate-700 px-6">Deskripsi</TableHead>
+                      <TableHead className="font-semibold text-slate-700 px-6">Kategori</TableHead>
+                      <TableHead className="text-right font-semibold text-slate-700 px-6">Jumlah</TableHead>
+                      <TableHead className="text-right font-semibold text-slate-700 px-6">Aksi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {transactions.map((transaction: Transaction, index) => (
+                    {transactions.map((transaction: Transaction) => (
                       <TableRow 
                         key={transaction.id} 
-                        className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors duration-200"
+                        // ✨ Perubahan: Menambahkan align-middle agar semua konten di baris ini rata tengah vertikal
+                        className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors duration-200 align-middle"
                       >
-                        <TableCell className="py-4">
+                        <TableCell className="py-4 px-6">
                           <div className="font-medium text-slate-700">
                             {format(new Date(transaction.date), "dd MMM yyyy")}
                           </div>
                         </TableCell>
-                        <TableCell className="min-w-[200px] max-w-[300px]">
+                        <TableCell className="min-w-[200px] max-w-[300px] px-6">
                           <div className="space-y-1">
                             <div className="font-semibold text-slate-800 text-sm">
                               {transaction.title || "Tanpa Judul"}
@@ -277,28 +293,29 @@ export default function FinancePage() {
                             />
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <div className={`inline-flex items-center px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        <TableCell className="px-6">
+                          <div className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 ${
                             transaction.category === "Pemasukan" 
                               ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200" 
                               : "bg-rose-100 text-rose-800 hover:bg-rose-200"
                           }`}>
                             {transaction.category === "Pemasukan" ? (
-                              <ArrowDown className="mr-2 h-4 w-4" />
+                              <ArrowDown className="mr-1.5 h-4 w-4" />
                             ) : (
-                              <ArrowUp className="mr-2 h-4 w-4" />
+                              <ArrowUp className="mr-1.5 h-4 w-4" />
                             )}
                             {transaction.category}
                           </div>
                         </TableCell>
-                        <TableCell className="text-right">
-                          <span className={`font-bold text-lg ${
+                        <TableCell className="text-right px-6">
+                          {/* ✨ Perubahan: Mengubah ukuran teks dari text-lg menjadi text-base agar lebih seimbang */}
+                          <span className={`font-bold text-base ${
                             transaction.category === "Pemasukan" ? "text-emerald-700" : "text-rose-700"
                           }`}>
                             {formatRupiah(Number(transaction.amount))}
                           </span>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right px-6">
                           <div className="flex justify-end space-x-2">
                             <Button
                               variant="outline"
@@ -399,7 +416,7 @@ export default function FinancePage() {
             financeId={selectedFinanceId}
             documentUrl={selectedDocumentUrl}
             onSuccess={() => {
-              refetch()
+              invalidateFinanceQueries()
             }}
           />
         )}
