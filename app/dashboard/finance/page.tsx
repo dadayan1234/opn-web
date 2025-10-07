@@ -48,7 +48,6 @@ export default function FinancePage() {
   const {
     data: transactionsData,
     isLoading: isLoadingTransactions,
-    // refetch
   } = useFinanceHistory();
 
   const transactions: Transaction[] = (transactionsData?.transactions || []).map(t => ({
@@ -57,10 +56,8 @@ export default function FinancePage() {
   }));
   const { createFinance, updateFinance, deleteFinance } = useFinanceMutations();
 
-  // Fungsi untuk menginvalidasi query
   const invalidateFinanceQueries = () => {
-    // Invalidate kedua query agar data summary dan history diperbarui
-    queryClient.invalidateQueries({ queryKey: ['finance-summary'] }); // Asumsi queryKey untuk summary
+    queryClient.invalidateQueries({ queryKey: ['finance-summary'] });
     queryClient.invalidateQueries({ queryKey: ['finance-history'] });
   }
 
@@ -135,10 +132,10 @@ export default function FinancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 md:p-8">
+      {/* ✨ Container dengan width yang lebih luas */}
+      <div className="max-w-[1600px] mx-auto space-y-6">
         {/* Header Section */}
-        {/* ✨ Perubahan: Latar belakang diubah menjadi putih solid untuk kontras yang lebih baik */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white rounded-2xl p-6 shadow-sm border">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
@@ -174,11 +171,11 @@ export default function FinancePage() {
           </Dialog>
         </div>
 
-        {/* Summary Cards */}
+        {/* Summary Cards - ✨ Perbaikan warna dan kontras */}
         <div className="grid gap-6 md:grid-cols-3">
-          {/* ✨ Perubahan: Latar belakang diubah menjadi putih solid dan padding disesuaikan */}
+          {/* Card Saldo - Warna Biru */}
           <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-br from-slate-600 to-slate-700 text-white pb-3">
+            <CardHeader className="bg-gradient-to-br from-blue-500 to-blue-600 text-white pb-4 pt-5 px-6">
               <CardTitle className="flex items-center text-lg font-semibold">
                 <Wallet className="mr-3 h-5 w-5" />
                 Saldo Saat Ini
@@ -188,16 +185,16 @@ export default function FinancePage() {
               {isLoading ? (
                 <Skeleton className="h-10 w-full rounded-lg" />
               ) : (
-                <p className="text-3xl font-bold text-slate-800">
+                <p className="text-3xl font-bold text-blue-600">
                   {formatRupiah(financeSummary?.current_balance || "0")}
                 </p>
               )}
             </CardContent>
           </Card>
 
-          {/* ✨ Perubahan: Latar belakang diubah menjadi putih solid dan padding disesuaikan */}
+          {/* Card Pemasukan - Warna Hijau */}
           <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-br from-emerald-500 to-green-600 text-white pb-3">
+            <CardHeader className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white pb-4 pt-5 px-6">
               <CardTitle className="flex items-center text-lg font-semibold">
                 <TrendingUp className="mr-3 h-5 w-5" />
                 Total Pemasukan
@@ -207,16 +204,16 @@ export default function FinancePage() {
               {isLoading ? (
                 <Skeleton className="h-10 w-full rounded-lg" />
               ) : (
-                <p className="text-3xl font-bold text-emerald-700">
+                <p className="text-3xl font-bold text-emerald-600">
                   {formatRupiah(financeSummary?.total_income || "0")}
                 </p>
               )}
             </CardContent>
           </Card>
 
-          {/* ✨ Perubahan: Latar belakang diubah menjadi putih solid dan padding disesuaikan */}
+          {/* Card Pengeluaran - Warna Merah */}
           <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-br from-rose-500 to-red-600 text-white pb-3">
+            <CardHeader className="bg-gradient-to-br from-rose-500 to-rose-600 text-white pb-4 pt-5 px-6">
               <CardTitle className="flex items-center text-lg font-semibold">
                 <TrendingDown className="mr-3 h-5 w-5" />
                 Total Pengeluaran
@@ -226,7 +223,7 @@ export default function FinancePage() {
               {isLoading ? (
                 <Skeleton className="h-10 w-full rounded-lg" />
               ) : (
-                <p className="text-3xl font-bold text-rose-700">
+                <p className="text-3xl font-bold text-rose-600">
                   {formatRupiah(financeSummary?.total_expense || "0")}
                 </p>
               )}
@@ -235,7 +232,6 @@ export default function FinancePage() {
         </div>
 
         {/* Transaction History */}
-        {/* ✨ Perubahan: Latar belakang diubah menjadi putih solid */}
         <Card className="bg-white border-0 shadow-lg rounded-2xl overflow-hidden">
           <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-100 p-6">
             <CardTitle className="text-2xl font-bold text-slate-800">Riwayat Transaksi</CardTitle>
@@ -272,7 +268,6 @@ export default function FinancePage() {
                     {transactions.map((transaction: Transaction) => (
                       <TableRow 
                         key={transaction.id} 
-                        // ✨ Perubahan: Menambahkan align-middle agar semua konten di baris ini rata tengah vertikal
                         className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors duration-200 align-middle"
                       >
                         <TableCell className="py-4 px-6">
@@ -308,7 +303,6 @@ export default function FinancePage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-right px-6">
-                          {/* ✨ Perubahan: Mengubah ukuran teks dari text-lg menjadi text-base agar lebih seimbang */}
                           <span className={`font-bold text-base ${
                             transaction.category === "Pemasukan" ? "text-emerald-700" : "text-rose-700"
                           }`}>

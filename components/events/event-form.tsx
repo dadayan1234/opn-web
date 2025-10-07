@@ -361,50 +361,70 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
 
   // For existing events, show the tabs interface
   return (
-    <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="details">Detail Acara</TabsTrigger>
-          <TabsTrigger value="attendance">Kehadiran</TabsTrigger>
-          <TabsTrigger value="minutes">Notulensi</TabsTrigger>
-        </TabsList>
+  <div className="space-y-6">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <TabsList className="grid w-full grid-cols-3">
+        <TabsTrigger value="details">Detail Acara</TabsTrigger>
+        <TabsTrigger value="attendance">Kehadiran</TabsTrigger>
+        <TabsTrigger value="minutes">Notulensi</TabsTrigger>
+      </TabsList>
 
-        <TabsContent value="details" className="space-y-4 mt-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Edit Acara</CardTitle>
-                  <CardDescription>
-                    Edit informasi acara yang sudah ada
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
+      <TabsContent value="details" className="space-y-4 mt-4">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Edit Acara</CardTitle>
+                <CardDescription>
+                  Edit informasi acara yang sudah ada
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* ... FormField untuk title dan description tetap sama ... */}
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Judul Acara</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Masukkan judul acara" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Deskripsi</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Masukkan deskripsi acara"
+                          className="min-h-32"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="title"
+                    name="date"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Judul Acara</FormLabel>
+                        <FormLabel>Tanggal</FormLabel>
                         <FormControl>
-                          <Input placeholder="Masukkan judul acara" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Deskripsi</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Masukkan deskripsi acara"
-                            className="min-h-32"
+                          {/* ✨ Perbaikan: Langsung potong string dari backend */}
+                          <Input
+                            type="date"
                             {...field}
+                            value={field.value ? String(field.value).substring(0, 10) : ''}
                           />
                         </FormControl>
                         <FormMessage />
@@ -412,116 +432,118 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
                     )}
                   />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="date"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Tanggal</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="time"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Waktu</FormLabel>
-                          <FormControl>
-                            <Input type="time" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
                   <FormField
                     control={form.control}
-                    name="location"
+                    name="time"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Lokasi</FormLabel>
+                        <FormLabel>Waktu</FormLabel>
                         <FormControl>
-                          <Input placeholder="Masukkan lokasi acara" {...field} />
+                          {/* ✨ Perbaikan: Langsung potong string dari backend */}
+                          <Input
+                            type="time"
+                            {...field}
+                            value={field.value ? String(field.value).substring(0, 5) : ''}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                </div>
 
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih status acara" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="akan datang">Akan Datang</SelectItem>
-                            <SelectItem value="selesai">Selesai</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => router.back()}
-                  >
-                    Batal
-                  </Button>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Menyimpan...
-                      </>
-                    ) : (
-                      "Simpan"
-                    )}
-                  </Button>
-                </CardFooter>
-              </Card>
-            </form>
-          </Form>
-        </TabsContent>
+                {/* ... Sisa FormField lainnya tetap sama ... */}
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Lokasi</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Masukkan lokasi acara" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-        <TabsContent value="attendance" className="space-y-4 mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Daftar Kehadiran</CardTitle>
-              <CardDescription>
-                Kelola daftar kehadiran untuk acara ini
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <MemberAttendanceForm
-                eventId={event.id}
-                onAttendanceChange={(records) => {
-                  console.log('Attendance records updated:', records);
-                  // You can add additional logic here if needed
-                }}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
-  )
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih status acara" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="akan datang">Akan Datang</SelectItem>
+                          <SelectItem value="selesai">Selesai</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.back()}
+                >
+                  Batal
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Menyimpan...
+                    </>
+                  ) : (
+                    "Simpan"
+                  )}
+                </Button>
+              </CardFooter>
+            </Card>
+          </form>
+        </Form>
+      </TabsContent>
+
+      <TabsContent value="attendance" className="space-y-4 mt-4">
+        {/* ... konten tab attendance ... */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Daftar Kehadiran</CardTitle>
+            <CardDescription>
+              Kelola daftar kehadiran untuk acara ini
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <MemberAttendanceForm
+              eventId={event.id}
+              onAttendanceChange={(records) => {
+                console.log('Attendance records updated:', records);
+              }}
+            />
+          </CardContent>
+        </Card>
+      </TabsContent>
+      <TabsContent value="minutes">
+        {/* ... konten tab minutes ... */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Notulensi</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Fitur notulensi akan segera tersedia.</p>
+          </CardContent>
+        </Card>
+      </TabsContent>
+    </Tabs>
+  </div>
+);
 }

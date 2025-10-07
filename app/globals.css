@@ -506,3 +506,86 @@
   stroke: #111 !important;
   fill: none !important; /* biar gak ketutup warna */
 }
+
+/* Override global h1-h6 styles untuk finance page */
+.finance-page h1,
+.finance-page h2,
+.finance-page h3,
+.finance-page h4,
+.finance-page h5,
+.finance-page h6 {
+  font-weight: 700 !important;
+  color: inherit !important;
+}
+
+/* Card header text harus tetap putih */
+.finance-page .card-header-white * {
+  color: white !important;
+}
+
+/* Pastikan teks dalam card content tidak terpengaruh */
+.finance-page .card-content-text {
+  color: inherit !important;
+}
+
+/* Override untuk memastikan kontras yang baik */
+.finance-page .text-white {
+  color: white !important;
+}
+
+.finance-page .text-blue-600 {
+  color: rgb(37 99 235) !important;
+}
+
+.finance-page .text-emerald-600 {
+  color: rgb(5 150 105) !important;
+}
+
+.finance-page .text-rose-600 {
+  color: rgb(225 29 72) !important;
+}
+
+/* Pastikan teks di header card tetap putih dan kontras */
+.finance-card-header {
+  color: white !important;
+}
+
+.finance-card-header * {
+  color: white !important;
+}
+
+/* Table styles khusus finance */
+.finance-table .text-slate-700 {
+  color: rgb(51 65 85) !important;
+}
+
+.finance-table .text-slate-800 {
+  color: rgb(30 41 59) !important;
+}
+
+/* Badge styles dengan kontras lebih baik */
+.finance-badge-income {
+  background-color: rgb(209 250 229) !important;
+  color: rgb(6 78 59) !important;
+}
+
+.finance-badge-expense {
+  background-color: rgb(254 205 211) !important;
+  color: rgb(136 19 55) !important;
+}
+
+/* Animation untuk smooth transition */
+.finance-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.finance-card-hover:hover {
+  transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .finance-page .max-w-\[1600px\] {
+    max-width: 100%;
+  }
+}
