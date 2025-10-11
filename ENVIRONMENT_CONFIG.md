@@ -17,8 +17,8 @@ File template yang menunjukkan semua environment variables yang tersedia beserta
 
 | Variable Name | Description | Default Value | Required |
 |---------------|-------------|---------------|----------|
-| `NEXT_PUBLIC_API_BASE_URL` | URL dasar untuk API backend | `https://beopn.penaku.site/api/v1` | Ya |
-| `NEXT_PUBLIC_BACKEND_URL` | URL backend server | `https://beopn.penaku.site` | Ya |
+| `NEXT_PUBLIC_API_BASE_URL` | URL dasar untuk API backend | `https://beopn.pemudanambangan.site/api/v1` | Ya |
+| `NEXT_PUBLIC_BACKEND_URL` | URL backend server | `https://beopn.pemudanambangan.site` | Ya |
 | `NEXT_PUBLIC_USE_FALLBACK_DATA` | Gunakan data fallback jika API gagal | `false` | Tidak |
 | `NEXT_PUBLIC_API_TIMEOUT_DEFAULT` | Timeout default untuk API calls (ms) | `15000` | Tidak |
 | `NEXT_PUBLIC_API_TIMEOUT_FINANCE` | Timeout untuk finance API calls (ms) | `30000` | Tidak |

@@ -11,7 +11,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'beopn.penaku.site',
+        hostname: 'beopn.pemudanambangan.site',
         port: '',
         pathname: '/**',
       },
@@ -22,7 +22,7 @@ const nextConfig = {
       },
     ],
     unoptimized: true,
-    domains: ['beopn.penaku.site', 'ui-avatars.com'],
+    domains: ['beopn.pemudanambangan.site', 'ui-avatars.com'],
   },
 
   // Add headers to allow CORS for images

@@ -43,8 +43,8 @@
 File `.env` sudah dikonfigurasi dengan:
 ```env
 # Backend API Configuration
-NEXT_PUBLIC_API_BASE_URL=https://beopn.penaku.site/api/v1
-NEXT_PUBLIC_BACKEND_URL=https://beopn.penaku.site
+NEXT_PUBLIC_API_BASE_URL=https://beopn.pemudanambangan.site/api/v1
+NEXT_PUBLIC_BACKEND_URL=https://beopn.pemudanambangan.site
 
 # Environment
 NODE_ENV=production

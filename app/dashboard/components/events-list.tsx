@@ -93,7 +93,7 @@ export function EventsList() {
         // Make a direct fetch call to ensure we're getting the raw response
         try {
           // Use the updated API format with pagination parameters
-          const response = await fetch(`https://beopn.penaku.site/api/v1/events/?page=${currentPage}&limit=10`, {
+          const response = await fetch(`https://beopn.pemudanambangan.site/api/v1/events/?page=${currentPage}&limit=10`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,

@@ -440,7 +440,7 @@ export function useAttendanceMutations(eventId: number | string) {
         throw new Error("Token tidak tersedia. Silakan login kembali.")
       }
 
-      const url = `https://beopn.penaku.site/api/v1/events/${eventId}/attendance`
+      const url = `https://beopn.pemudanambangan.site/api/v1/events/${eventId}/attendance`
 
       // Kirim satu per satu
       for (const record of attendanceData) {

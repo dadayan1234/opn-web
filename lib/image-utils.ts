@@ -78,7 +78,7 @@ export function formatImageUrl(url: string | null | undefined, contextId?: strin
       }
 
       // Preserve double slashes as required by the backend
-      // The backend expects URLs like https://beopn.penaku.site//uploads/...
+      // The backend expects URLs like https://beopn.pemudanambangan.site//uploads/...
       console.log(`[formatImageUrl] Using double slash format for uploads`);
       const fullUrl = `${baseUrl}//uploads/${pathAfterUploads}`;
 
@@ -108,7 +108,7 @@ export function formatImageUrl(url: string | null | undefined, contextId?: strin
       }
 
       // Preserve double slashes as required by the backend
-      // The backend expects URLs like https://beopn.penaku.site//uploads/...
+      // The backend expects URLs like https://beopn.pemudanambangan.site//uploads/...
       console.log(`[formatImageUrl] Using double slash format for clean URL`);
       const fullUrl = `${baseUrl}//${cleanUrl}`;
       console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
@@ -118,7 +118,7 @@ export function formatImageUrl(url: string | null | undefined, contextId?: strin
     // If it's a relative URL starting with /, add the base URL
     if (url.startsWith('/')) {
       // Preserve double slashes as required by the backend
-      // The backend expects URLs like https://beopn.penaku.site//uploads/...
+      // The backend expects URLs like https://beopn.pemudanambangan.site//uploads/...
       console.log(`[formatImageUrl] Using double slash format for relative URL`);
       const fullUrl = `${baseUrl}//${url.startsWith('/') ? url.substring(1) : url}`;
       console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
@@ -129,7 +129,7 @@ export function formatImageUrl(url: string | null | undefined, contextId?: strin
     if (!url.includes('/')) {
       // Assume it's a filename that should be in the uploads directory
       // Preserve double slashes as required by the backend
-      // The backend expects URLs like https://beopn.penaku.site//uploads/...
+      // The backend expects URLs like https://beopn.pemudanambangan.site//uploads/...
       console.log(`[formatImageUrl] Using double slash format for uploads without slash`);
       const fullUrl = `${baseUrl}//uploads/${url}`;
       console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
@@ -138,7 +138,7 @@ export function formatImageUrl(url: string | null | undefined, contextId?: strin
 
     // For any other URL, assume it's a relative path and add the base URL
     // Preserve double slashes as required by the backend
-    // The backend expects URLs like https://beopn.penaku.site//uploads/...
+    // The backend expects URLs like https://beopn.pemudanambangan.site//uploads/...
     console.log(`[formatImageUrl] Using double slash format for uploads with slash`);
     const fullUrl = `${baseUrl}//uploads/${url}`;
     console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
@@ -182,9 +182,9 @@ export function getAuthenticatedImageUrl(url: string | null | undefined): string
   }
 
   // Ensure double slashes are preserved for the backend
-  if (fullUrl.includes('beopn.penaku.site/') && !fullUrl.includes('beopn.penaku.site//')) {
+  if (fullUrl.includes('beopn.pemudanambangan.site/') && !fullUrl.includes('beopn.pemudanambangan.site//')) {
     console.log(`[formatImageUrl] Fixing single slash to double slash`);
-    fullUrl = fullUrl.replace('beopn.penaku.site/', 'beopn.penaku.site//');
+    fullUrl = fullUrl.replace('beopn.pemudanambangan.site/', 'beopn.pemudanambangan.site//');
   }
 
   // Return the direct URL - the component should handle authentication
@@ -292,9 +292,9 @@ export async function fetchImageAsBlob(path: string): Promise<string | null> {
       console.log(`[fetchImageAsBlob] URL contains 'uploads' path: ${url}`);
 
       // Check if the URL has the correct structure
-      if (url.includes('beopn.penaku.site//uploads')) {
+      if (url.includes('beopn.pemudanambangan.site//uploads')) {
         console.log(`[fetchImageAsBlob] URL has correct double-slash structure`);
-      } else if (url.includes('beopn.penaku.site/uploads')) {
+      } else if (url.includes('beopn.pemudanambangan.site/uploads')) {
         console.log(`[fetchImageAsBlob] URL has incorrect single-slash structure`);
       }
     }

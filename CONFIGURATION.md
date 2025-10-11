@@ -8,8 +8,8 @@ This application uses environment variables for configuration. All settings are 
 
 ```bash
 # Backend API Configuration (REQUIRED)
-NEXT_PUBLIC_API_BASE_URL=https://beopn.penaku.site/api/v1
-NEXT_PUBLIC_BACKEND_URL=https://beopn.penaku.site
+NEXT_PUBLIC_API_BASE_URL=https://beopn.pemudanambangan.site/api/v1
+NEXT_PUBLIC_BACKEND_URL=https://beopn.pemudanambangan.site
 
 # Environment Mode
 NODE_ENV=production

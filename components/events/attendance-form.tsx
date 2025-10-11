@@ -68,7 +68,7 @@ export function AttendanceForm({ eventId, onRefresh = () => {} }: AttendanceForm
           attendanceData = await eventApi.getAttendance(eventId)
         } else {
           const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE || 'https://beopn.penaku.site'}/api/v1/events/${eventId}/attendance`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE || 'https://beopn.pemudanambangan.site'}/api/v1/events/${eventId}/attendance`, {
             headers: {
               Accept: "application/json",
               ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -191,7 +191,7 @@ export function AttendanceForm({ eventId, onRefresh = () => {} }: AttendanceForm
               try {
                 const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
                 const res = await fetch(
-                  `${process.env.NEXT_PUBLIC_API_BASE || "https://beopn.penaku.site"}/api/v1/events/${eventId}/attendance/pdf`,
+                  `${process.env.NEXT_PUBLIC_API_BASE || "https://beopn.pemudanambangan.site"}/api/v1/events/${eventId}/attendance/pdf`,
                   {
                     headers: {
                       Accept: "*/*",

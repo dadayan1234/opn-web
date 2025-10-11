@@ -5,7 +5,7 @@ import axios from "axios"
 import { newsApi, type NewsItem, type NewsFormData } from "@/lib/api-service" // Updated path
 import { useToast } from "@/components/ui/use-toast"
 
-const API_BASE = "https://beopn.penaku.site/api/v1";
+const API_BASE = "https://beopn.pemudanambangan.site/api/v1";
 // Query keys for news
 export const newsKeys = {
   all: ['news'] as const,
