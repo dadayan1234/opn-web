@@ -1,62 +1,95 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
+
 const nextConfig = {
+  // --- BUILD & RUNTIME CONFIGURATION ---
+
+  // Menonaktifkan Strict Mode sementara. Biasanya harus diaktifkan (true) untuk produksi.
   reactStrictMode: false,
 
-  // No API rewrites - direct connection to backend
-  async rewrites() {
-    return [];
-  },
-
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'beopn.pemudanambangan.site',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'ui-avatars.com',
-        pathname: '/**',
-      },
-    ],
-    unoptimized: true,
-    domains: ['beopn.pemudanambangan.site', 'ui-avatars.com'],
-  },
-
-  // Add headers to allow CORS for images
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          { key: 'Access-Control-Allow-Credentials', value: 'true' },
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-          { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS,PATCH,DELETE,POST,PUT' },
-          { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization' },
-        ],
-      },
-      // Add specific headers for backend image requests
-      {
-        source: '/uploads/:path*',
-        headers: [
-          { key: 'Authorization', value: 'Bearer {{token}}' }, // This will be replaced by middleware
-        ],
-      },
-    ];
-  },
-
-  // Allow builds to complete even with errors
+  // Mengabaikan error pada build. Ini harusnya hanya sementara; 
+  // direkomendasikan untuk menonaktifkan ini setelah semua error fix.
   typescript: {
     ignoreBuildErrors: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
   },
-
-  // Use standalone output for better performance
+  
+  // Menggunakan output Standalone untuk performa dan image Docker yang lebih baik.
   output: 'standalone',
+
+  // --- WEBPACK & ALIAS PATH FIX ---
+  // Memperbaiki masalah 'Module Not Found' (@/) yang terjadi di Vercel.
+  webpack: (config, { isServer }) => {
+    // Menetapkan '@/' agar menunjuk ke root direktori proyek.
+    config.resolve.alias['@'] = path.join(__dirname);
+    return config;
+  },
+
+  // --- IMAGE OPTIMIZATION & DOMAINS ---
+
+  images: {
+    // unoptimized: true menonaktifkan optimasi image.
+    // Direkomendasikan untuk diubah menjadi false untuk produksi jika memungkinkan.
+    unoptimized: true, 
+    
+    // Konfigurasi domains dan remotePatterns yang disatukan
+    domains: [
+      'beopn.pemudanambangan.site', 
+      'ui-avatars.com'
+    ],
+    remotePatterns: [
+      // Domain untuk backend Anda
+      {
+        protocol: 'https',
+        hostname: 'beopn.pemudanambangan.site',
+        pathname: '/**',
+      },
+      // Domain untuk Avatar
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com',
+        pathname: '/**',
+      },
+      // Penghapusan 'port: ""' karena itu redundan untuk HTTPS standar.
+    ],
+  },
+  
+  // --- REWRITES & HEADERS ---
+  
+  // Tidak menggunakan rewrites API (dibiarkan kosong).
+  async rewrites() {
+    return [];
+  },
+
+  // Menambahkan headers kustom, terutama untuk CORS dan Authorization.
+  async headers() {
+    return [
+      // Header CORS Global (/:path*)
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS,PATCH,DELETE,POST,PUT' },
+          { 
+            key: 'Access-Control-Allow-Headers', 
+            value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization' 
+          },
+        ],
+      },
+      // Header Khusus untuk Path Upload (misalnya untuk mengirim token saat fetch gambar)
+      {
+        source: '/uploads/:path*',
+        headers: [
+          // Catatan: Header ini harus diisi di middleware/server; 
+          // token di sini hanya sebagai placeholder.
+          { key: 'Authorization', value: 'Bearer {{token}}' }, 
+        ],
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
