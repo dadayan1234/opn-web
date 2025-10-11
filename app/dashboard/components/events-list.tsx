@@ -3,14 +3,12 @@
 import { useState, useEffect } from "react"
 import { Eye, Edit, Trash2, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react"
 import { format } from "date-fns"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "components/ui/button"
+import { Skeleton } from "components/ui/skeleton"
 import { useRouter } from "next/navigation"
-import { useToast } from "@/components/ui/use-toast"
-import { useEventMutations } from "@/hooks/useEvents"
-import { DeleteConfirmationDialog } from "@/components/dashboard/delete-confirmation-dialog"
-import { apiClient } from "@/lib/api-client"
-import { useEvents } from "@/hooks/useEvents"
+import { useToast } from "components/ui/use-toast"
+import { useEventMutations } from "hooks/useEvents"
+import { DeleteConfirmationDialog } from "components/dashboard/delete-confirmation-dialog"
 
 interface Event {
   id: number
