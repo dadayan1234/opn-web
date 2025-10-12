@@ -13,6 +13,7 @@ import { getSavedAttendanceData, updateAttendanceData } from "@/utils/attendance
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { AuthenticatedImage } from "@/app/components/authenticated-image"
 
 interface Attendee {
   id: number
@@ -286,7 +287,7 @@ export function AttendanceForm({ eventId, onRefresh = () => {} }: AttendanceForm
                           <TableCell className="font-medium">
                             <div className="flex items-center gap-2">
                               {attendee.avatar ? (
-                                <img
+                                <AuthenticatedImage
                                   src={attendee.avatar}
                                   alt={attendee.member_name || attendee.name || 'Anggota'}
                                   className="w-6 h-6 rounded-full"
