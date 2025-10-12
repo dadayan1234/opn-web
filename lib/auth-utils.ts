@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { useRouter } from 'next/navigation';
 
 // ==========================
 // 🔧 TYPE DEFINISI
@@ -8,12 +9,6 @@ type ServerRequest = NextRequest | undefined;
 // ==========================
 // 🎫 GET AUTH TOKEN (Universal)
 // ==========================
-/**
- * Mengambil token otentikasi baik di server maupun client.
- * - Di server: baca dari cookie pada NextRequest.
- * - Di client: baca dari localStorage, lalu cookie jika perlu.
- * @param req Objek NextRequest (hanya diperlukan di server).
- */
 export const getAuthToken = (req?: ServerRequest): string | null => {
   // --- Server-side Logic ---
   if (req) {
@@ -48,7 +43,6 @@ export const getAuthToken = (req?: ServerRequest): string | null => {
   // 2️⃣ Cek Cookie
   const cookieAuthToken = getCookie('auth_token');
   const cookieToken = getCookie('token');
-
   const formattedCookieToken = checkToken(cookieAuthToken || cookieToken);
   if (formattedCookieToken) {
     syncTokenToCookie(formattedCookieToken);
@@ -61,15 +55,13 @@ export const getAuthToken = (req?: ServerRequest): string | null => {
 // ==========================
 // 🧩 AUTHENTICATION CHECK
 // ==========================
-/**
- * Mengecek apakah user sudah login (autentikasi aktif).
- */
 export const isAuthenticated = (): boolean => {
   if (typeof window === 'undefined') return false;
 
   try {
     const token = getAuthToken();
-    return !!(token && token.length >= 10);
+    const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
+    return !!(token && token.length >= 10 && isLoggedIn);
   } catch (error) {
     console.error('Error checking authentication:', error);
     return false;
@@ -79,9 +71,6 @@ export const isAuthenticated = (): boolean => {
 // ==========================
 // 💾 SET TOKEN
 // ==========================
-/**
- * Menyimpan token ke localStorage & cookie agar tersedia untuk server dan client.
- */
 export const setAuthTokens = (token: string, refreshToken?: string): void => {
   if (typeof window === 'undefined') return;
 
@@ -104,8 +93,11 @@ export const setAuthTokens = (token: string, refreshToken?: string): void => {
       document.cookie = `refreshToken=${refreshToken};${cookieOptions}`;
     }
 
-    // Sinkronisasi token untuk server
+    // Sinkronisasi token ke cookie server
     syncTokenToCookie(formattedToken);
+
+    // 🔁 Redirect otomatis ke dashboard setelah login
+    window.location.href = '/dashboard';
   } catch (error) {
     console.error('Error setting auth tokens:', error);
   }
@@ -114,30 +106,25 @@ export const setAuthTokens = (token: string, refreshToken?: string): void => {
 // ==========================
 // ❌ REMOVE TOKEN
 // ==========================
-/**
- * Menghapus semua token dari localStorage dan cookie.
- */
 export const removeAuthTokens = (): void => {
   if (typeof window === 'undefined') return;
 
-  // Hapus dari LocalStorage
   localStorage.removeItem('token');
   localStorage.removeItem('auth_token');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('is_logged_in');
 
-  // Hapus dari Cookie
   const expired = 'path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';
   ['token', 'auth_token', 'refreshToken', 'is_logged_in', 'auth_token_for_server']
     .forEach(name => (document.cookie = `${name}=;${expired}`));
+
+  // 🔁 Redirect otomatis ke login setelah logout
+  window.location.href = '/login';
 };
 
 // ==========================
 // 🔁 REFRESH TOKEN
 // ==========================
-/**
- * Mengambil refresh token dari localStorage atau cookie.
- */
 export const getRefreshToken = (): string | null => {
   if (typeof window === 'undefined') return null;
 
@@ -150,9 +137,6 @@ export const getRefreshToken = (): string | null => {
 // ==========================
 // 🔗 SYNC TOKEN KE COOKIE
 // ==========================
-/**
- * Sinkronisasi token ke cookie agar bisa dibaca oleh server (mis. untuk Route Handler).
- */
 export function syncTokenToCookie(token: string): void {
   if (typeof window === 'undefined') return;
 
@@ -167,9 +151,6 @@ export function syncTokenToCookie(token: string): void {
 // ==========================
 // 🍪 HELPER FUNGSI
 // ==========================
-/**
- * Mengambil nilai cookie berdasarkan nama.
- */
 function getCookie(name: string): string | null {
   if (typeof document === 'undefined') return null;
   return (
@@ -179,3 +160,25 @@ function getCookie(name: string): string | null {
     ) || null
   );
 }
+
+// ==========================
+// 🚀 AUTO NAVIGATOR
+// ==========================
+/**
+ * Fungsi ini bisa dipanggil di layout, middleware, atau halaman.
+ * Secara otomatis redirect user sesuai status autentikasi:
+ * - Jika login → /dashboard
+ * - Jika tidak login → /login
+ */
+export const handleAuthRedirect = (): void => {
+  if (typeof window === 'undefined') return;
+
+  const loggedIn = isAuthenticated();
+  const currentPath = window.location.pathname;
+
+  if (loggedIn && currentPath !== '/dashboard') {
+    window.location.href = '/dashboard';
+  } else if (!loggedIn && currentPath !== '/login') {
+    window.location.href = '/login';
+  }
+};
