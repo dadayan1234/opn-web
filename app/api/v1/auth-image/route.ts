@@ -9,14 +9,14 @@ import { API_CONFIG } from '@/lib/config';
 // Function untuk menyusun URL Backend lengkap
 function constructFinalBackendUrl(imagePath: string): string {
     // Ambil BASE URL API Anda (misal: 'https://beopn.pemudanambangan.site/api/v1')
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''; 
+    const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || ''; 
 
     // Asumsi: Gambar di-serve dari domain yang sama dengan API, 
     // tetapi kita hapus suffix /api/v1 jika ada.
     const baseUrl = apiUrl.replace(/\/api\/v1$/, ''); 
 
     // Pastikan path dimulai dengan slash
-    const normalizedPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    const normalizedPath = imagePath.startsWith('/') ? imagePath : `${imagePath}`;
 
     // Gabungkan URL backend + path gambar
     return `${baseUrl}${normalizedPath}`;
