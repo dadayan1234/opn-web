@@ -2,25 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
-import Image from 'next/image';
-import { formatImageUrl } from '@/lib/image-utils';
-import { getAuthToken } from '@/lib/auth-utils';
-import { API_CONFIG } from '@/lib/config';
-
-/**
- * Helper function to construct a proper URL with the backend domain and path
- * Ensures there are no double slashes between the domain and path
- */
-function constructFullBackendUrl(backendUrl: string, path: string): string {
-  // Remove trailing slash from backend URL if present
-  const baseUrl = backendUrl.endsWith('/') ? backendUrl.slice(0, -1) : backendUrl;
-
-  // Ensure path starts with a slash
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-
-  // Combine them to form the full URL
-  return `${baseUrl}${normalizedPath}`;
-}
+// Tidak perlu import Image dari next/image atau utilities lain yang tidak digunakan
 
 interface AuthenticatedImageProps {
   src: string;
@@ -32,8 +14,8 @@ interface AuthenticatedImageProps {
 }
 
 /**
- * A component that displays an image from the backend
- * This approach uses next/image to handle image loading with direct backend URLs
+ * Komponen yang menampilkan gambar yang memerlukan token autentikasi.
+ * Menggunakan rute proxy API lokal (/api/v1/auth-image) untuk menyertakan token.
  */
 export function AuthenticatedImage({
   src,
@@ -44,61 +26,72 @@ export function AuthenticatedImage({
   fallbackSrc = '/placeholder-image.png'
 }: AuthenticatedImageProps) {
   const [error, setError] = useState(false);
-  const [directUrl, setDirectUrl] = useState<string>('');
+  const [proxyUrl, setProxyUrl] = useState<string>(''); // Menyimpan URL proxy lokal
 
-  // Format the URL to use direct backend URL
+  // State untuk mengontrol tampilan Skeleton selama loading awal
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     if (!src) return;
+    
+    // Reset state saat src berubah
+    setError(false);
+    setIsLoading(true);
 
     try {
-      // Format the URL using our utility function
-      const directUrl = formatImageUrl(src);
+      // 1. Normalisasi path backend (misal: '/uploads/photos/123.jpg')
+      const relativePath = src.startsWith('/') ? src : `${src}`;
 
-      // Verify the URL doesn't contain localhost
-      if (directUrl.includes('localhost')) {
-        console.error(`[AuthenticatedImage] Error: URL contains localhost: ${directUrl}`);
-        setError(true);
-        return;
-      }
+      // 2. Buat URL PROXY LOKAL Next.js Anda
+      // Rute ini bertanggung jawab menambahkan header Authorization ke request backend.
+      const localProxyUrl = `/api/v1/auth-image?path=${encodeURIComponent(relativePath)}`;
 
-      // Use the direct URL from the backend
-      console.log(`[AuthenticatedImage] Using direct URL: ${directUrl}`);
-      setDirectUrl(directUrl);
+      // console.log(`[AuthenticatedImage] Proxy URL: ${localProxyUrl}`);
+      setProxyUrl(localProxyUrl);
+
     } catch (e) {
-      console.error(`[AuthenticatedImage] Error formatting URL: ${src}`, e);
+      console.error(`[AuthenticatedImage] Error processing path: ${src}`, e);
       setError(true);
+      setIsLoading(false);
     }
   }, [src]);
 
-  // Don't render anything if the src is invalid or there was an error
-  if (!src || error || !directUrl) {
+  // --- RENDERING DENGAN STATE ---
+
+  // Jika error atau src tidak valid, tampilkan fallback atau placeholder
+  if (!src || error) {
     return (
-      <div
-        className={`flex items-center justify-center text-muted-foreground text-xs bg-secondary ${className}`}
-        style={{ width: width, height: height }}
-      >
-        <span>{alt}</span>
-      </div>
+      <img 
+        src={fallbackSrc}
+        alt={`Placeholder for ${alt}`}
+        className={`object-cover ${className}`}
+        width={width}
+        height={height}
+        // Tambahkan styles untuk div wrapper jika diperlukan
+      />
     );
   }
 
-  // Use a regular img tag instead of next/image
+  // Tampilkan skeleton saat loading
+  if (isLoading || !proxyUrl) {
+    return <Skeleton className={`object-cover ${className}`} style={{ width, height }} />;
+  }
+
+  // Tampilkan gambar menggunakan tag img standar yang menargetkan proxy lokal
   return (
-    <div className={className} style={{ width, height, position: 'relative' }}>
-      <img
-        src={directUrl}
-        alt={alt}
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover'
-        }}
-        crossOrigin="anonymous"
-        onError={() => {
-          console.error(`[AuthenticatedImage] Error loading image: ${directUrl}`);
-          setError(true);
-        }}
-      />
-    </div>
+    <img
+      src={proxyUrl} // Menggunakan URL proxy lokal
+      alt={alt}
+      width={width}
+      height={height}
+      className={`object-cover ${className}`}
+      // Menggunakan onload untuk mematikan loading state
+      onLoad={() => setIsLoading(false)} 
+      onError={() => {
+        console.error(`[AuthenticatedImage] Failed to load image from proxy: ${proxyUrl}`);
+        setError(true); // Memicu tampilan fallback
+        setIsLoading(false);
+      }}
+    />
   );
 }

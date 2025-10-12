@@ -1,89 +1,93 @@
+// app/api/v1/auth-image/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthToken } from '@/lib/auth-utils';
+import { getAuthToken } from '@/lib/auth-utils'; 
+// Asumsikan getAuthToken sekarang menerima request untuk membaca cookie/header
+import { API_CONFIG } from '@/lib/config'; 
+// Asumsi API_CONFIG ada, atau kita ambil dari process.env
 
-/**
- * API route to proxy authenticated image requests
- * This version explicitly uses the GET method, not OPTIONS
- */
+// Function untuk menyusun URL Backend lengkap
+function constructFinalBackendUrl(imagePath: string): string {
+    // Ambil BASE URL API Anda (misal: 'https://beopn.pemudanambangan.site/api/v1')
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''; 
+
+    // Asumsi: Gambar di-serve dari domain yang sama dengan API, 
+    // tetapi kita hapus suffix /api/v1 jika ada.
+    const baseUrl = apiUrl.replace(/\/api\/v1$/, ''); 
+
+    // Pastikan path dimulai dengan slash
+    const normalizedPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+
+    // Gabungkan URL backend + path gambar
+    return `${baseUrl}${normalizedPath}`;
+}
+
 export async function GET(request: NextRequest) {
-  try {
-    // Get the URL from the query string
-    const { searchParams } = new URL(request.url);
-    const imageUrl = searchParams.get('url');
+    try {
+        const { searchParams } = new URL(request.url);
+        // PERBAIKAN 1: Ambil path gambar menggunakan query parameter 'path'
+        // (sesuai dengan yang dikirim dari AuthenticatedImage.tsx)
+        const imagePath = searchParams.get('path'); 
 
-    // Validate the URL
-    if (!imageUrl) {
-      console.error('[Auth Image] No URL provided');
-      return new NextResponse(JSON.stringify({ error: 'No URL provided' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+        // --- VALIDASI AWAL ---
+        if (!imagePath) {
+            return new NextResponse(JSON.stringify({ error: 'Image path not provided' }), {
+                status: 400,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+        
+        // --- AMBIL TOKEN & OTORISASI ---
+        // PERBAIKAN 2: Mengambil token dari request untuk server-side
+        const authToken = getAuthToken(request); 
+        
+        if (!authToken) {
+            console.warn('[Auth Image Proxy] No authorization token found');
+            return new NextResponse(JSON.stringify({ error: 'Authentication required' }), {
+                status: 401,
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
+        // --- SUSUN URL AKHIR ---
+        const finalBackendUrl = constructFinalBackendUrl(imagePath);
+
+        // --- FETCH DENGAN TOKEN ---
+        const response = await fetch(finalBackendUrl, {
+            method: 'GET', 
+            headers: {
+                // PERBAIKAN 3: Menyertakan token ke header Authorization
+                'Authorization': `Bearer ${authToken.replace('Bearer ', '')}`,
+                'Accept': 'image/*',
+            },
+            cache: 'no-store'
+        });
+
+        // --- HANDLE RESPONSE ---
+        if (!response.ok) {
+            console.error(`[Auth Image Proxy] Backend returned error: ${response.status} for ${finalBackendUrl}`);
+            return new NextResponse(`Backend error: ${response.status}`, { status: response.status });
+        }
+
+        // Mengembalikan gambar
+        const buffer = await response.arrayBuffer();
+        const contentType = response.headers.get('content-type') || 'application/octet-stream';
+
+        return new NextResponse(buffer, {
+            status: 200,
+            headers: {
+                'Content-Type': contentType,
+                'Cache-Control': 'public, max-age=3600',
+            },
+        });
+    } catch (error) {
+        console.error('[Auth Image Proxy] Internal Error:', error);
+        return new NextResponse(JSON.stringify({
+            error: 'Internal server error',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
-
-    // Check if the URL contains localhost
-    if (imageUrl.includes('localhost')) {
-      console.error('[Auth Image] URL contains localhost:', imageUrl);
-      return new NextResponse(JSON.stringify({ error: 'Direct localhost requests are not allowed' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Get the auth token
-    const authToken = getAuthToken();
-    if (!authToken) {
-      console.warn('[Auth Image] No authorization token found');
-
-      // Return a 401 Unauthorized response with a clear error message
-      return new NextResponse(JSON.stringify({
-        error: 'Authentication required to access this image',
-        message: 'Please log in to view this content'
-      }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Make the request to the backend with a direct GET request
-    const response = await fetch(imageUrl, {
-      method: 'GET', // Explicitly use GET method, not OPTIONS
-      headers: {
-        'Authorization': authToken.startsWith('Bearer ') ? authToken : `Bearer ${authToken}`,
-        'Accept': 'image/*',
-      },
-      cache: 'no-store'
-    });
-
-    // Check if the response is successful
-    if (!response.ok) {
-      console.error(`[Auth Image] Backend returned error: ${response.status}`);
-      return new NextResponse(`Backend error: ${response.status}`, { status: response.status });
-    }
-
-    // Get the response body as an array buffer
-    const buffer = await response.arrayBuffer();
-
-    // Get the content type from the response
-    const contentType = response.headers.get('content-type') || 'application/octet-stream';
-
-    // Return the response with the correct content type
-    return new NextResponse(buffer, {
-      status: 200,
-      headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=3600',
-      },
-    });
-  } catch (error) {
-    console.error('[Auth Image] Error:', error);
-
-    // Return a 500 error response
-    return new NextResponse(JSON.stringify({
-      error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
 }
