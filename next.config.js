@@ -90,6 +90,19 @@ const nextConfig = {
       },
     ];
   },
+  
+  // --- RUNTIME & PAYLOAD CONFIG ---
+  serverRuntimeConfig: {
+    // Menetapkan batas ukuran body parser di server (untuk Pages Router legacy)
+    bodyLimit: '30mb', 
+  },
+  // Konfigurasi untuk menaikkan batas ukuran payload di Route Handlers (App Router)
+  // Catatan: Ini HANYA efektif jika request Anda diarahkan melalui API Route lokal.
+  // Jika upload Anda langsung ke backend eksternal, ini tidak relevan.
+  api: {
+    bodyParser: false, // Matikan body parser default
+    responseLimit: '30mb', // Opsional: Batas ukuran respons
+  }
 };
 
 module.exports = nextConfig;
