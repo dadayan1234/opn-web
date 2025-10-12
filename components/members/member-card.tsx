@@ -41,7 +41,7 @@ export function MemberCard({ member, onEdit, onDelete }) {
 
   const age = calculateAge(member.birth_date);
   const initials = member.full_name ? member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'UN';
-
+  const BE_URL = `${process.env.NEXT_PUBLIC_BACKEND_URL}`;
   return (
     <div className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
       {/* Role indicator */}
@@ -61,7 +61,7 @@ export function MemberCard({ member, onEdit, onDelete }) {
           <div className="relative mb-4">
             {member.photo_url ? (
               <img
-                src={member.photo_url}
+                src={BE_URL + member.photo_url}
                 alt={member.full_name}
                 className="w-16 h-16 rounded-full object-cover border-3 border-white shadow-md"
               />
