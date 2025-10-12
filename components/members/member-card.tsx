@@ -1,5 +1,6 @@
 import React from 'react';
 import { Edit, Trash2, Mail, Phone, MapPin, Calendar, Crown } from 'lucide-react';
+import { AuthenticatedImage } from '@/components/shared/AuthenticatedImage';
 
 export function MemberCard({ member, onEdit, onDelete }) {
   // Function to get division display name
@@ -60,9 +61,12 @@ export function MemberCard({ member, onEdit, onDelete }) {
           {/* Profile Picture */}
           <div className="relative mb-4">
             {member.photo_url ? (
-              <img
-                src={BE_URL + member.photo_url}
+              // MENGGUNAKAN KOMPONEN AUTHENTICATED IMAGE
+              <AuthenticatedImage
+                src={member.photo_url} // Kirim path relatif backend
                 alt={member.full_name}
+                width={64}
+                height={64}
                 className="w-16 h-16 rounded-full object-cover border-3 border-white shadow-md"
               />
             ) : (
