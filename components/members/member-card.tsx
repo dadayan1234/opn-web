@@ -61,15 +61,14 @@ export function MemberCard({ member, onEdit, onDelete }) {
           {/* Profile Picture */}
           <div className="relative mb-4">
             {member.photo_url ? (
-              // MENGGUNAKAN KOMPONEN AUTHENTICATED IMAGE
-              <AuthenticatedImage
-                src={member.photo_url} // Kirim path relatif backend
-                alt={member.full_name}
-                width={64}
-                height={64}
-                className="w-16 h-16 rounded-full object-cover border-3 border-white shadow-md"
-              />
-            ) : (
+                <AuthenticatedImage
+                  src={member.photo_url} // Ini akan memicu fetch langsung ke backend
+                  alt={member.full_name}
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 rounded-full object-cover border-3 border-white shadow-md"
+                />
+              ) : (
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
                 {initials}
               </div>
