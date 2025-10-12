@@ -1,52 +1,51 @@
-// app/api/v1/auth-image/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
+// Pastikan API_CONFIG terdefinisi dan memiliki BACKEND_URL
+// Pastikan getAuthToken sudah diperbaiki agar menerima NextRequest
 import { getAuthToken } from '@/lib/auth-utils'; 
-// Asumsikan getAuthToken sekarang menerima request untuk membaca cookie/header
 import { API_CONFIG } from '@/lib/config'; 
-// Asumsi API_CONFIG ada, atau kita ambil dari process.env
 
-// Function untuk menyusun URL Backend lengkap
+// Menonaktifkan caching statis pada Route Handler ini (penting untuk API proxy)
+export const dynamic = 'force-dynamic'; 
+
+/**
+ * Menyusun URL Backend lengkap dari path gambar.
+ * * @param imagePath Path gambar relatif dari root backend (e.g., /uploads/users/...)
+ * @returns URL lengkap backend (e.g., https://backend.com/uploads/users/...)
+ */
 function constructFinalBackendUrl(imagePath: string): string {
-    // Ambil BASE URL API Anda (misal: 'https://beopn.pemudanambangan.site/api/v1')
-    const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || ''; 
-
-    // Asumsi: Gambar di-serve dari domain yang sama dengan API, 
-    // tetapi kita hapus suffix /api/v1 jika ada.
-    const baseUrl = apiUrl.replace(/\/api\/v1$/, ''); 
-
-    // Pastikan path dimulai dengan slash
-    const normalizedPath = imagePath.startsWith('/') ? imagePath : `${imagePath}`;
-
-    // Gabungkan URL backend + path gambar
-    return `${baseUrl}${normalizedPath}`;
+    const backendBaseUrl = API_CONFIG.BACKEND_URL;
+    
+    // Menghilangkan trailing slash dari base URL jika ada
+    const cleanBaseUrl = backendBaseUrl.endsWith('/') ? backendBaseUrl.slice(0, -1) : backendBaseUrl;
+    
+    // Memastikan path dimulai dengan slash '/'
+    const normalizedPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    
+    return `${cleanBaseUrl}${normalizedPath}`;
 }
 
+
+/**
+ * Route Handler GET yang berfungsi sebagai proxy untuk gambar yang memerlukan otentikasi.
+ * Ini mengambil Bearer Token dari request dan meneruskannya ke backend gambar.
+ */
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
-        // PERBAIKAN 1: Ambil path gambar menggunakan query parameter 'path'
-        // (sesuai dengan yang dikirim dari AuthenticatedImage.tsx)
         const imagePath = searchParams.get('path'); 
 
-        // --- VALIDASI AWAL ---
+        // --- VALIDASI & AMBIL TOKEN ---
         if (!imagePath) {
-            return new NextResponse(JSON.stringify({ error: 'Image path not provided' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' }
-            });
+            return NextResponse.json({ error: 'Image path not provided' }, { status: 400 });
         }
         
-        // --- AMBIL TOKEN & OTORISASI ---
-        // PERBAIKAN 2: Mengambil token dari request untuk server-side
+        // Ambil token dari request (akan membaca dari cookie)
         const authToken = getAuthToken(request); 
         
         if (!authToken) {
-            console.warn('[Auth Image Proxy] No authorization token found');
-            return new NextResponse(JSON.stringify({ error: 'Authentication required' }), {
-                status: 401,
-                headers: { 'Content-Type': 'application/json' }
-            });
+            // Jika token tidak ditemukan, server merespons 401 Unauthorized
+            console.error('[Auth Image Proxy] Authentication token is missing');
+            return NextResponse.json({ error: 'Authentication token is missing' }, { status: 401 });
         }
 
         // --- SUSUN URL AKHIR ---
@@ -56,36 +55,41 @@ export async function GET(request: NextRequest) {
         const response = await fetch(finalBackendUrl, {
             method: 'GET', 
             headers: {
-                // PERBAIKAN 3: Menyertakan token ke header Authorization
-                'Authorization': `Bearer ${authToken.replace('Bearer ', '')}`,
-                'Accept': 'image/*',
+                'Authorization': authToken, // 'Bearer <token>'
+                // Minta format gambar yang kompatibel
+                'Accept': 'image/jpeg, image/png, image/webp, image/gif', 
             },
-            cache: 'no-store'
+            // Gunakan 'no-store' untuk mencegah Next.js menyimpan cache server-side
+            cache: 'no-store' 
         });
 
         // --- HANDLE RESPONSE ---
         if (!response.ok) {
+            // Jika backend mengembalikan error, teruskan statusnya
             console.error(`[Auth Image Proxy] Backend returned error: ${response.status} for ${finalBackendUrl}`);
+            // Mengembalikan status dan pesan error dari backend
             return new NextResponse(`Backend error: ${response.status}`, { status: response.status });
         }
 
-        // Mengembalikan gambar
-        const buffer = await response.arrayBuffer();
+        // Dapatkan header Content-Type dari backend untuk merender gambar dengan benar
         const contentType = response.headers.get('content-type') || 'application/octet-stream';
-
-        return new NextResponse(buffer, {
+        
+        // Kembalikan gambar dalam response baru
+        return new NextResponse(response.body, {
             status: 200,
             headers: {
                 'Content-Type': contentType,
+                // Mengatur Cache-Control untuk caching browser yang wajar (1 jam)
                 'Cache-Control': 'public, max-age=3600',
             },
         });
     } catch (error) {
-        console.error('[Auth Image Proxy] Internal Error:', error);
-        return new NextResponse(JSON.stringify({
+        console.error('[Auth Image Proxy] Internal Server Error:', error);
+        
+        return NextResponse.json({
             error: 'Internal server error',
             message: error instanceof Error ? error.message : 'Unknown error'
-        }), {
+        }, {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });

@@ -1,34 +1,67 @@
-export const isAuthenticated = (): boolean => {
-  if (typeof window === 'undefined') return false;
+import { NextRequest } from 'next/server';
 
-  try {
-    const token = localStorage.getItem('token');
-    const authToken = localStorage.getItem('auth_token');
+// Mendefinisikan tipe Request yang bisa diterima (NextRequest atau undefined)
+type ServerRequest = NextRequest | undefined;
 
-    if (authToken && authToken.length >= 10) {
-      return true;
-    }
+/**
+ * Mendapatkan token otentikasi dari berbagai sumber (LocalStorage atau Cookie).
+ * Di sisi server (Route Handler), ia akan membaca dari cookie yang dikirim dalam NextRequest.
+ * * @param req Objek NextRequest (hanya digunakan di sisi server/Route Handler).
+ * @returns Token yang diformat ('Bearer <token>') atau null.
+ */
+export const getAuthToken = (req?: ServerRequest): string | null => {
+  // --- Server-side Logic (NextRequest) ---
+  if (req) {
+    // Di sisi server, kita harus membaca token dari cookies yang dikirim oleh klien
+    const token = req.cookies.get('auth_token')?.value || req.cookies.get('token')?.value;
 
     if (token && token.length >= 10) {
-      return true;
+      // Pastikan formatnya 'Bearer <token>'
+      return token.startsWith('Bearer ') ? token : `Bearer ${token}`;
     }
-
-    const cookieToken = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-    const cookieAuthToken = document.cookie.replace(/(?:(?:^|.*;\s*)auth_token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-
-    if (cookieAuthToken && cookieAuthToken.length >= 10) {
-      return true;
-    }
-
-    if (cookieToken && cookieToken.length >= 10) {
-      return true;
-    }
-
-    return false;
-  } catch (error) {
-    console.error('Error checking authentication:', error);
-    return false;
+    return null;
   }
+
+  // --- Client-side Logic (Browser/window) ---
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const checkToken = (token: string | null | undefined): string | null => {
+    if (token && token.length >= 10) {
+      return token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    }
+    return null;
+  }
+
+  // Cek dari LocalStorage
+  const authToken = checkToken(localStorage.getItem('auth_token'));
+  if (authToken) return authToken;
+
+  const token = checkToken(localStorage.getItem('token'));
+  if (token) {
+      // Sync token to cookie if found in localStorage
+      syncTokenToCookie(token);
+      return token;
+  }
+
+  // Cek dari Cookie (fallback jika localStorage gagal atau belum sync)
+  const cookieAuthToken = document.cookie.replace(/(?:(?:^|.*;\s*)auth_token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+  if (cookieAuthToken) {
+    const formattedToken = checkToken(cookieAuthToken);
+    if (formattedToken) {
+        syncTokenToCookie(formattedToken);
+        return formattedToken;
+    }
+  }
+
+  return null;
+};
+
+// Fungsi lain (dibuat ringkas untuk fokus pada getAuthToken)
+export const isAuthenticated = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return !!getAuthToken();
 };
 
 export const setAuthTokens = (token: string, refreshToken?: string): void => {
@@ -43,13 +76,12 @@ export const setAuthTokens = (token: string, refreshToken?: string): void => {
       localStorage.setItem('refreshToken', refreshToken);
     }
 
-    const cookieOptions = 'path=/;max-age=2592000;SameSite=Lax';
-    document.cookie = `token=${token};${cookieOptions}`;
-    document.cookie = `auth_token=${token};${cookieOptions}`;
-    document.cookie = `is_logged_in=true;${cookieOptions}`;
-
+    const cookieOptions = 'path=/;max-age=2592000;SameSite=Lax;Secure';
     const formattedToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    syncTokenToCookie(formattedToken);
+    
+    // Simpan token yang sudah diformat ke cookie agar bisa diakses server (Route Handler)
+    document.cookie = `token=${formattedToken};${cookieOptions}`; 
+    document.cookie = `auth_token=${formattedToken};${cookieOptions}`; 
 
     if (refreshToken) {
       document.cookie = `refreshToken=${refreshToken};${cookieOptions}`;
@@ -67,47 +99,11 @@ export const removeAuthTokens = (): void => {
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('is_logged_in');
 
-  document.cookie = "token=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-  document.cookie = "auth_token=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-  document.cookie = "refreshToken=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-  document.cookie = "is_logged_in=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-  document.cookie = "auth_token_for_server=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-};
-
-export const getAuthToken = (): string | null => {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  const authToken = localStorage.getItem('auth_token');
-  if (authToken) {
-    const formattedToken = authToken.startsWith('Bearer ') ? authToken : `Bearer ${authToken}`;
-    syncTokenToCookie(formattedToken);
-    return formattedToken;
-  }
-
-  const token = localStorage.getItem('token');
-  if (token) {
-    const formattedToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    syncTokenToCookie(formattedToken);
-    return formattedToken;
-  }
-
-  const cookieAuthToken = document.cookie.replace(/(?:(?:^|.*;\s*)auth_token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-  if (cookieAuthToken) {
-    const formattedToken = cookieAuthToken.startsWith('Bearer ') ? cookieAuthToken : `Bearer ${cookieAuthToken}`;
-    syncTokenToCookie(formattedToken);
-    return formattedToken;
-  }
-
-  const cookieToken = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-  if (cookieToken) {
-    const formattedToken = cookieToken.startsWith('Bearer ') ? cookieToken : `Bearer ${cookieToken}`;
-    syncTokenToCookie(formattedToken);
-    return formattedToken;
-  }
-
-  return null;
+  const expiredOptions = "path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  document.cookie = `token=;${expiredOptions}`;
+  document.cookie = `auth_token=;${expiredOptions}`;
+  document.cookie = `refreshToken=;${expiredOptions}`;
+  document.cookie = `is_logged_in=;${expiredOptions}`;
 };
 
 export const getRefreshToken = (): string | null => {
@@ -119,13 +115,13 @@ export const getRefreshToken = (): string | null => {
   return document.cookie.replace(/(?:(?:^|.*;\s*)refreshToken\s*\=\s*([^;]*).*$)|^.*$/, "$1") || null;
 };
 
+// Di-sync ke cookie secara otomatis di getAuthToken, tidak perlu diekspor lagi.
 export function syncTokenToCookie(token: string): void {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
+  if (typeof window === 'undefined') return;
   try {
-    document.cookie = `auth_token_for_server=${token}; path=/; max-age=3600; SameSite=Strict`;
+    // Pastikan token yang dikirim ke cookie sudah Bearer format
+    const formattedToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    document.cookie = `auth_token=${formattedToken}; path=/; max-age=3600; SameSite=Lax; Secure`;
   } catch (error) {
     console.error('[Auth Utils] Error syncing token to cookie:', error);
   }
