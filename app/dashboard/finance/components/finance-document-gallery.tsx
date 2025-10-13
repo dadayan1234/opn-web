@@ -317,12 +317,12 @@ export function FinanceDocumentGallery({
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                       {documentUrl ? (
                         <AuthenticatedImage
                           src={documentUrl}
                           alt="Bukti transaksi"
-                          className="max-w-full max-h-full object-contain rounded-md"
+                          className="w-full h-full object-cover rounded-md"
                           // tidak perlu onError
                         />
                       ) : (
