@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { uploadsApi } from "@/lib/api-uploads"
 import { useToast } from "@/components/ui/use-toast"
 import { format } from "date-fns"
+import { AuthenticatedImage } from "@/components/shared/AuthenticatedImage"
 
 interface FinanceDocumentGalleryProps {
   open: boolean
@@ -317,41 +318,18 @@ export function FinanceDocumentGallery({
                     </div>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <img
-                        src={documentUrl}
-                        alt="Bukti transaksi"
-                        className="max-w-full max-h-full object-contain"
-                        onError={(e) => {
-                          console.error("Error loading image:", documentUrl);
-
-                          // Try to fix the URL if it's missing the API prefix
-                          const target = e.target as HTMLImageElement;
-
-                          if (documentUrl) {
-                            // Check if URL is relative and doesn't have the proper API prefix
-                            if (documentUrl.startsWith('/uploads/') && !documentUrl.includes('/api/v1/')) {
-                              const fixedUrl = `/api/v1${documentUrl}`;
-                              console.log("Fixing document URL format. New URL:", fixedUrl);
-                              target.src = fixedUrl;
-                              return;
-                            }
-
-                            // Check if URL is absolute but missing the API path
-                            if (documentUrl.includes('beopn.pemudanambangan.site') && !documentUrl.includes('/api/v1/')) {
-                              const fixedUrl = documentUrl.replace('beopn.pemudanambangan.site/', 'beopn.pemudanambangan.site/api/v1/');
-                              console.log("Fixing document URL format. New URL:", fixedUrl);
-                              target.src = fixedUrl;
-                              return;
-                            }
-
-                            // Log the URL format for debugging
-                            console.warn("Document URL format issue. Current URL:", documentUrl);
-                          }
-
-                          // If all fixes fail, show placeholder
-                          target.src = "/placeholder.svg";
-                        }}
-                      />
+                      {documentUrl ? (
+                        <AuthenticatedImage
+                          src={documentUrl}
+                          alt="Bukti transaksi"
+                          className="max-w-full max-h-full object-contain rounded-md"
+                          // tidak perlu onError
+                        />
+                      ) : (
+                        <div className="w-24 h-24 rounded-md bg-muted flex items-center justify-center">
+                          <span className="text-sm text-gray-500">No Image</span>
+                        </div>
+                      )}
                     </div>
                   )}
                   <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm">
