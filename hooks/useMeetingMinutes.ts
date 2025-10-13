@@ -78,7 +78,7 @@ export function useMeetingMinutesByEvent(eventId: number | string) {
     queryKey: eventMinutesKey,
     queryFn: async ({ signal }) => {
       try {
-        // console.log('%c Fetching meeting minutes directly for event ID', 'background: #00f; color: #fff', numericEventId)
+        console.log('%c Fetching meeting minutes directly for event ID', 'background: #00f; color: #fff', numericEventId)
 
         // Create an AbortController that we can use to track cancellations
         const controller = new AbortController()
@@ -92,7 +92,7 @@ export function useMeetingMinutesByEvent(eventId: number | string) {
           try {
             if (!controller.signal.aborted) {
               controller.abort()
-              // console.log(`%c Aborted meeting minutes request for event ID ${numericEventId}`, 'background: #f0f; color: #fff')
+              console.log(`%c Aborted meeting minutes request for event ID ${numericEventId}`, 'background: #f0f; color: #fff')
             }
           } catch (e) {
             console.error('Error during cleanup:', e)
@@ -101,12 +101,12 @@ export function useMeetingMinutesByEvent(eventId: number | string) {
 
         try {
           const result = await meetingMinutesApi.getMeetingMinutesByEventId(numericEventId, combinedSignal)
-          // console.log('%c Fetched result:', 'background: #0f0; color: #000', result)
+          console.log('%c Fetched result:', 'background: #0f0; color: #000', result)
           return result
         } catch (error) {
           // Handle canceled requests gracefully
           if (axios.isCancel(error)) {
-            // console.log(`Meeting minutes request for event ID ${numericEventId} was cancelled - returning empty array`)
+            console.log(`Meeting minutes request for event ID ${numericEventId} was cancelled - returning empty array`)
             return [] // Return empty array instead of throwing error
           }
 
@@ -135,59 +135,59 @@ export function useMeetingMinutesByEvent(eventId: number | string) {
     retry: (failureCount, error: any) => {
       // Don't retry if the request was canceled
       if (axios.isCancel(error) || error?.name === 'CanceledError') {
-        // console.log('%c Not retrying canceled request', 'background: #f00; color: #fff')
+        console.log('%c Not retrying canceled request', 'background: #f00; color: #fff')
         return false
       }
       // Don't retry 403 errors
       if (axios.isAxiosError(error) && error.response?.status === 403) {
-        // console.log('%c Not retrying 403 error', 'background: #f00; color: #fff')
+        console.log('%c Not retrying 403 error', 'background: #f00; color: #fff')
         return false
       }
       // Don't retry 404 errors
       if (axios.isAxiosError(error) && error.response?.status === 404) {
-        // console.log('%c Not retrying 404 error', 'background: #f00; color: #fff')
+        console.log('%c Not retrying 404 error', 'background: #f00; color: #fff')
         return false
       }
       // Don't retry 502 or 504 errors (gateway issues)
       if (axios.isAxiosError(error) && (error.response?.status === 502 || error.response?.status === 504)) {
-        // console.log('%c Not retrying gateway error', 'background: #f00; color: #fff')
+        console.log('%c Not retrying gateway error', 'background: #f00; color: #fff')
         return false
       }
       // Retry up to 2 times for other errors (reduced from 3)
-      // console.log('%c Retrying request, attempt', 'background: #f00; color: #fff', failureCount + 1, 'of 2')
+      console.log('%c Retrying request, attempt', 'background: #f00; color: #fff', failureCount + 1, 'of 2')
       return failureCount < 2
     },
   })
 
   // Enhanced refetch function that also invalidates the query cache
   const enhancedRefetch = async () => {
-    // console.log('%c Enhanced refetch called for event ID', 'background: #f0f; color: #fff', numericEventId)
+    console.log('%c Enhanced refetch called for event ID', 'background: #f0f; color: #fff', numericEventId)
 
     // Force clear the cache completely
-    // console.log('%c Clearing query cache', 'background: #f0f; color: #fff')
+    console.log('%c Clearing query cache', 'background: #f0f; color: #fff')
     queryClient.clear()
 
     // Invalidate ALL queries
-    // console.log('%c Invalidating all queries', 'background: #f0f; color: #fff')
+    console.log('%c Invalidating all queries', 'background: #f0f; color: #fff')
     queryClient.invalidateQueries()
 
     // Specifically invalidate this event's query
-    // console.log('%c Specifically invalidating event query', 'background: #f0f; color: #fff', eventMinutesKey)
+    console.log('%c Specifically invalidating event query', 'background: #f0f; color: #fff', eventMinutesKey)
     queryClient.invalidateQueries({ queryKey: eventMinutesKey })
 
     // Invalidate all meeting minutes queries
-    // console.log('%c Invalidating all meeting minutes queries', 'background: #f0f; color: #fff')
+    console.log('%c Invalidating all meeting minutes queries', 'background: #f0f; color: #fff')
     queryClient.invalidateQueries({ queryKey: meetingMinutesKeys.all })
 
     // Force refetch
-    // console.log('%c Forcing refetch', 'background: #f0f; color: #fff')
+    console.log('%c Forcing refetch', 'background: #f0f; color: #fff')
     try {
       // Reset the query to force a complete refresh
       await queryClient.resetQueries({ queryKey: eventMinutesKey })
 
       // Then refetch
       const result = await refetch()
-      // console.log('%c Refetch result:', 'background: #0f0; color: #000', result)
+      console.log('%c Refetch result:', 'background: #0f0; color: #000', result)
       return result
     } catch (error) {
       console.error('%c Error during refetch:', 'background: #f00; color: #fff', error)
@@ -201,7 +201,7 @@ export function useMeetingMinutesByEvent(eventId: number | string) {
 
     // Check if it's a 403 error (permission denied)
     if (axios.isAxiosError(error) && error.response?.status === 403) {
-      // console.log('Permission denied for meeting minutes. Returning empty array.')
+      console.log('Permission denied for meeting minutes. Returning empty array.')
       toast({
         title: "Akses Ditolak",
         description: "Anda tidak memiliki izin untuk melihat notulensi ini.",
@@ -211,7 +211,7 @@ export function useMeetingMinutesByEvent(eventId: number | string) {
 
     // Check if it's a timeout error
     if (axios.isAxiosError(error) && error.code === 'ECONNABORTED') {
-      // console.log('Timeout error fetching meeting minutes. Returning empty array.')
+      console.log('Timeout error fetching meeting minutes. Returning empty array.')
       toast({
         title: "Waktu permintaan habis",
         description: "Tidak dapat memuat data notulensi. Silakan coba lagi nanti.",
@@ -281,40 +281,40 @@ export function useMeetingMinutesMutations() {
   const createMeetingMinutes = useMutation({
     mutationFn: (data: MeetingMinutesFormData) => meetingMinutesApi.createMeetingMinutes(data),
     onSuccess: (data) => {
-      // console.log('%c Meeting minutes created successfully:', 'background: #0f0; color: #000', data)
+      console.log('%c Meeting minutes created successfully:', 'background: #0f0; color: #000', data)
 
       // Get the event ID from the created data
       const eventId = data.event_id
-      // console.log('%c Event ID from created data:', 'background: #0f0; color: #000', eventId, 'Type:', typeof eventId)
+      console.log('%c Event ID from created data:', 'background: #0f0; color: #000', eventId, 'Type:', typeof eventId)
 
       // Force clear the cache completely
-      // console.log('%c Clearing query cache', 'background: #0f0; color: #000')
+      console.log('%c Clearing query cache', 'background: #0f0; color: #000')
       queryClient.clear()
 
       // Invalidate ALL queries to force a complete refresh
-      // console.log('%c Invalidating all queries', 'background: #0f0; color: #000')
+      console.log('%c Invalidating all queries', 'background: #0f0; color: #000')
       queryClient.invalidateQueries()
 
       // Specifically invalidate meeting minutes queries
-      // console.log('%c Invalidating meeting minutes queries', 'background: #0f0; color: #000')
+      console.log('%c Invalidating meeting minutes queries', 'background: #0f0; color: #000')
       queryClient.invalidateQueries({ queryKey: meetingMinutesKeys.all })
       queryClient.invalidateQueries({ queryKey: meetingMinutesKeys.lists() })
 
       // Invalidate the specific event's meeting minutes query
-      // console.log('%c Invalidating event-specific meeting minutes query', 'background: #0f0; color: #000', [...meetingMinutesKeys.all, 'event', eventId])
+      console.log('%c Invalidating event-specific meeting minutes query', 'background: #0f0; color: #000', [...meetingMinutesKeys.all, 'event', eventId])
       queryClient.invalidateQueries({ queryKey: [...meetingMinutesKeys.all, 'event', eventId] })
 
       // Reset queries to force a complete refresh
-      // console.log('%c Resetting queries', 'background: #0f0; color: #000')
+      console.log('%c Resetting queries', 'background: #0f0; color: #000')
       queryClient.resetQueries({ queryKey: meetingMinutesKeys.all })
       queryClient.resetQueries({ queryKey: [...meetingMinutesKeys.all, 'event', eventId] })
 
       // Force refetch ALL queries
-      // console.log('%c Force refetching all queries', 'background: #0f0; color: #000')
+      console.log('%c Force refetching all queries', 'background: #0f0; color: #000')
       queryClient.refetchQueries()
 
       // Specifically force refetch meeting minutes queries
-      // console.log('%c Force refetching meeting minutes queries', 'background: #0f0; color: #000')
+      console.log('%c Force refetching meeting minutes queries', 'background: #0f0; color: #000')
       queryClient.refetchQueries({ queryKey: meetingMinutesKeys.lists() })
       queryClient.refetchQueries({ queryKey: [...meetingMinutesKeys.all, 'event', eventId] })
 

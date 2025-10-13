@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse('URL parameter is required', { status: 400 });
     }
 
-    // console.log(`[Raw Image] Proxying image request for: ${imageUrl}`);
+    console.log(`[Raw Image] Proxying image request for: ${imageUrl}`);
 
     // Get authorization from request headers first
     const headersList = headers();
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
         authHeader = tokenCookie.value.startsWith('Bearer ')
           ? tokenCookie.value
           : `Bearer ${tokenCookie.value}`;
-        // console.log('[Raw Image] Using token from cookies');
+        console.log('[Raw Image] Using token from cookies');
       } else {
         // If we still don't have a token, try to get it from localStorage via a cookie
         // This is a workaround since we can't access localStorage directly in a server component
@@ -58,14 +58,14 @@ export async function GET(request: NextRequest) {
           authHeader = authCookie.value.startsWith('Bearer ')
             ? authCookie.value
             : `Bearer ${authCookie.value}`;
-          // console.log('[Raw Image] Using token from auth_token_for_server cookie');
+          console.log('[Raw Image] Using token from auth_token_for_server cookie');
         } else {
           // If we still don't have a token, log a warning
           console.warn('[Raw Image] No authorization token found in any cookie');
         }
       }
     } else {
-      // console.log('[Raw Image] Using authorization from headers');
+      console.log('[Raw Image] Using authorization from headers');
     }
 
     // Create headers for the backend request
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
       const maskedToken = formattedAuthHeader.length > 15
         ? `${formattedAuthHeader.substring(0, 15)}...${formattedAuthHeader.substring(formattedAuthHeader.length - 5)}`
         : '***';
-      // console.log(`[Raw Image] Added Authorization header: ${maskedToken}`);
+      console.log(`[Raw Image] Added Authorization header: ${maskedToken}`);
     } else {
       // Even if we don't have a token, we'll still try to fetch the image
       // Some images might be publicly accessible
@@ -99,15 +99,15 @@ export async function GET(request: NextRequest) {
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
     try {
-      // console.log(`[Raw Image] Making request to: ${imageUrl}`);
-      // console.log(`[Raw Image] With headers:`, requestHeaders);
+      console.log(`[Raw Image] Making request to: ${imageUrl}`);
+      console.log(`[Raw Image] With headers:`, requestHeaders);
 
       // Add a referrer policy to avoid CORS issues
       requestHeaders['Referrer-Policy'] = 'no-referrer';
 
       // Log the full request details
-      // console.log(`[Raw Image] Making request to: ${imageUrl}`);
-      // console.log(`[Raw Image] With headers:`, JSON.stringify(requestHeaders, null, 2));
+      console.log(`[Raw Image] Making request to: ${imageUrl}`);
+      console.log(`[Raw Image] With headers:`, JSON.stringify(requestHeaders, null, 2));
 
       const response = await fetch(imageUrl, {
         method: 'GET', // Explicitly use GET method, not OPTIONS
@@ -119,8 +119,8 @@ export async function GET(request: NextRequest) {
         credentials: 'same-origin'
       });
 
-      // console.log(`[Raw Image] Response status: ${response.status} ${response.statusText}`);
-      // console.log(`[Raw Image] Response headers:`, Object.fromEntries([...response.headers.entries()]));
+      console.log(`[Raw Image] Response status: ${response.status} ${response.statusText}`);
+      console.log(`[Raw Image] Response headers:`, Object.fromEntries([...response.headers.entries()]));
 
       clearTimeout(timeoutId);
 
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
 
         // For image requests, return a fallback image instead of an error
         // This helps prevent the UI from breaking when images fail to load
-        // console.log('[Raw Image] Returning fallback image');
+        console.log('[Raw Image] Returning fallback image');
 
         // Return a transparent 1x1 pixel GIF as fallback
         const transparentPixel = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -179,7 +179,7 @@ export async function GET(request: NextRequest) {
 
       // For image requests, return a fallback image instead of an error
       // This helps prevent the UI from breaking when images fail to load
-      // console.log('[Raw Image] Returning fallback image due to fetch error');
+      console.log('[Raw Image] Returning fallback image due to fetch error');
 
       // Return a transparent 1x1 pixel GIF as fallback
       const transparentPixel = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -202,7 +202,7 @@ export async function GET(request: NextRequest) {
 
     // For image requests, return a fallback image instead of an error
     // This helps prevent the UI from breaking when images fail to load
-    // console.log('[Raw Image] Returning fallback image due to server error');
+    console.log('[Raw Image] Returning fallback image due to server error');
 
     // Return a transparent 1x1 pixel GIF as fallback
     const transparentPixel = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';

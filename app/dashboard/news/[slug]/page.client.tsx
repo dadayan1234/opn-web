@@ -34,24 +34,24 @@ export default function NewsDetailPageClient({ slug }: { slug: string }) {
   // Debug: Log the news item data when it's available
   useEffect(() => {
     if (newsItem) {
-      // console.log('News item data:', newsItem)
+      console.log('News item data:', newsItem)
 
       // Log description details
       if (newsItem.description) {
-        // console.log('News description type:', typeof newsItem.description)
-        // console.log('News description length:', newsItem.description.length)
-        // console.log('News description sample:', newsItem.description.substring(0, 100))
-        // console.log('News description contains HTML tags:', newsItem.description.includes('<'))
+        console.log('News description type:', typeof newsItem.description)
+        console.log('News description length:', newsItem.description.length)
+        console.log('News description sample:', newsItem.description.substring(0, 100))
+        console.log('News description contains HTML tags:', newsItem.description.includes('<'))
       } else {
         console.warn('News description is empty or undefined')
       }
 
       // Log photo details
       if (newsItem.photos && newsItem.photos.length > 0) {
-        // console.log('News photo URL:', newsItem.photos[0].photo_url)
-        // console.log('Formatted photo URL:', formatImageUrl(newsItem.photos[0].photo_url))
+        console.log('News photo URL:', newsItem.photos[0].photo_url)
+        console.log('Formatted photo URL:', formatImageUrl(newsItem.photos[0].photo_url))
       } else {
-        // console.log('News has no photos')
+        console.log('News has no photos')
       }
     }
   }, [newsItem])
@@ -60,7 +60,7 @@ export default function NewsDetailPageClient({ slug }: { slug: string }) {
   const formatDate = (dateString: string) => {
     try {
       // Log the date string for debugging
-      // console.log('Formatting date string:', dateString)
+      console.log('Formatting date string:', dateString)
 
       // Check if the date string is valid
       if (!dateString || dateString === 'Invalid Date' || dateString === 'undefined') {
@@ -290,7 +290,7 @@ export default function NewsDetailPageClient({ slug }: { slug: string }) {
           <div className="news-photo-container rounded-md overflow-hidden border">
             {/* Log the photo URL for debugging */}
             {newsItem.photos && newsItem.photos.length > 0 && newsItem.photos[0].photo_url &&
-              // console.log('Photo URL:', newsItem.photos[0].photo_url)
+              console.log('Photo URL:', newsItem.photos[0].photo_url)
             }
 
             {/* Show loading overlay when fetching */}
@@ -302,7 +302,7 @@ export default function NewsDetailPageClient({ slug }: { slug: string }) {
 
             {/* Log the photo URL for debugging */}
             {newsItem.photos && newsItem.photos.length > 0 && newsItem.photos[0].photo_url &&
-              // console.log('Photo URL in render:', newsItem.photos[0].photo_url, 'Formatted:', formatImageUrl(newsItem.photos[0].photo_url))
+              console.log('Photo URL in render:', newsItem.photos[0].photo_url, 'Formatted:', formatImageUrl(newsItem.photos[0].photo_url))
             }
 
             {/* Check if we have a photo */}
@@ -327,7 +327,7 @@ export default function NewsDetailPageClient({ slug }: { slug: string }) {
 
           <div className="prose max-w-none">
             {/* Log the description for debugging */}
-            {// console.log('News description:', newsItem.description)}
+            {console.log('News description:', newsItem.description)}
             {/* Ensure we have a valid description */}
             <TipTapContent content={newsItem.description || ''} />
           </div>
@@ -336,7 +336,7 @@ export default function NewsDetailPageClient({ slug }: { slug: string }) {
           <PhotoUpload
             newsId={newsId}
             onPhotoUploaded={() => {
-              // console.log('Photo uploaded, refreshing news data')
+              console.log('Photo uploaded, refreshing news data')
               refetch()
             }}
           />

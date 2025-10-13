@@ -63,7 +63,7 @@ export const MemberAttendanceForm = forwardRef<
   useEffect(() => {
     if (!isInitialized && members && Object.keys(members).length > 0) {
       try {
-        // console.log('Initializing attendance records with members data:', members);
+        console.log('Initializing attendance records with members data:', members);
 
         // Create a normalized version of the members data
         const normalizedMembers: Record<string, any[]> = {};
@@ -98,11 +98,11 @@ export const MemberAttendanceForm = forwardRef<
           }
         });
 
-        // console.log('Normalized members data:', normalizedMembers);
+        console.log('Normalized members data:', normalizedMembers);
 
         // Load saved attendance data from localStorage using our utility function
         const savedAttendanceData = getSavedAttendanceData(eventId);
-        // console.log(`[MemberAttendanceForm] Loaded ${savedAttendanceData.length} saved attendance records from localStorage:`, savedAttendanceData);
+        console.log(`[MemberAttendanceForm] Loaded ${savedAttendanceData.length} saved attendance records from localStorage:`, savedAttendanceData);
 
         // Create initial attendance records from the normalized data
         const initialRecords = Object.entries(normalizedMembers).flatMap(([division, membersList]) => {
@@ -132,7 +132,7 @@ export const MemberAttendanceForm = forwardRef<
           }).filter(Boolean); // Remove null entries
         });
 
-        // console.log('Created initial attendance records:', initialRecords);
+        console.log('Created initial attendance records:', initialRecords);
         setAttendanceRecords(initialRecords);
 
         // Set the first division as active tab if available
@@ -239,7 +239,7 @@ export const MemberAttendanceForm = forwardRef<
         };
       });
 
-      // console.log(`[MemberAttendanceForm] Saving ${attendanceData.length} attendance records for event ${eventId} locally`);
+      console.log(`[MemberAttendanceForm] Saving ${attendanceData.length} attendance records for event ${eventId} locally`);
 
       // Save attendance data to localStorage using our utility function
       const saveResult = saveAttendanceData(eventId, attendanceData);
@@ -254,11 +254,11 @@ export const MemberAttendanceForm = forwardRef<
         return Promise.reject(new Error("Failed to save attendance data"));
       }
 
-      // console.log(`[MemberAttendanceForm] Successfully saved attendance data to localStorage`);
+      console.log(`[MemberAttendanceForm] Successfully saved attendance data to localStorage`);
 
       // Notify parent component about the change
       if (onAttendanceChange && typeof onAttendanceChange === 'function') {
-        // console.log('[MemberAttendanceForm] Notifying parent component about attendance change');
+        console.log('[MemberAttendanceForm] Notifying parent component about attendance change');
         onAttendanceChange(attendanceData);
       }
 

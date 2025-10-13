@@ -24,7 +24,7 @@ export function useEventFeedback(eventId: number | string | null) {
     queryFn: async ({ signal }) => {
       // If eventId is null or undefined, return empty array
       if (!eventId) {
-        // console.log('No event ID provided for feedback. Returning empty array.');
+        console.log('No event ID provided for feedback. Returning empty array.');
         return [];
       }
 
@@ -34,13 +34,13 @@ export function useEventFeedback(eventId: number | string | null) {
         // Handle specific error cases
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 403) {
-            // console.log('Permission denied for feedback. Returning empty array.')
+            console.log('Permission denied for feedback. Returning empty array.')
             return [] // Return empty array for 403 errors
           }
 
           // Handle timeout errors
           if (error.code === 'ECONNABORTED') {
-            // console.log('Timeout error fetching feedback. Returning empty array.')
+            console.log('Timeout error fetching feedback. Returning empty array.')
             toast({
               title: "Waktu permintaan habis",
               description: "Tidak dapat memuat data feedback. Silakan coba lagi nanti.",

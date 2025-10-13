@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse('URL parameter is required', { status: 400 });
     }
 
-    // console.log(`[Direct Fetch] Fetching URL: ${url}`);
+    console.log(`[Direct Fetch] Fetching URL: ${url}`);
 
     // Get authorization from request headers first
     const headersList = headers();
@@ -38,10 +38,10 @@ export async function GET(request: NextRequest) {
         authHeader = tokenCookie.value.startsWith('Bearer ')
           ? tokenCookie.value
           : `Bearer ${tokenCookie.value}`;
-        // console.log('[Direct Fetch] Using token from cookies');
+        console.log('[Direct Fetch] Using token from cookies');
       }
     } else {
-      // console.log('[Direct Fetch] Using authorization from headers');
+      console.log('[Direct Fetch] Using authorization from headers');
     }
 
     // Create headers for the backend request
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
       const maskedToken = authHeader.length > 15
         ? `${authHeader.substring(0, 10)}...${authHeader.substring(authHeader.length - 5)}`
         : '***';
-      // console.log(`[Direct Fetch] Added Authorization header: ${maskedToken}`);
+      console.log(`[Direct Fetch] Added Authorization header: ${maskedToken}`);
     } else {
       console.warn('[Direct Fetch] No authorization token found');
     }

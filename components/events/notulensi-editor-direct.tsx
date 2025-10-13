@@ -43,16 +43,16 @@ export function NotulensiEditorDirect({ eventId, initialContent, onSaved }: Notu
     }
 
     try {
-      // console.log(`[NotulensiEditorDirect] Saving notulensi for event ${eventId}:`, content)
+      console.log(`[NotulensiEditorDirect] Saving notulensi for event ${eventId}:`, content)
 
       // Try the PATCH endpoint first (more specific for minutes updates)
       try {
-        // console.log(`[NotulensiEditorDirect] Trying PATCH endpoint for minutes update`)
+        console.log(`[NotulensiEditorDirect] Trying PATCH endpoint for minutes update`)
         const patchResponse = await apiClient.patch(`/events/${eventId}/minutes`, {
           minutes: content.trim()
         })
 
-        // console.log(`[NotulensiEditorDirect] PATCH response:`, patchResponse.data)
+        console.log(`[NotulensiEditorDirect] PATCH response:`, patchResponse.data)
 
         toast({
           title: "Berhasil",
@@ -68,7 +68,7 @@ export function NotulensiEditorDirect({ eventId, initialContent, onSaved }: Notu
         return
       } catch (patchError) {
         // PATCH endpoint might not exist, fall back to PUT
-        // console.log(`[NotulensiEditorDirect] PATCH error, falling back to PUT:`, patchError)
+        console.log(`[NotulensiEditorDirect] PATCH error, falling back to PUT:`, patchError)
       }
 
       // Fall back to the PUT endpoint with just the minutes field
@@ -76,7 +76,7 @@ export function NotulensiEditorDirect({ eventId, initialContent, onSaved }: Notu
         minutes: content.trim()
       })
 
-      // console.log(`[NotulensiEditorDirect] PUT response:`, response.data)
+      console.log(`[NotulensiEditorDirect] PUT response:`, response.data)
 
       toast({
         title: "Berhasil",

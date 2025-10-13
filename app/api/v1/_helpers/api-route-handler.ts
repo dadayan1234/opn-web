@@ -20,7 +20,7 @@ export function addCorsHeaders(response: Response | NextResponse) {
 
 // Handle OPTIONS requests for CORS preflight
 export function handleOptionsRequest() {
-  // console.log('Handling OPTIONS request for CORS preflight');
+  console.log('Handling OPTIONS request for CORS preflight');
 
   // Create a new response with 200 status
   const response = new NextResponse(null, {
@@ -61,9 +61,9 @@ export async function handleApiRoute(
     const fullUrl = `${backendUrl}/api/v1${endpoint}`;
 
     // Log the URL for debugging
-    // console.log(`[handleApiRoute] Using standard URL format: ${fullUrl}`);
+    console.log(`[handleApiRoute] Using standard URL format: ${fullUrl}`);
 
-    // console.log(`Forwarding ${method} request to: ${fullUrl}`);
+    console.log(`Forwarding ${method} request to: ${fullUrl}`);
 
     // Get headers
     const headers: HeadersInit = {
@@ -108,20 +108,20 @@ export async function handleApiRoute(
     }
 
     // Forward request to backend API
-    // console.log(`[handleApiRoute] Sending ${method} request to backend: ${fullUrl}`);
-    // console.log(`[handleApiRoute] Request headers:`, headers);
+    console.log(`[handleApiRoute] Sending ${method} request to backend: ${fullUrl}`);
+    console.log(`[handleApiRoute] Request headers:`, headers);
 
     const response = await fetch(fullUrl, requestOptions);
 
     // Log detailed response information
-    // console.log(`[handleApiRoute] Backend response status for ${fullUrl}: ${response.status}`);
+    console.log(`[handleApiRoute] Backend response status for ${fullUrl}: ${response.status}`);
     const backendContentType = response.headers.get('content-type');
-    // console.log(`[handleApiRoute] Backend response Content-Type: ${backendContentType}`);
+    console.log(`[handleApiRoute] Backend response Content-Type: ${backendContentType}`);
 
     // Clone the response to read the body as text first for logging
     const responseClone = response.clone();
     const backendBodyText = await responseClone.text();
-    // console.log(`[handleApiRoute] Backend response body text (first 500 chars): ${backendBodyText.substring(0, 500)}${backendBodyText.length > 500 ? '...' : ''}`);
+    console.log(`[handleApiRoute] Backend response body text (first 500 chars): ${backendBodyText.substring(0, 500)}${backendBodyText.length > 500 ? '...' : ''}`);
 
     // Get response data
     const contentType = response.headers.get('content-type');
@@ -130,12 +130,12 @@ export async function handleApiRoute(
       try {
         // Try to parse as JSON
         const data = JSON.parse(backendBodyText);
-        // console.log(`[handleApiRoute] Successfully parsed response as JSON`);
+        console.log(`[handleApiRoute] Successfully parsed response as JSON`);
         const jsonResponse = NextResponse.json(data, { status: response.status });
         return addCorsHeaders(jsonResponse);
       } catch (jsonError) {
         console.error(`[handleApiRoute] Error parsing JSON response:`, jsonError);
-        // console.log(`[handleApiRoute] Returning raw text response with status ${response.status}`);
+        console.log(`[handleApiRoute] Returning raw text response with status ${response.status}`);
         const textResponse = new Response(backendBodyText, {
           status: response.status,
           headers: {
@@ -145,7 +145,7 @@ export async function handleApiRoute(
         return addCorsHeaders(textResponse);
       }
     } else {
-      // console.log(`[handleApiRoute] Returning non-JSON response with status ${response.status}`);
+      console.log(`[handleApiRoute] Returning non-JSON response with status ${response.status}`);
       const nonJsonResponse = new Response(backendBodyText, {
         status: response.status,
         headers: {

@@ -7,7 +7,7 @@ import { handleApiRoute } from '../_helpers/api-route-handler';
 
 // GET /api/v1/meeting-minutes
 export async function GET(request: NextRequest) {
-  // console.log('Processing GET request for meeting minutes');
+  console.log('Processing GET request for meeting minutes');
   return handleApiRoute(request, '/meeting-minutes/' + request.nextUrl.search, {
     timeout: 15000, // Increase timeout for meeting minutes
     requireAuth: true
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/v1/meeting-minutes
 export async function POST(request: NextRequest) {
-  // console.log('Processing POST request for meeting minutes');
+  console.log('Processing POST request for meeting minutes');
   return handleApiRoute(request, '/meeting-minutes/', {
     timeout: 15000, // Increase timeout for meeting minutes
     requireAuth: true

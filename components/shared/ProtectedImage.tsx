@@ -52,7 +52,7 @@ export const ProtectedImage: React.FC<ProtectedImageProps> = ({
       return;
     }
 
-    // console.log(`[ProtectedImage] Formatted URL: ${formattedUrl}`);
+    console.log(`[ProtectedImage] Formatted URL: ${formattedUrl}`);
 
     // Get the auth token
     const token = getAuthToken();
@@ -69,7 +69,7 @@ export const ProtectedImage: React.FC<ProtectedImageProps> = ({
     // Use our improved image-proxy endpoint that ensures GET method with Bearer token
     // This avoids the OPTIONS preflight request and ensures proper authentication
     const proxyUrl = `/api/v1/image-proxy?url=${encodeURIComponent(formattedUrl)}&token=${encodeURIComponent(token)}&_=${cacheBuster}`;
-    // console.log(`[ProtectedImage] Using improved image-proxy URL with cache buster: ${proxyUrl}`);
+    console.log(`[ProtectedImage] Using improved image-proxy URL with cache buster: ${proxyUrl}`);
 
     // Create a new AbortController for this request
     const controller = new AbortController();
@@ -97,18 +97,18 @@ export const ProtectedImage: React.FC<ProtectedImageProps> = ({
       const objectUrl = URL.createObjectURL(blob);
       setImageSrc(objectUrl);
       setIsLoading(false);
-      // console.log(`[ProtectedImage] Image loaded successfully via fetch: ${formattedUrl}`);
+      console.log(`[ProtectedImage] Image loaded successfully via fetch: ${formattedUrl}`);
     })
     .catch(error => {
       console.error(`[ProtectedImage] Error loading image via fetch: ${formattedUrl}`, error);
 
       // Fallback to Image element approach if fetch fails
-      // console.log(`[ProtectedImage] Falling back to Image element approach`);
+      console.log(`[ProtectedImage] Falling back to Image element approach`);
 
       const img = new Image();
 
       img.onload = () => {
-        // console.log(`[ProtectedImage] Image loaded successfully via Image element: ${formattedUrl}`);
+        console.log(`[ProtectedImage] Image loaded successfully via Image element: ${formattedUrl}`);
 
         const canvas = document.createElement('canvas');
         canvas.width = img.width;

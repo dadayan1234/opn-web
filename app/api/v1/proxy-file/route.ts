@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse('Localhost URLs are not allowed', { status: 400 });
     }
 
-    // console.log(`[Proxy File] Proxying request to: ${fileUrl}`);
+    console.log(`[Proxy File] Proxying request to: ${fileUrl}`);
 
     // Get authorization from request headers first
     const headersList = headers();
@@ -43,10 +43,10 @@ export async function GET(request: NextRequest) {
         authHeader = tokenCookie.value.startsWith('Bearer ')
           ? tokenCookie.value
           : `Bearer ${tokenCookie.value}`;
-        // console.log('[Proxy File] Using token from cookies');
+        console.log('[Proxy File] Using token from cookies');
       }
     } else {
-      // console.log('[Proxy File] Using authorization from headers');
+      console.log('[Proxy File] Using authorization from headers');
     }
 
     // Create headers for the backend request
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       const maskedToken = authHeader.length > 15
         ? `${authHeader.substring(0, 10)}...${authHeader.substring(authHeader.length - 5)}`
         : '***';
-      // console.log(`[Proxy File] Added Authorization header: ${maskedToken}`);
+      console.log(`[Proxy File] Added Authorization header: ${maskedToken}`);
     } else {
       console.warn('[Proxy File] No authorization token found');
     }

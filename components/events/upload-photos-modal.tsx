@@ -116,7 +116,7 @@ export function UploadPhotosModal({ open, onClose, eventId, onSuccess }: UploadP
     }
 
     // Log the eventId for debugging
-    // console.log('[UploadPhotosModal] Event ID received:', eventId, 'Type:', typeof eventId)
+    console.log('[UploadPhotosModal] Event ID received:', eventId, 'Type:', typeof eventId)
 
     // Validate eventId
     if (!eventId) {
@@ -127,7 +127,7 @@ export function UploadPhotosModal({ open, onClose, eventId, onSuccess }: UploadP
 
     // Ensure eventId is a number
     const numericEventId = Number(eventId)
-    // console.log('[UploadPhotosModal] Converted event ID:', numericEventId, 'isNaN:', isNaN(numericEventId))
+    console.log('[UploadPhotosModal] Converted event ID:', numericEventId, 'isNaN:', isNaN(numericEventId))
 
     if (isNaN(numericEventId) || numericEventId <= 0) {
       console.error('[UploadPhotosModal] Invalid numeric event ID:', numericEventId)
@@ -140,7 +140,7 @@ export function UploadPhotosModal({ open, onClose, eventId, onSuccess }: UploadP
     setUploadProgress(0)
 
     // Log the files being uploaded
-    // console.log(`[UploadPhotosModal] Uploading ${files.length} files to event ${numericEventId}:`, files.map(f => ({ name: f.name, size: f.size, type: f.type })))
+    console.log(`[UploadPhotosModal] Uploading ${files.length} files to event ${numericEventId}:`, files.map(f => ({ name: f.name, size: f.size, type: f.type })))
 
     uploadPhotos.mutate(
       {
@@ -152,13 +152,13 @@ export function UploadPhotosModal({ open, onClose, eventId, onSuccess }: UploadP
       },
       {
         onSuccess: (response) => {
-          // console.log('Upload success response:', response)
+          console.log('Upload success response:', response)
           setIsSuccess(true)
           setIsUploading(false)
 
           // Call the onSuccess callback IMMEDIATELY if provided
           if (onSuccess) {
-            // console.log('[UploadPhotosModal] Immediately triggering onSuccess callback to refresh gallery');
+            console.log('[UploadPhotosModal] Immediately triggering onSuccess callback to refresh gallery');
             onSuccess()
           }
 

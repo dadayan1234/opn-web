@@ -130,7 +130,7 @@ export function NewsForm({ defaultValues, existingPhotos = [], newsId, onSubmit,
                     content={field.value || ''}
                     onChange={(html) => {
                       field.onChange(html);
-                      // console.log('TipTap content updated:', html);
+                      console.log('TipTap content updated:', html);
                     }}
                     placeholder="Masukkan deskripsi berita"
                   />

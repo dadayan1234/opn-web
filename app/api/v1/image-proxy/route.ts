@@ -50,10 +50,10 @@ export async function GET(request: NextRequest) {
     if (fullUrl.includes('beopn.pemudanambangan.site/') && !fullUrl.includes('beopn.pemudanambangan.site//')) {
       // Fix the URL to have double slashes
       fullUrl = fullUrl.replace('beopn.pemudanambangan.site/', 'beopn.pemudanambangan.site//');
-      // console.log(`[Image Proxy] Fixed URL to have double slashes: ${fullUrl}`);
+      console.log(`[Image Proxy] Fixed URL to have double slashes: ${fullUrl}`);
     }
 
-    // console.log(`[Image Proxy] Proxying request to: ${fullUrl}`);
+    console.log(`[Image Proxy] Proxying request to: ${fullUrl}`);
 
     // Create headers for the backend request
     const requestHeaders: HeadersInit = {
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       const maskedToken = token.length > 15
         ? `${token.substring(0, 10)}...${token.substring(token.length - 5)}`
         : '***';
-      // console.log(`[Image Proxy] Using token from query parameter: ${maskedToken}`);
+      console.log(`[Image Proxy] Using token from query parameter: ${maskedToken}`);
     }
     // Otherwise try to get from authorization header
     else {
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
         requestHeaders['Authorization'] = authorization.startsWith('Bearer ')
           ? authorization
           : `Bearer ${authorization}`;
-        // console.log('[Image Proxy] Using authorization from request header');
+        console.log('[Image Proxy] Using authorization from request header');
       }
       // Finally try cookies as last resort
       else {
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
           requestHeaders['Authorization'] = tokenValue.startsWith('Bearer ')
             ? tokenValue
             : `Bearer ${tokenValue}`;
-          // console.log('[Image Proxy] Using token from cookies');
+          console.log('[Image Proxy] Using token from cookies');
         } else {
           console.warn('[Image Proxy] No token found anywhere - request will likely fail');
         }

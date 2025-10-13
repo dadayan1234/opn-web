@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // console.log(`[Secure Image] Fetching image from: ${imageUrl}`);
+    console.log(`[Secure Image] Fetching image from: ${imageUrl}`);
 
     // Get authorization from request headers first
     const headersList = headers();
@@ -48,10 +48,10 @@ export async function GET(request: NextRequest) {
         authHeader = tokenCookie.value.startsWith('Bearer ')
           ? tokenCookie.value
           : `Bearer ${tokenCookie.value}`;
-        // console.log('[Secure Image] Using token from cookies');
+        console.log('[Secure Image] Using token from cookies');
       }
     } else {
-      // console.log('[Secure Image] Using authorization from headers');
+      console.log('[Secure Image] Using authorization from headers');
     }
 
     // Create headers for the backend request
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
       const maskedToken = formattedAuthHeader.length > 15
         ? `${formattedAuthHeader.substring(0, 15)}...${formattedAuthHeader.substring(formattedAuthHeader.length - 5)}`
         : '***';
-      // console.log(`[Secure Image] Added Authorization header: ${maskedToken}`);
+      console.log(`[Secure Image] Added Authorization header: ${maskedToken}`);
     } else {
       console.warn('[Secure Image] No authorization token found');
 

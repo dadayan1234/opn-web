@@ -13,7 +13,7 @@ export async function PUT(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`Processing PUT request for updating event photo ${id}`);
+    console.log(`Processing PUT request for updating event photo ${id}`);
 
     // Forward the request to the backend API using the correct uploads endpoint
     const response = await handleApiRoute(request, `/uploads/events/photos/${id}`, {
@@ -70,7 +70,7 @@ export async function DELETE(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`Processing DELETE request for event photo ${id}`);
+    console.log(`Processing DELETE request for event photo ${id}`);
 
     // Forward the request to the backend API using the correct uploads endpoint
     const response = await handleApiRoute(request, `/uploads/events/photos/${id}`, {

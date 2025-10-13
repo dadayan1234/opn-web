@@ -52,7 +52,7 @@ export function DirectImage({
   }
 
   // Use the image directly with the URL
-  // console.log(`[DirectImage] Using direct URL: ${url}`);
+  console.log(`[DirectImage] Using direct URL: ${url}`);
   return (
     <div className={className} style={{ width, height, position: 'relative', overflow: 'hidden' }}>
       {/* No fallback image */}

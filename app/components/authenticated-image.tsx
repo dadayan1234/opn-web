@@ -27,7 +27,7 @@ export function AuthenticatedImage({
   // Log the source for debugging
   useEffect(() => {
     if (src) {
-      // console.log(`[AuthenticatedImage] Rendering image with src: ${src}`);
+      console.log(`[AuthenticatedImage] Rendering image with src: ${src}`);
     }
   }, [src]);
 

@@ -13,7 +13,7 @@ export async function DELETE(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`[API Route] Processing DELETE request for user ID: ${id}`);
+    console.log(`[API Route] Processing DELETE request for user ID: ${id}`);
 
     // Forward the request to the backend API
     return await handleApiRoute(request, `/members/user/${id}`, {

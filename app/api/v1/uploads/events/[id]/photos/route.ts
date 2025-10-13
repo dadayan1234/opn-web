@@ -13,7 +13,7 @@ export async function GET(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`Processing GET request for event ${id} photos from uploads endpoint`);
+    console.log(`Processing GET request for event ${id} photos from uploads endpoint`);
 
     // Since the backend might not have a direct GET endpoint for photos,
     // we'll try to get the event details first and extract the photos
@@ -30,7 +30,7 @@ export async function GET(
 
         // If the event has photos, return them
         if (eventData && eventData.photos && Array.isArray(eventData.photos)) {
-          // console.log(`Found ${eventData.photos.length} photos in event ${id} details`);
+          console.log(`Found ${eventData.photos.length} photos in event ${id} details`);
           return new Response(
             JSON.stringify(eventData.photos),
             {
@@ -42,7 +42,7 @@ export async function GET(
       }
 
       // If we couldn't get photos from the event details, try the direct uploads endpoint
-      // console.log(`Trying direct uploads endpoint for event ${id} photos`);
+      console.log(`Trying direct uploads endpoint for event ${id} photos`);
       const uploadsResponse = await handleApiRoute(request, `/uploads/events/${id}/photos`, {
         timeout: 15000, // Increase timeout for photos
         requireAuth: true
@@ -64,7 +64,7 @@ export async function GET(
 
       // If the uploads response is not OK, return an empty array
       if (!uploadsResponse.ok) {
-        // console.log(`No photos found for event ${id} in uploads endpoint (${uploadsResponse.status})`);
+        console.log(`No photos found for event ${id} in uploads endpoint (${uploadsResponse.status})`);
         return new Response(
           JSON.stringify([]),
           {
@@ -85,7 +85,7 @@ export async function GET(
                            uploaded_at: new Date().toISOString()
                          })) : []);
 
-      // console.log(`Returning ${photosArray.length} photos for event ${id} from uploads endpoint`);
+      console.log(`Returning ${photosArray.length} photos for event ${id} from uploads endpoint`);
       return new Response(
         JSON.stringify(photosArray),
         {
@@ -127,7 +127,7 @@ export async function POST(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`Processing POST request for uploading photos to event ${id}`);
+    console.log(`Processing POST request for uploading photos to event ${id}`);
 
     // Forward the request to the backend API using the correct uploads endpoint
     const response = await handleApiRoute(request, `/uploads/events/${id}/photos`, {

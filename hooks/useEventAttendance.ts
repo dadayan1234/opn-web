@@ -46,9 +46,9 @@ export function useEventAttendance(eventId: number | string) {
     // Only try to save if we have a valid eventId and records
     if (attendanceRecords.length > 0 && eventId && eventId !== 0 && createOrUpdateAttendance) {
       try {
-        // console.log('Saving attendance records for event:', eventId, 'Records:', attendanceRecords.length)
+        console.log('Saving attendance records for event:', eventId, 'Records:', attendanceRecords.length)
         await createOrUpdateAttendance.mutateAsync(attendanceRecords)
-        // console.log('Attendance records saved successfully')
+        console.log('Attendance records saved successfully')
         return true
       } catch (error) {
         console.error('Error saving attendance records:', error)
@@ -57,11 +57,11 @@ export function useEventAttendance(eventId: number | string) {
     } else {
       // Log why we're not saving
       if (!attendanceRecords.length) {
-        // console.log('No attendance records to save')
+        console.log('No attendance records to save')
       } else if (!eventId || eventId === 0) {
-        // console.log('No valid eventId for saving attendance')
+        console.log('No valid eventId for saving attendance')
       } else if (!createOrUpdateAttendance) {
-        // console.log('createOrUpdateAttendance mutation is not available')
+        console.log('createOrUpdateAttendance mutation is not available')
       }
       // Just return success
       return true

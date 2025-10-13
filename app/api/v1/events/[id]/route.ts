@@ -13,11 +13,11 @@ export async function GET(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`[API Route] Processing GET request for event ID: ${id}`);
+    console.log(`[API Route] Processing GET request for event ID: ${id}`);
 
     // Forward the request to the backend API without trailing slash
     try {
-      // console.log(`[API Route] Fetching event ${id} without trailing slash`);
+      console.log(`[API Route] Fetching event ${id} without trailing slash`);
       const response = await handleApiRoute(request, `/events/${id}`, {
         timeout: 15000, // Increase timeout for event details
         requireAuth: true
@@ -25,7 +25,7 @@ export async function GET(
 
       // If the event is not found, return a 404 response
       if (response.status === 404) {
-        // console.log(`[API Route] Event ${id} not found`);
+        console.log(`[API Route] Event ${id} not found`);
         return new Response(
           JSON.stringify({ error: 'Event not found', message: 'The requested event does not exist' }),
           { status: 404, headers: { 'Content-Type': 'application/json' } }
@@ -59,7 +59,7 @@ export async function PUT(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`[API Route] Processing PUT request for event ID: ${id}`);
+    console.log(`[API Route] Processing PUT request for event ID: ${id}`);
 
     // Forward the request to the backend API without trailing slash
     return await handleApiRoute(request, `/events/${id}`, {
@@ -85,7 +85,7 @@ export async function DELETE(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`[API Route] Processing DELETE request for event ID: ${id}`);
+    console.log(`[API Route] Processing DELETE request for event ID: ${id}`);
 
     // Forward the request to the backend API without trailing slash
     return await handleApiRoute(request, `/events/${id}`, {

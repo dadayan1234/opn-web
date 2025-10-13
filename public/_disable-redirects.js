@@ -1,6 +1,6 @@
 // This script disables all automatic redirects to prevent redirect loops
 
-// console.log('Disabling automatic redirects');
+console.log('Disabling automatic redirects');
 
 // Override any existing redirect functions
 window.disableStaticRedirects = true;
@@ -69,13 +69,13 @@ if (redirectCount > 3) {
   // Reset redirect count after 30 seconds
   setTimeout(function() {
     sessionStorage.setItem('redirectCount', '0');
-    // console.log('Reset redirect count');
+    console.log('Reset redirect count');
   }, 30000);
 }
 
 // Function to run when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-  // console.log('DOM loaded, ensuring no static redirects occur');
+  console.log('DOM loaded, ensuring no static redirects occur');
 
   // Find and disable any redirect scripts
   const scripts = document.querySelectorAll('script');
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (script.textContent &&
         (script.textContent.includes('window.location.href') ||
          script.textContent.includes('isAuthenticated'))) {
-      // console.log('Found a potential redirect script, disabling it');
+      console.log('Found a potential redirect script, disabling it');
       script.textContent = '// Disabled to prevent redirect loops';
     }
   });

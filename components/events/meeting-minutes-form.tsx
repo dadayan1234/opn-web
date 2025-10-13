@@ -118,7 +118,7 @@ export function MeetingMinutesForm({ defaultValues, eventId, onSubmit, isSubmitt
                     content={field.value || ''}
                     onChange={(html) => {
                       field.onChange(html);
-                      // console.log('TipTap content updated:', html);
+                      console.log('TipTap content updated:', html);
                     }}
                     placeholder="Masukkan deskripsi notulensi"
                     className="min-h-32"

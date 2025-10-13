@@ -99,7 +99,7 @@ export function DirectBackendImage({
 
   // Do NOT fix double slashes in URL as the backend requires them
   // The backend expects URLs like https://beopn.mysesa.site//uploads/...
-  // console.log(`[DirectBackendImage] Using URL: ${url}`);
+  console.log(`[DirectBackendImage] Using URL: ${url}`);
 
   // Keep the original URL as is
   // url = url;
@@ -114,7 +114,7 @@ export function DirectBackendImage({
 
     // Check if the URL is a placeholder or local image
     if (url.includes('placeholder') || url.startsWith('/') && !url.startsWith('/api/')) {
-      // console.log(`[DirectBackendImage] Using local image: ${url}`);
+      console.log(`[DirectBackendImage] Using local image: ${url}`);
       // For local images, just create a blob URL directly
       if (isMounted) {
         setBlobUrl(url);
@@ -136,7 +136,7 @@ export function DirectBackendImage({
 
         // Make sure token has Bearer prefix
         const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-        // console.log(`[DirectBackendImage] Using auth token: ${authHeader.substring(0, 15)}...`);
+        console.log(`[DirectBackendImage] Using auth token: ${authHeader.substring(0, 15)}...`);
 
         // Try different approaches to fetch the image
         let response;
@@ -144,10 +144,10 @@ export function DirectBackendImage({
 
         // First try: Use fetch with authentication token directly
         try {
-          // console.log(`[DirectBackendImage] Trying to fetch with fetch API: ${url}`);
+          console.log(`[DirectBackendImage] Trying to fetch with fetch API: ${url}`);
 
           // Use fetch with authentication
-          // console.log(`[DirectBackendImage] Fetch headers:`, {
+          console.log(`[DirectBackendImage] Fetch headers:`, {
             'Authorization': `${authHeader.substring(0, 10)}...`,
             'Accept': 'image/*',
           });
@@ -162,8 +162,8 @@ export function DirectBackendImage({
             credentials: 'same-origin' // Only include credentials for same-origin requests
           });
 
-          // console.log(`[DirectBackendImage] Fetch response status: ${response.status} ${response.statusText}`);
-          // console.log(`[DirectBackendImage] Response headers:`, Object.fromEntries([...response.headers.entries()]));
+          console.log(`[DirectBackendImage] Fetch response status: ${response.status} ${response.statusText}`);
+          console.log(`[DirectBackendImage] Response headers:`, Object.fromEntries([...response.headers.entries()]));
 
           // If the response is not ok, throw an error to try the next approach
           if (!response.ok) {
@@ -180,15 +180,15 @@ export function DirectBackendImage({
             throw new Error(`Fetch failed with status ${response.status}: ${errorText}`);
           }
 
-          // console.log(`[DirectBackendImage] Successfully fetched with fetch API`);
+          console.log(`[DirectBackendImage] Successfully fetched with fetch API`);
         } catch (fetchError) {
           console.error(`[DirectBackendImage] Error fetching with fetch API:`, fetchError);
           errorMessage += `fetch error: ${fetchError.message}\n`;
 
           // Second try: Use apiClient
           try {
-            // console.log(`[DirectBackendImage] Trying to fetch with apiClient: ${url}`);
-            // console.log(`[DirectBackendImage] apiClient headers:`, {
+            console.log(`[DirectBackendImage] Trying to fetch with apiClient: ${url}`);
+            console.log(`[DirectBackendImage] apiClient headers:`, {
               'Authorization': `${authHeader.substring(0, 10)}...`,
               'Accept': 'image/*',
             });
@@ -203,8 +203,8 @@ export function DirectBackendImage({
               }
             });
 
-            // console.log(`[DirectBackendImage] apiClient response status:`, apiResponse.status);
-            // console.log(`[DirectBackendImage] apiClient response headers:`, apiResponse.headers);
+            console.log(`[DirectBackendImage] apiClient response status:`, apiResponse.status);
+            console.log(`[DirectBackendImage] apiClient response headers:`, apiResponse.headers);
 
             // Create a Response object from the apiClient response
             response = new Response(apiResponse.data, {
@@ -215,29 +215,29 @@ export function DirectBackendImage({
               },
             });
 
-            // console.log(`[DirectBackendImage] Successfully fetched with apiClient`);
+            console.log(`[DirectBackendImage] Successfully fetched with apiClient`);
           } catch (apiError) {
             console.error(`[DirectBackendImage] Error fetching with apiClient:`, apiError);
             errorMessage += `apiClient error: ${apiError.message}\n`;
 
             // Third try: Use raw-image API endpoint
             try {
-              // console.log(`[DirectBackendImage] Trying to fetch with raw-image API endpoint`);
+              console.log(`[DirectBackendImage] Trying to fetch with raw-image API endpoint`);
               const proxyUrl = `/api/v1/raw-image?url=${encodeURIComponent(url)}`;
-              // console.log(`[DirectBackendImage] Proxy URL: ${proxyUrl}`);
+              console.log(`[DirectBackendImage] Proxy URL: ${proxyUrl}`);
 
               // Use the raw-image API endpoint without additional headers
               // The server-side API will handle adding the authorization header
               response = await fetch(proxyUrl);
 
-              // console.log(`[DirectBackendImage] raw-image response status: ${response.status} ${response.statusText}`);
-              // console.log(`[DirectBackendImage] raw-image response headers:`, Object.fromEntries([...response.headers.entries()]));
+              console.log(`[DirectBackendImage] raw-image response status: ${response.status} ${response.statusText}`);
+              console.log(`[DirectBackendImage] raw-image response headers:`, Object.fromEntries([...response.headers.entries()]));
 
               if (!response.ok) {
                 throw new Error(`Raw-image API failed with status ${response.status}`);
               }
 
-              // console.log(`[DirectBackendImage] Successfully fetched with raw-image API endpoint`);
+              console.log(`[DirectBackendImage] Successfully fetched with raw-image API endpoint`);
             } catch (proxyError) {
               console.error(`[DirectBackendImage] Error fetching with raw-image API endpoint:`, proxyError);
               errorMessage += `proxy error: ${proxyError.message}`;
@@ -246,10 +246,10 @@ export function DirectBackendImage({
           }
         }
 
-        // console.log(`[DirectBackendImage] Fetch response status: ${response.status} ${response.statusText}`);
+        console.log(`[DirectBackendImage] Fetch response status: ${response.status} ${response.statusText}`);
 
         // Log detailed information about the response
-        // console.log(`[DirectBackendImage] Response headers:`, Object.fromEntries([...response.headers.entries()]));
+        console.log(`[DirectBackendImage] Response headers:`, Object.fromEntries([...response.headers.entries()]));
 
         if (!response.ok) {
           // Try to get more information about the error

@@ -27,7 +27,7 @@ export class ApiClient {
 
   private constructor() {
     // Log the API URL being used
-    // console.log('API Client initializing with URL:', API_CONFIG.BASE_URL);
+    console.log('API Client initializing with URL:', API_CONFIG.BASE_URL);
 
     this.client = axios.create({
       baseURL: API_CONFIG.BASE_URL, // Direct connection to backend
@@ -133,14 +133,14 @@ export class ApiClient {
     // 2. Try admin token
     const adminToken = localStorage.getItem('admin_token');
     if (adminToken) {
-      // console.log('Using admin token as fallback');
+      console.log('Using admin token as fallback');
       return adminToken;
     }
 
     // 3. Try sessionStorage
     const sessionToken = sessionStorage.getItem(API_CONFIG.AUTH.TOKEN_KEY);
     if (sessionToken) {
-      // console.log('Using session token as fallback');
+      console.log('Using session token as fallback');
       // Also store in localStorage for future requests
       localStorage.setItem(API_CONFIG.AUTH.TOKEN_KEY, sessionToken);
       return sessionToken;
@@ -152,7 +152,7 @@ export class ApiClient {
       "$1"
     );
     if (cookieToken) {
-      // console.log('Using cookie token as fallback');
+      console.log('Using cookie token as fallback');
       // Also store in localStorage for future requests
       localStorage.setItem(API_CONFIG.AUTH.TOKEN_KEY, cookieToken);
       return cookieToken;

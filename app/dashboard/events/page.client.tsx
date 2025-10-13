@@ -162,9 +162,9 @@ export default function EventsPageClient() {
     setAttendanceEvent(null)
     setIsAttendanceOpen(false)
   }
-// // console.log("eventsResponse:", eventsResponse)
-// // console.log("paginationMeta:", paginationMeta)
-// // console.log("isLoading:", isLoading, "isFetching:", isFetching)
+// console.log("eventsResponse:", eventsResponse)
+// console.log("paginationMeta:", paginationMeta)
+// console.log("isLoading:", isLoading, "isFetching:", isFetching)
 
 
   // Show loading state

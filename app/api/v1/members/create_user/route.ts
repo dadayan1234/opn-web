@@ -8,7 +8,7 @@ import { handleApiRoute } from '../../_helpers/api-route-handler';
 // POST /api/v1/members/create_user
 export async function POST(request: NextRequest) {
   try {
-    // console.log('[API Route] Processing POST request for creating a new user');
+    console.log('[API Route] Processing POST request for creating a new user');
     
     // Forward the request to the backend API
     const response = await handleApiRoute(request, '/members/create_user', {
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       requireAuth: true
     });
     
-    // console.log('[API Route] User creation response status:', response.status);
+    console.log('[API Route] User creation response status:', response.status);
     return response;
   } catch (error) {
     console.error('[API Route] Error in POST /members/create_user:', error);

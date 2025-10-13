@@ -16,7 +16,7 @@ export default function SimplifiedLoginPage() {
     setError("")
 
     try {
-      // console.log("Performing direct login...")
+      console.log("Performing direct login...")
 
       // Clear any existing auth data
       localStorage.clear()
@@ -46,7 +46,7 @@ export default function SimplifiedLoginPage() {
         role: "admin"
       }))
 
-      // console.log("Direct login successful, redirecting to dashboard...")
+      console.log("Direct login successful, redirecting to dashboard...")
 
       // Redirect to dashboard
       window.location.href = "/dashboard"

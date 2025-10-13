@@ -18,7 +18,7 @@ export const fileApi = {
       return new Blob();
     }
 
-    // console.log(`[API Files] Received relative path: ${relativePath}`); // Log input
+    console.log(`[API Files] Received relative path: ${relativePath}`); // Log input
 
     try {
       // 2. Construct the full absolute URL
@@ -36,7 +36,7 @@ export const fileApi = {
         throw new Error('Direct localhost requests are not allowed');
       }
 
-      // console.log(`[API Files] Constructed full URL for direct fetch: ${fullUrl}`); // Log URL being fetched
+      console.log(`[API Files] Constructed full URL for direct fetch: ${fullUrl}`); // Log URL being fetched
 
       // Get the auth token
       const token = getAuthToken();
@@ -45,7 +45,7 @@ export const fileApi = {
         throw new Error('Authentication required. Please log in again.');
       }
 
-      // console.log(`[API Files] Using auth token: ${token.substring(0, 15)}...`);
+      console.log(`[API Files] Using auth token: ${token.substring(0, 15)}...`);
 
       // 3. Fetch directly using apiClient with explicit auth header
       const response = await apiClient.get(
@@ -61,12 +61,12 @@ export const fileApi = {
         }
       );
 
-      // console.log(`[API Files] Successfully fetched file directly: ${fullUrl}`); // Log success
+      console.log(`[API Files] Successfully fetched file directly: ${fullUrl}`); // Log success
       return response.data; // Return the blob data
 
     } catch (error) {
       if (axios.isCancel(error)) {
-        // console.log('[API Files] Direct file request was cancelled for path:', relativePath);
+        console.log('[API Files] Direct file request was cancelled for path:', relativePath);
         return new Blob();
       }
 
@@ -87,7 +87,7 @@ export const fileApi = {
         // Try using the raw-image API endpoint as a fallback
         if (error.response?.status === 401 || error.response?.status === 403) {
           try {
-            // console.log(`[API Files] Trying fallback approach with raw-image API endpoint`);
+            console.log(`[API Files] Trying fallback approach with raw-image API endpoint`);
             const token = getAuthToken();
             if (!token) {
               console.error('[API Files] No authentication token available for fallback approach');
@@ -96,7 +96,7 @@ export const fileApi = {
 
             // Use the raw-image API endpoint
             const proxyUrl = `/api/v1/raw-image?url=${encodeURIComponent(fullUrl)}`;
-            // console.log(`[API Files] Using proxy URL: ${proxyUrl}`);
+            console.log(`[API Files] Using proxy URL: ${proxyUrl}`);
 
             const proxyResponse = await fetch(proxyUrl, {
               headers: {
@@ -109,7 +109,7 @@ export const fileApi = {
               return new Blob();
             }
 
-            // console.log(`[API Files] Successfully fetched file using proxy: ${proxyUrl}`);
+            console.log(`[API Files] Successfully fetched file using proxy: ${proxyUrl}`);
             return await proxyResponse.blob();
           } catch (proxyError) {
             console.error(`[API Files] Error using proxy approach:`, proxyError);

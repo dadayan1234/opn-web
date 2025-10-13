@@ -38,7 +38,7 @@ export function ClientAuthCheck({ children }: { children: React.ReactNode }) {
         }
 
         // For development/demo purposes, always consider authenticated
-        // console.log(`Auth check at ${pathname}: Bypassing authentication check`)
+        console.log(`Auth check at ${pathname}: Bypassing authentication check`)
         setIsAuthed(true)
         setIsLoading(false)
         return

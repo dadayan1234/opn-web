@@ -13,7 +13,7 @@ export async function GET(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`Processing GET request for event ${id} photos`);
+    console.log(`Processing GET request for event ${id} photos`);
 
     // Forward the request to the backend API using the correct endpoint
     const response = await handleApiRoute(request, `/uploads/events/${id}/photos`, {
@@ -103,7 +103,7 @@ export async function POST(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`Processing POST request for event ${id} photos`);
+    console.log(`Processing POST request for event ${id} photos`);
 
     // Forward the request to the backend API using the correct uploads endpoint
     const response = await handleApiRoute(request, `/uploads/events/${id}/photos`, {

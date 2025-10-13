@@ -44,7 +44,7 @@ export function NewsCard({
 
   // Log the photo URL for debugging
   if (hasPhoto) {
-    // console.log(`[NewsCard] Photo URL for news ${id}: ${photoUrl}`);
+    console.log(`[NewsCard] Photo URL for news ${id}: ${photoUrl}`);
   }
 
   return (

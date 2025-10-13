@@ -57,7 +57,7 @@ export async function withRetry<T>(
   initialDelay = API_CONFIG?.RETRY?.DELAY || 1000,
 ): Promise<AxiosResponse<T>> {
   try {
-    // console.log('Making API call with retry mechanism');
+    console.log('Making API call with retry mechanism');
     return await apiCall();
   } catch (error: any) {
     if (!retries) {
@@ -67,7 +67,7 @@ export async function withRetry<T>(
 
     // Don't retry canceled requests
     if (axios.isCancel(error)) {
-      // console.log('Request was cancelled, not retrying');
+      console.log('Request was cancelled, not retrying');
       throw error;
     }
 
@@ -83,15 +83,15 @@ export async function withRetry<T>(
         axiosError.message === 'Network Error' ||
         (axiosError.response?.status !== undefined && axiosError.response.status >= 500);
 
-      // console.log(`Axios error: ${axiosError.message}, status: ${axiosError.response?.status}, code: ${axiosError.code}`);
+      console.log(`Axios error: ${axiosError.message}, status: ${axiosError.response?.status}, code: ${axiosError.code}`);
     } else {
       // For non-Axios errors, check if it's a network error
       shouldRetry = error.message === 'Network Error' || error.message?.includes('network');
-      // console.log('Non-Axios error:', error.message);
+      console.log('Non-Axios error:', error.message);
     }
 
     if (!shouldRetry) {
-      // console.log(`Error is not retryable, throwing error`);
+      console.log(`Error is not retryable, throwing error`);
       throw error;
     }
 
@@ -103,7 +103,7 @@ export async function withRetry<T>(
       30000 // Max delay of 30 seconds
     );
 
-    // console.log(`Request failed, retrying in ${delay}ms... (${retries} attempts remaining)`);
+    console.log(`Request failed, retrying in ${delay}ms... (${retries} attempts remaining)`);
     await new Promise(resolve => setTimeout(resolve, delay));
 
     return withRetry(apiCall, retries - 1, initialDelay);

@@ -5,7 +5,7 @@ import { API_CONFIG } from './lib/config'
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
   // Log the request for debugging
-  // console.log('Middleware: Request to', request.nextUrl.pathname)
+  console.log('Middleware: Request to', request.nextUrl.pathname)
 
   // Skip authentication check for login page, static assets, and API routes
   const isLoginPage = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/simple-login'
@@ -82,7 +82,7 @@ export async function middleware(request: NextRequest) {
     // Construct the full URL
     const fullUrl = `${baseUrlWithoutApiPath}${normalizedPath}`
 
-    // console.log(`[Middleware] Redirecting direct-image request to: ${fullUrl}`)
+    console.log(`[Middleware] Redirecting direct-image request to: ${fullUrl}`)
 
     // Get token from cookies
     let token = request.cookies.get('auth_token')?.value
@@ -93,16 +93,16 @@ export async function middleware(request: NextRequest) {
     // Forward the Authorization header if it exists
     const authHeader = request.headers.get('authorization')
     if (authHeader) {
-      // console.log('Using Authorization header from request')
+      console.log('Using Authorization header from request')
       requestHeaders.set('Authorization', authHeader)
     } else if (token) {
       // If no Authorization header but we have a token in cookies, add it
       // Check if the token already has the Bearer prefix
       const authToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`
-      // console.log('Using token from cookies')
+      console.log('Using token from cookies')
       requestHeaders.set('Authorization', authToken)
     } else {
-      // console.log('No auth token found - request will be unauthorized')
+      console.log('No auth token found - request will be unauthorized')
     }
 
     // Create a new URL for the redirect
@@ -127,17 +127,17 @@ export async function middleware(request: NextRequest) {
       // Forward the Authorization header if it exists
       const authHeader = request.headers.get('authorization')
       if (authHeader) {
-        // console.log('Using Authorization header from request:', authHeader)
+        console.log('Using Authorization header from request:', authHeader)
         requestHeaders.set('Authorization', authHeader)
       } else if (token) {
         // If no Authorization header but we have a token in cookies, add it
         // Check if the token already has the Bearer prefix
         const authToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`
-        // console.log('Using token from cookies:', authToken)
+        console.log('Using token from cookies:', authToken)
         requestHeaders.set('Authorization', authToken)
       } else {
         // Don't add a mock token - let the backend handle unauthorized requests
-        // console.log('No auth token found - request will be unauthorized')
+        console.log('No auth token found - request will be unauthorized')
       }
     }
 
@@ -165,14 +165,14 @@ export async function middleware(request: NextRequest) {
 
   // If this is not the login page, a static asset, or an API route, redirect to login
   if (!isLoginPage && !isStaticAsset && !isApiRoute && !isBackendImageRequest) {
-    // console.log('Middleware: Forcing redirect to login page from:', request.nextUrl.pathname)
+    console.log('Middleware: Forcing redirect to login page from:', request.nextUrl.pathname)
 
     // Get token from cookies
     const token = request.cookies.get('auth_token')?.value
     const isLoggedIn = request.cookies.get('is_logged_in')?.value === 'true'
 
     // Log authentication status
-    // console.log('Auth check in middleware:', {
+    console.log('Auth check in middleware:', {
       token: token ? 'present' : 'missing',
       isLoggedIn: isLoggedIn ? 'true' : 'false'
     })
@@ -195,7 +195,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // If we get here, the user is authenticated, so we can proceed
-    // console.log('User is authenticated, proceeding to:', request.nextUrl.pathname)
+    console.log('User is authenticated, proceeding to:', request.nextUrl.pathname)
   }
 
   // Get response headers
@@ -207,17 +207,17 @@ export async function middleware(request: NextRequest) {
   // Forward the Authorization header if it exists
   const authHeader = request.headers.get('authorization')
   if (authHeader) {
-    // console.log('Using Authorization header from request:', authHeader)
+    console.log('Using Authorization header from request:', authHeader)
     requestHeaders.set('Authorization', authHeader)
   } else if (token) {
     // If no Authorization header but we have a token in cookies, add it
     // Check if the token already has the Bearer prefix
     const authToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`
-    // console.log('Using token from cookies:', authToken)
+    console.log('Using token from cookies:', authToken)
     requestHeaders.set('Authorization', authToken)
   } else {
     // Don't add a mock token - let the backend handle unauthorized requests
-    // console.log('No auth token found - request will be unauthorized')
+    console.log('No auth token found - request will be unauthorized')
   }
 
   const response = NextResponse.next({

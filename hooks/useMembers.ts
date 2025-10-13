@@ -23,7 +23,7 @@ export function useMembers(filters?: { age_gt?: number }) {
     retry: (failureCount, error: any) => {
       // Don't retry if the request was canceled
       if (axios.isCancel(error)) {
-        // console.log("[useMembers] Request was canceled, not retrying");
+        console.log("[useMembers] Request was canceled, not retrying");
         return false
       }
       // Retry up to 2 times for other errors

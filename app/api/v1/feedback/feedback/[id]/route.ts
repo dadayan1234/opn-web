@@ -13,7 +13,7 @@ export async function GET(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`Processing GET request for feedback ID: ${id}`);
+    console.log(`Processing GET request for feedback ID: ${id}`);
 
     // Forward the request to the backend API
     return await handleApiRoute(request, `/feedback/feedback/${id}`, {
@@ -37,7 +37,7 @@ export async function PUT(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`Processing PUT request for feedback ID: ${id}`);
+    console.log(`Processing PUT request for feedback ID: ${id}`);
 
     // Forward the request to the backend API
     return await handleApiRoute(request, `/feedback/feedback/${id}`, {
@@ -61,7 +61,7 @@ export async function DELETE(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    // console.log(`Processing DELETE request for feedback ID: ${id}`);
+    console.log(`Processing DELETE request for feedback ID: ${id}`);
 
     // Forward the request to the backend API
     return await handleApiRoute(request, `/feedback/feedback/${id}`, {

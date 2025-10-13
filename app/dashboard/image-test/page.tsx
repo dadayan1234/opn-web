@@ -35,7 +35,7 @@ export default function ImageTestPage() {
       }
 
       const data = await response.json();
-      // console.log('Upload response:', data);
+      console.log('Upload response:', data);
 
       if (data.uploaded_files && data.uploaded_files.length > 0) {
         const uploadedUrl = data.uploaded_files[0];

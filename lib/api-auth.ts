@@ -5,7 +5,7 @@ import { setAuthTokens, removeAuthTokens } from './auth-utils';
 
 // Helper function to process login response
 function processLoginResponse(data: any): { token: string; refreshToken: string } {
-  // console.log('Processing login response:', {
+  console.log('Processing login response:', {
     access_token: data.access_token ? '[PRESENT]' : '[MISSING]',
     token_type: data.token_type
   });
@@ -16,7 +16,7 @@ function processLoginResponse(data: any): { token: string; refreshToken: string 
   }
 
   // For debugging
-  // console.log('About to set auth tokens with:', {
+  console.log('About to set auth tokens with:', {
     token_length: data.access_token.length,
     refresh_token: data.refresh_token ? 'present' : 'missing'
   });
@@ -28,7 +28,7 @@ function processLoginResponse(data: any): { token: string; refreshToken: string 
     // Verify tokens were set
     setTimeout(() => {
       const storedToken = localStorage.getItem('auth_token');
-      // console.log('Verification - token in localStorage:', storedToken ? 'present' : 'missing');
+      console.log('Verification - token in localStorage:', storedToken ? 'present' : 'missing');
     }, 100);
 
     return {
@@ -46,7 +46,7 @@ export const authApi = {
   // Login function
   login: async (username: string, password: string): Promise<{ token: string; refreshToken: string }> => {
     try {
-      // console.log(`Attempting to login with username: ${username}`);
+      console.log(`Attempting to login with username: ${username}`);
 
       // Create form data
       const formData = new URLSearchParams();
@@ -56,7 +56,7 @@ export const authApi = {
 
       // Try the primary login method first using the API proxy
       try {
-        // console.log('Trying primary login method...');
+        console.log('Trying primary login method...');
         // Make API request through the local API proxy to handle CORS properly
         const response = await fetch(`/api/v1/auth/token`, {
           method: 'POST',
@@ -69,12 +69,12 @@ export const authApi = {
           credentials: 'same-origin',
         });
 
-        // console.log('Login response status:', response.status);
+        console.log('Login response status:', response.status);
 
         // If successful, process the response
         if (response.ok) {
           const data = await response.json();
-          // console.log('Login successful with primary method');
+          console.log('Login successful with primary method');
           return processLoginResponse(data);
         }
 
@@ -88,7 +88,7 @@ export const authApi = {
         throw new Error(errorText);
       } catch (primaryError) {
         // If primary method fails, try the fallback method
-        // console.log('Primary login method failed, trying fallback...', primaryError);
+        console.log('Primary login method failed, trying fallback...', primaryError);
 
         // Try the fallback login method (JSON-based) through the local API proxy
         const fallbackResponse = await fetch(`/api/v1/auth/login`, {
@@ -105,7 +105,7 @@ export const authApi = {
           credentials: 'same-origin',
         });
 
-        // console.log('Fallback login response status:', fallbackResponse.status);
+        console.log('Fallback login response status:', fallbackResponse.status);
 
         // Handle fallback response
         if (!fallbackResponse.ok) {
@@ -131,7 +131,7 @@ export const authApi = {
 
         // Parse fallback response
         const data = await fallbackResponse.json();
-        // console.log('Login successful with fallback method');
+        console.log('Login successful with fallback method');
         return processLoginResponse(data);
       }
     } catch (error: any) {

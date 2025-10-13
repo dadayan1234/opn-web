@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 
-// console.log('Running restore-test-image script...');
+console.log('Running restore-test-image script...');
 
 // Path to the test-image directory
 const testImageDir = path.join(__dirname, '..', 'app', 'test-image');
@@ -13,12 +13,12 @@ const testImageBackupDir = path.join(__dirname, '..', 'scripts', 'test-image-bac
 
 // Check if the backup directory exists
 if (fs.existsSync(testImageBackupDir)) {
-  // console.log(`Found backup directory at ${testImageBackupDir}`);
+  console.log(`Found backup directory at ${testImageBackupDir}`);
   
   // Create the test-image directory if it doesn't exist
   if (!fs.existsSync(testImageDir)) {
     fs.mkdirSync(testImageDir);
-    // console.log(`Created test-image directory at ${testImageDir}`);
+    console.log(`Created test-image directory at ${testImageDir}`);
   }
   
   // Read all files in the backup directory
@@ -31,12 +31,12 @@ if (fs.existsSync(testImageBackupDir)) {
     
     // Copy the file from the backup directory
     fs.copyFileSync(srcPath, destPath);
-    // console.log(`Copied ${srcPath} to ${destPath}`);
+    console.log(`Copied ${srcPath} to ${destPath}`);
   });
   
-  // console.log('Successfully restored test-image page');
+  console.log('Successfully restored test-image page');
 } else {
-  // console.log(`Backup directory not found at ${testImageBackupDir}`);
+  console.log(`Backup directory not found at ${testImageBackupDir}`);
 }
 
-// console.log('restore-test-image script completed');
+console.log('restore-test-image script completed');

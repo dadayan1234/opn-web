@@ -52,7 +52,7 @@ export function useEvents(
     queryFn: async ({ signal }) => {
       try {
         const raw = await eventApi.getEvents(page, limit, signal)
-        // console.log("[useEvents] raw response:", raw)
+        console.log("[useEvents] raw response:", raw)
 
         // format { data, meta }
         if (raw && typeof raw === "object" && "data" in raw && "meta" in raw) {
@@ -118,7 +118,7 @@ export function useSearchEvents(
     queryFn: async ({ signal }) => {
       try {
         const raw = await eventApi.searchEvents(filters, signal);
-        // console.log("[useSearchEvents] raw response:", raw);
+        console.log("[useSearchEvents] raw response:", raw);
 
         // ✅ Perbaikan: Jika respons adalah array, bungkus ke format yang benar
         if (Array.isArray(raw)) {
@@ -168,7 +168,7 @@ export function useEvent(id: number | string, options?: UseQueryOptions<Event>) 
     queryKey: eventKeys.detail(id),
     queryFn: async ({ signal }) => {
       try {
-        // console.log('Fetching event with ID:', id)
+        console.log('Fetching event with ID:', id)
         return await eventApi.getEvent(id, signal)
       } catch (error) {
         console.error(`Error fetching event with ID ${id}:`, error)
@@ -242,20 +242,20 @@ export function useEventAttendance(
     queryKey: eventKeys.attendance(eventId),
     queryFn: async ({ signal }) => {
       try {
-        // console.log('Fetching attendance for event ID:', eventId)
+        console.log('Fetching attendance for event ID:', eventId)
 
         // Try to get attendance data from localStorage first using our utility function
         if (typeof window !== 'undefined') {
           try {
             // Get saved attendance data using our utility function
             const savedAttendanceData = getSavedAttendanceData(eventId);
-            // console.log(`[useEventAttendance] Loaded ${savedAttendanceData.length} saved attendance records from localStorage:`, savedAttendanceData);
+            console.log(`[useEventAttendance] Loaded ${savedAttendanceData.length} saved attendance records from localStorage:`, savedAttendanceData);
 
             // Always fetch members data to ensure we have the latest member information
             try {
               // Get members data from the API
               const membersResponse = await memberApi.getMembers();
-              // console.log('[useEventAttendance] Fetched members data:', membersResponse);
+              console.log('[useEventAttendance] Fetched members data:', membersResponse);
 
               // Create a flat array of all members with their division
               const allMembers: Record<number, { name: string, division: string }> = {};
@@ -297,7 +297,7 @@ export function useEventAttendance(
                     return result;
                   } else {
                     // If no attendance data from API, create default records for all members
-                    // console.log('[useEventAttendance] No attendance data from API, creating default records for all members');
+                    console.log('[useEventAttendance] No attendance data from API, creating default records for all members');
 
                     // Create attendance records for all members with default values
                     const defaultAttendance: EventAttendance[] = [];
@@ -433,7 +433,7 @@ export function useAttendanceMutations(eventId: number | string) {
 
   const createOrUpdateAttendance = useMutation({
     mutationFn: async (attendanceData: AttendanceFormData[]) => {
-      // console.log(`[useAttendanceMutations] Saving attendance for event ${eventId}:`, attendanceData);
+      console.log(`[useAttendanceMutations] Saving attendance for event ${eventId}:`, attendanceData);
 
       const token = localStorage.getItem("token")
       if (!token) {
@@ -470,7 +470,7 @@ export function useAttendanceMutations(eventId: number | string) {
       return true
     },
     onSuccess: () => {
-      // console.log(`[useAttendanceMutations] Successfully saved attendance for event ${eventId}`);
+      console.log(`[useAttendanceMutations] Successfully saved attendance for event ${eventId}`);
 
       // Invalidate agar daftar kehadiran diperbarui
       queryClient.invalidateQueries({ queryKey: eventKeys.attendance(eventId) })

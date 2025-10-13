@@ -13,7 +13,7 @@ export async function POST(
   const { id } = params;
 
   try {
-    // console.log(`Uploading photo for user ${id}...`);
+    console.log(`Uploading photo for user ${id}...`);
 
     // Forward to backend with correct endpoint
     const response = await handleApiRoute(

@@ -22,14 +22,14 @@ export default function LoginPage() {
 
   // Simple check for existing login - no automatic redirects
   useEffect(() => {
-    // console.log('Login page loaded - checking for logout parameter');
+    console.log('Login page loaded - checking for logout parameter');
 
     // Check if this is a logout redirect (has timestamp parameter)
     const params = new URLSearchParams(window.location.search);
     const isLogoutRedirect = params.has('t');
 
     if (isLogoutRedirect) {
-      // console.log('Login page loaded after logout, clearing all tokens');
+      console.log('Login page loaded after logout, clearing all tokens');
       // Clear any remaining tokens to be safe
       localStorage.clear();
       sessionStorage.clear();
@@ -61,7 +61,7 @@ export default function LoginPage() {
 
     // Only auto-login in development mode
     if (process.env.NODE_ENV === 'development') {
-      // console.log('Development mode: Auto-login enabled');
+      console.log('Development mode: Auto-login enabled');
 
       // Set default credentials
       setUsername('admin');
@@ -82,17 +82,17 @@ export default function LoginPage() {
       localStorage.removeItem(API_CONFIG.AUTH.TOKEN_KEY)
       localStorage.removeItem(API_CONFIG.AUTH.REFRESH_TOKEN_KEY)
 
-      // console.log("Attempting to login with username:", username);
+      console.log("Attempting to login with username:", username);
 
       // Use the auth API service to login
       await authApi.login(username, password);
 
       // Login successful, tokens are already stored by authApi.login
-      // console.log("Login successful, token received")
+      console.log("Login successful, token received")
 
       // Explicitly set the is_logged_in flag to true
       localStorage.setItem('is_logged_in', 'true');
-      // console.log("is_logged_in flag set to true")
+      console.log("is_logged_in flag set to true")
 
       // Get redirect path or default to dashboard
       const redirectPath = localStorage.getItem(API_CONFIG.AUTH.REDIRECT_KEY) || '/dashboard'
@@ -103,14 +103,14 @@ export default function LoginPage() {
 
       // Verify token is stored before redirecting
       const storedToken = localStorage.getItem('auth_token')
-      // console.log('Before redirect - token in localStorage:', storedToken ? 'present' : 'missing')
+      console.log('Before redirect - token in localStorage:', storedToken ? 'present' : 'missing')
 
       if (!storedToken) {
         console.warn('Token not found in localStorage after login')
       }
 
       // Redirect
-      // console.log("Login successful, redirecting to:", redirectPath)
+      console.log("Login successful, redirecting to:", redirectPath)
 
       // Use window.location.href for a full page refresh to ensure tokens are properly loaded
       window.location.href = redirectPath;

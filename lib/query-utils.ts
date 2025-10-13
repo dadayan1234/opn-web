@@ -20,7 +20,7 @@ export function handleQueryError(
   
   // Don't treat canceled requests as errors
   if (axios.isCancel(error)) {
-    // console.log('Request was canceled - this is normal when components unmount');
+    console.log('Request was canceled - this is normal when components unmount');
     return;
   }
   

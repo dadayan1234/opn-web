@@ -18,7 +18,7 @@ export const uploadsApi = {
   ): Promise<any> => {
     try {
       // Detailed logging for debugging
-      // console.log('[API-Uploads] uploadEventPhotos called with eventId:', eventId, 'Type:', typeof eventId);
+      console.log('[API-Uploads] uploadEventPhotos called with eventId:', eventId, 'Type:', typeof eventId);
 
       // Validate eventId
       if (!eventId) {
@@ -28,18 +28,18 @@ export const uploadsApi = {
 
       // Ensure eventId is a valid number
       const numericEventId = Number(eventId);
-      // console.log('[API-Uploads] Converted event ID:', numericEventId, 'isNaN:', isNaN(numericEventId));
+      console.log('[API-Uploads] Converted event ID:', numericEventId, 'isNaN:', isNaN(numericEventId));
 
       if (isNaN(numericEventId) || numericEventId <= 0) {
         console.error('[API-Uploads] Invalid event ID (not a valid positive number) for photo upload:', eventId);
         throw new Error('Invalid event ID. Please provide a valid numeric event ID.');
       }
 
-      // console.log(`[API-Uploads] Uploading ${files.length} photos for event ID: ${numericEventId}`);
+      console.log(`[API-Uploads] Uploading ${files.length} photos for event ID: ${numericEventId}`);
 
       // Make sure the ID is properly formatted
       const id = String(numericEventId).trim();
-      // console.log('[API-Uploads] Formatted ID for API call:', id);
+      console.log('[API-Uploads] Formatted ID for API call:', id);
 
       // Create form data
       const formData = new FormData();
@@ -58,12 +58,12 @@ export const uploadsApi = {
       // Log the full API URL for debugging
       // Use the correct endpoint format based on the backend API
       const apiEndpoint = `/uploads/events/${id}/photos`; // Removed trailing slash
-      // console.log('[API-Uploads] Making API request to endpoint:', apiEndpoint);
-      // console.log('[API-Uploads] Full URL:', `${API_CONFIG.BASE_URL}${apiEndpoint}`);
+      console.log('[API-Uploads] Making API request to endpoint:', apiEndpoint);
+      console.log('[API-Uploads] Full URL:', `${API_CONFIG.BASE_URL}${apiEndpoint}`);
 
       // Use the correct endpoint for uploading photos
       const response = await withRetry(() => {
-        // console.log('[API-Uploads] Attempting API call with apiClient');
+        console.log('[API-Uploads] Attempting API call with apiClient');
         return apiClient.post(
           apiEndpoint,
           formData,
@@ -76,7 +76,7 @@ export const uploadsApi = {
                   const total = progressEvent.total || 0;
                   const loaded = progressEvent.loaded || 0;
                   const percentCompleted = total > 0 ? Math.round((loaded * 100) / total) : 0;
-                  // console.log(`[API-Uploads] Upload progress: ${percentCompleted}%`);
+                  console.log(`[API-Uploads] Upload progress: ${percentCompleted}%`);
                   onProgress(percentCompleted);
                 }
               : undefined
@@ -84,8 +84,8 @@ export const uploadsApi = {
         );
       });
 
-      // console.log(`[API-Uploads] Successfully uploaded photos for event ${id}:`, response.data);
-      // console.log('[API-Uploads] Response status:', response.status, 'Response headers:', response.headers);
+      console.log(`[API-Uploads] Successfully uploaded photos for event ${id}:`, response.data);
+      console.log('[API-Uploads] Response status:', response.status, 'Response headers:', response.headers);
 
       // Process the response based on the backend API format
       let result;
@@ -108,7 +108,7 @@ export const uploadsApi = {
     } catch (error) {
       // Handle canceled requests gracefully
       if (axios.isCancel(error)) {
-        // console.log('[API-Uploads] Event photos upload was cancelled');
+        console.log('[API-Uploads] Event photos upload was cancelled');
         return { uploaded_files: [] };
       }
 
@@ -186,7 +186,7 @@ export const uploadsApi = {
     onProgress?: (percentage: number) => void
   ): Promise<any> => {
     try {
-      // console.log(`[API] Uploading ${files.length} photos for news ID: ${newsId}`);
+      console.log(`[API] Uploading ${files.length} photos for news ID: ${newsId}`);
 
       // Make sure the ID is properly formatted
       const id = String(newsId).trim();
@@ -224,12 +224,12 @@ export const uploadsApi = {
         }
       );
 
-      // console.log(`[API] Successfully uploaded photos for news ${id}:`, response.data);
+      console.log(`[API] Successfully uploaded photos for news ${id}:`, response.data);
       return response.data;
     } catch (error) {
       // Handle canceled requests gracefully
       if (axios.isCancel(error)) {
-        // console.log('[API] News photos upload was cancelled');
+        console.log('[API] News photos upload was cancelled');
         return { uploaded_files: [] };
       }
 
@@ -252,7 +252,7 @@ export const uploadsApi = {
     onProgress?: (percentage: number) => void
   ): Promise<any> => {
     try {
-      // console.log(`[API-Uploads] Uploading document for finance ID: ${financeId}`);
+      console.log(`[API-Uploads] Uploading document for finance ID: ${financeId}`);
 
       // Validate financeId
       if (!financeId) {
@@ -262,7 +262,7 @@ export const uploadsApi = {
 
       // Ensure financeId is a valid number
       const numericFinanceId = Number(financeId);
-      // console.log('[API-Uploads] Converted finance ID:', numericFinanceId, 'isNaN:', isNaN(numericFinanceId));
+      console.log('[API-Uploads] Converted finance ID:', numericFinanceId, 'isNaN:', isNaN(numericFinanceId));
 
       if (isNaN(numericFinanceId) || numericFinanceId <= 0) {
         console.error('[API-Uploads] Invalid finance ID (not a valid positive number) for document upload:', financeId);
@@ -271,7 +271,7 @@ export const uploadsApi = {
 
       // Make sure the ID is properly formatted
       const id = String(numericFinanceId).trim();
-      // console.log('[API-Uploads] Formatted ID for API call:', id);
+      console.log('[API-Uploads] Formatted ID for API call:', id);
 
       // Create form data
       const formData = new FormData();
@@ -290,7 +290,7 @@ export const uploadsApi = {
       // Format should be: https://beopn.pemudanambangan.site/api/v1/uploads/finances/10/document
       const apiEndpoint = `/uploads/finances/${id}/document`;
       // So the full URL will be: https://beopn.pemudanambangan.site/api/v1/uploads/finances/10/document
-      // console.log('[API-Uploads] Making API request to endpoint:', apiEndpoint);
+      console.log('[API-Uploads] Making API request to endpoint:', apiEndpoint);
 
       // The uploadsApiClient has baseURL: ${API_CONFIG.BACKEND_URL}/api/v1
       // So the full URL will be: https://beopn.pemudanambangan.site/api/v1/uploads/finances/10/document
@@ -298,7 +298,7 @@ export const uploadsApi = {
 
       // Use the uploadsApiClient for uploading document with PUT method instead of POST
       const response = await withRetry(() => {
-        // console.log('[API-Uploads] Attempting API call with uploadsApiClient using PUT method');
+        console.log('[API-Uploads] Attempting API call with uploadsApiClient using PUT method');
         return uploadsApiClient.put(
           apiEndpoint,
           formData,
@@ -311,7 +311,7 @@ export const uploadsApi = {
                   const total = progressEvent.total || 0;
                   const loaded = progressEvent.loaded || 0;
                   const percentCompleted = total > 0 ? Math.round((loaded * 100) / total) : 0;
-                  // console.log(`[API-Uploads] Upload progress: ${percentCompleted}%`);
+                  console.log(`[API-Uploads] Upload progress: ${percentCompleted}%`);
                   onProgress(percentCompleted);
                 }
               : undefined
@@ -319,13 +319,13 @@ export const uploadsApi = {
         );
       });
 
-      // console.log(`[API-Uploads] Successfully uploaded document for finance ${id}:`, response.data);
-      // console.log('[API-Uploads] Response status:', response.status, 'Response headers:', response.headers);
+      console.log(`[API-Uploads] Successfully uploaded document for finance ${id}:`, response.data);
+      console.log('[API-Uploads] Response status:', response.status, 'Response headers:', response.headers);
       return response.data;
     } catch (error) {
       // Handle canceled requests gracefully
       if (axios.isCancel(error)) {
-        // console.log('[API-Uploads] Finance document upload was cancelled');
+        console.log('[API-Uploads] Finance document upload was cancelled');
         return {};
       }
 
@@ -393,7 +393,7 @@ export const uploadsApi = {
     onProgress?: (percentage: number) => void
   ): Promise<any> => {
     try {
-      // console.log(`[API-Uploads] Editing document for finance ID: ${financeId}`);
+      console.log(`[API-Uploads] Editing document for finance ID: ${financeId}`);
 
       // Validate financeId
       if (!financeId) {
@@ -403,7 +403,7 @@ export const uploadsApi = {
 
       // Ensure financeId is a valid number
       const numericFinanceId = Number(financeId);
-      // console.log('[API-Uploads] Converted finance ID:', numericFinanceId, 'isNaN:', isNaN(numericFinanceId));
+      console.log('[API-Uploads] Converted finance ID:', numericFinanceId, 'isNaN:', isNaN(numericFinanceId));
 
       if (isNaN(numericFinanceId) || numericFinanceId <= 0) {
         console.error('[API-Uploads] Invalid finance ID (not a valid positive number) for document edit:', financeId);
@@ -412,7 +412,7 @@ export const uploadsApi = {
 
       // Make sure the ID is properly formatted
       const id = String(numericFinanceId).trim();
-      // console.log('[API-Uploads] Formatted ID for API call:', id);
+      console.log('[API-Uploads] Formatted ID for API call:', id);
 
       // Create form data
       const formData = new FormData();
@@ -431,7 +431,7 @@ export const uploadsApi = {
       // Format should be: https://beopn.pemudanambangan.site/api/v1/uploads/finances/10/document
       const apiEndpoint = `/uploads/finances/${id}/document`;
       // So the full URL will be: https://beopn.pemudanambangan.site/api/v1/uploads/finances/10/document
-      // console.log('[API-Uploads] Making API request to endpoint:', apiEndpoint);
+      console.log('[API-Uploads] Making API request to endpoint:', apiEndpoint);
 
       // The uploadsApiClient has baseURL: ${API_CONFIG.BACKEND_URL}/api/v1
       // So the full URL will be: https://beopn.pemudanambangan.site/api/v1/uploads/finances/10/document
@@ -439,7 +439,7 @@ export const uploadsApi = {
 
       // Use the uploadsApiClient for editing document
       const response = await withRetry(() => {
-        // console.log('[API-Uploads] Attempting API call with uploadsApiClient');
+        console.log('[API-Uploads] Attempting API call with uploadsApiClient');
         return uploadsApiClient.put(
           apiEndpoint,
           formData,
@@ -452,7 +452,7 @@ export const uploadsApi = {
                   const total = progressEvent.total || 0;
                   const loaded = progressEvent.loaded || 0;
                   const percentCompleted = total > 0 ? Math.round((loaded * 100) / total) : 0;
-                  // console.log(`[API-Uploads] Upload progress: ${percentCompleted}%`);
+                  console.log(`[API-Uploads] Upload progress: ${percentCompleted}%`);
                   onProgress(percentCompleted);
                 }
               : undefined
@@ -460,13 +460,13 @@ export const uploadsApi = {
         );
       });
 
-      // console.log(`[API-Uploads] Successfully edited document for finance ${id}:`, response.data);
-      // console.log('[API-Uploads] Response status:', response.status, 'Response headers:', response.headers);
+      console.log(`[API-Uploads] Successfully edited document for finance ${id}:`, response.data);
+      console.log('[API-Uploads] Response status:', response.status, 'Response headers:', response.headers);
       return response.data;
     } catch (error) {
       // Handle canceled requests gracefully
       if (axios.isCancel(error)) {
-        // console.log('[API-Uploads] Finance document edit was cancelled');
+        console.log('[API-Uploads] Finance document edit was cancelled');
         return {};
       }
 
@@ -530,7 +530,7 @@ export const uploadsApi = {
   // Delete finance document
   deleteFinanceDocument: async (financeId: number | string): Promise<any> => {
     try {
-      // console.log(`[API-Uploads] Deleting document for finance ID: ${financeId}`);
+      console.log(`[API-Uploads] Deleting document for finance ID: ${financeId}`);
 
       // Validate financeId
       if (!financeId) {
@@ -540,7 +540,7 @@ export const uploadsApi = {
 
       // Ensure financeId is a valid number
       const numericFinanceId = Number(financeId);
-      // console.log('[API-Uploads] Converted finance ID:', numericFinanceId, 'isNaN:', isNaN(numericFinanceId));
+      console.log('[API-Uploads] Converted finance ID:', numericFinanceId, 'isNaN:', isNaN(numericFinanceId));
 
       if (isNaN(numericFinanceId) || numericFinanceId <= 0) {
         console.error('[API-Uploads] Invalid finance ID (not a valid positive number) for document delete:', financeId);
@@ -549,14 +549,14 @@ export const uploadsApi = {
 
       // Make sure the ID is properly formatted
       const id = String(numericFinanceId).trim();
-      // console.log('[API-Uploads] Formatted ID for API call:', id);
+      console.log('[API-Uploads] Formatted ID for API call:', id);
 
       // Log the full API URL for debugging
       // Use the standard URL format for all endpoints
       // Format should be: https://beopn.pemudanambangan.site/api/v1/uploads/finances/10/document
       const apiEndpoint = `/uploads/finances/${id}/document`;
       // So the full URL will be: https://beopn.pemudanambangan.site/api/v1/uploads/finances/10/document
-      // console.log('[API-Uploads] Making API request to endpoint:', apiEndpoint);
+      console.log('[API-Uploads] Making API request to endpoint:', apiEndpoint);
 
       // The uploadsApiClient has baseURL: ${API_CONFIG.BACKEND_URL}/api/v1
       // So the full URL will be: https://beopn.pemudanambangan.site/api/v1/uploads/finances/10/document
@@ -564,12 +564,12 @@ export const uploadsApi = {
 
       // Use the uploadsApiClient for deleting document
       const response = await withRetry(() => {
-        // console.log('[API-Uploads] Attempting API call with uploadsApiClient');
+        console.log('[API-Uploads] Attempting API call with uploadsApiClient');
         return uploadsApiClient.delete(apiEndpoint);
       });
 
-      // console.log(`[API-Uploads] Successfully deleted document for finance ${id}:`, response.data);
-      // console.log('[API-Uploads] Response status:', response.status, 'Response headers:', response.headers);
+      console.log(`[API-Uploads] Successfully deleted document for finance ${id}:`, response.data);
+      console.log('[API-Uploads] Response status:', response.status, 'Response headers:', response.headers);
       return response.data;
     } catch (error) {
       // Handle 502 Bad Gateway errors
@@ -625,7 +625,7 @@ export const uploadsApi = {
     onProgress?: (percentage: number) => void
   ): Promise<any> => {
     try {
-      // console.log(`[API] Editing photo with ID: ${photoId}`);
+      console.log(`[API] Editing photo with ID: ${photoId}`);
 
       // Make sure the ID is properly formatted
       const id = String(photoId).trim();
@@ -661,12 +661,12 @@ export const uploadsApi = {
         }
       );
 
-      // console.log(`[API] Successfully edited photo with ID ${id}:`, response.data);
+      console.log(`[API] Successfully edited photo with ID ${id}:`, response.data);
       return response.data;
     } catch (error) {
       // Handle canceled requests gracefully
       if (axios.isCancel(error)) {
-        // console.log('[API] Event photo edit was cancelled');
+        console.log('[API] Event photo edit was cancelled');
         return {};
       }
 
@@ -685,7 +685,7 @@ export const uploadsApi = {
   // Delete event photo
   deleteEventPhoto: async (photoId: number | string): Promise<any> => {
     try {
-      // console.log(`[API] Deleting photo with ID: ${photoId}`);
+      console.log(`[API] Deleting photo with ID: ${photoId}`);
 
       // Make sure the ID is properly formatted
       const id = String(photoId).trim();
@@ -693,7 +693,7 @@ export const uploadsApi = {
       // Use the correct endpoint for deleting photo
       const response = await apiClient.delete(`/uploads/events/photos/${id}`); // Removed trailing slash
 
-      // console.log(`[API] Successfully deleted photo with ID ${id}:`, response.data);
+      console.log(`[API] Successfully deleted photo with ID ${id}:`, response.data);
       return response.data;
     } catch (error) {
       // Log detailed error information
@@ -715,7 +715,7 @@ export const uploadsApi = {
     onProgress?: (percentage: number) => void
   ): Promise<any> => {
     try {
-      // console.log(`[API] Editing news photo with ID: ${photoId}`);
+      console.log(`[API] Editing news photo with ID: ${photoId}`);
 
       // Make sure the ID is properly formatted
       const id = String(photoId).trim();
@@ -751,12 +751,12 @@ export const uploadsApi = {
         }
       );
 
-      // console.log(`[API] Successfully edited news photo with ID ${id}:`, response.data);
+      console.log(`[API] Successfully edited news photo with ID ${id}:`, response.data);
       return response.data;
     } catch (error) {
       // Handle canceled requests gracefully
       if (axios.isCancel(error)) {
-        // console.log('[API] News photo edit was cancelled');
+        console.log('[API] News photo edit was cancelled');
         return {};
       }
 
@@ -775,7 +775,7 @@ export const uploadsApi = {
   // Delete news photo
   deleteNewsPhoto: async (photoId: number | string): Promise<any> => {
     try {
-      // console.log(`[API] Deleting news photo with ID: ${photoId}`);
+      console.log(`[API] Deleting news photo with ID: ${photoId}`);
 
       // Make sure the ID is properly formatted
       const id = String(photoId).trim();
@@ -783,7 +783,7 @@ export const uploadsApi = {
       // Use the correct endpoint for deleting photo
       const response = await apiClient.delete(`/uploads/news/photos/${id}`); // Removed trailing slash
 
-      // console.log(`[API] Successfully deleted news photo with ID ${id}:`, response.data);
+      console.log(`[API] Successfully deleted news photo with ID ${id}:`, response.data);
       return response.data;
     } catch (error) {
       // Log detailed error information

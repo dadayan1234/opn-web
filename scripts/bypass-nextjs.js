@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 
-// console.log('Starting bypass-nextjs script...');
+console.log('Starting bypass-nextjs script...');
 
 // Create the static-site directory if it doesn't exist
 const staticDir = path.join(__dirname, '..', 'static-site');
@@ -158,5 +158,5 @@ fs.writeFileSync(path.join(staticDir, 'dashboard.html'), dashboardHtml);
 fs.writeFileSync(path.join(staticDir, '404.html'), notFoundHtml);
 fs.writeFileSync(path.join(staticDir, '_redirects'), redirects);
 
-// console.log('Static files generated successfully!');
-// console.log('bypass-nextjs script completed successfully!');
+console.log('Static files generated successfully!');
+console.log('bypass-nextjs script completed successfully!');

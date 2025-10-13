@@ -57,7 +57,7 @@ export default function MembersPage() {
       // Force cache invalidation to ensure we get fresh data
       await queryClient.invalidateQueries({ queryKey: memberKeys.lists() })
       await refetch()
-      // console.log("Members data refreshed successfully")
+      console.log("Members data refreshed successfully")
     } catch (error) {
       console.error("Error refetching members:", error)
     } finally {

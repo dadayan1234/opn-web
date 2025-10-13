@@ -40,7 +40,7 @@ export function RealEventsStats() {
         }
 
         const data = await response.json()
-        // console.log('Events data for stats from backend:', data)
+        console.log('Events data for stats from backend:', data)
 
         // Ensure data is an array
         if (Array.isArray(data) && data.length > 0) {

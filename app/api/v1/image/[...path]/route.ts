@@ -34,7 +34,7 @@ export async function GET(
     // Construct the full URL
     const fullUrl = `${backendUrl}/uploads/${path}`;
 
-    // console.log(`[Image Route] Fetching image from: ${fullUrl}`);
+    console.log(`[Image Route] Fetching image from: ${fullUrl}`);
 
     // Get authorization from request headers first
     const headersList = headers();
@@ -49,10 +49,10 @@ export async function GET(
         authHeader = tokenCookie.value.startsWith('Bearer ')
           ? tokenCookie.value
           : `Bearer ${tokenCookie.value}`;
-        // console.log('[Image Route] Using token from cookies');
+        console.log('[Image Route] Using token from cookies');
       }
     } else {
-      // console.log('[Image Route] Using authorization from headers');
+      console.log('[Image Route] Using authorization from headers');
     }
 
     // Create headers for the backend request
@@ -67,7 +67,7 @@ export async function GET(
       const maskedToken = authHeader.length > 15
         ? `${authHeader.substring(0, 10)}...${authHeader.substring(authHeader.length - 5)}`
         : '***';
-      // console.log(`[Image Route] Added Authorization header: ${maskedToken}`);
+      console.log(`[Image Route] Added Authorization header: ${maskedToken}`);
     } else {
       console.warn('[Image Route] No authorization token found');
     }
