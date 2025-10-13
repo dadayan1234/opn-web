@@ -210,7 +210,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={toggleMobileMenu}>
               <SafeIcon><Menu className="h-6 w-6" /></SafeIcon>
             </Button>
-            <form onSubmit={handleSearch} className="ml-4 hidden md:block">
+            {/* <form onSubmit={handleSearch} className="ml-4 hidden md:block">
               <div className="relative">
                 <SafeIcon><Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" /></SafeIcon>
                 <Input
@@ -224,7 +224,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </form>
           </div>
           <div className="flex items-center space-x-3">
-            {isClient && <NotificationsDropdown />}
+            {isClient && <NotificationsDropdown />} */}
             <Button
               variant="ghost"
               size="sm"
