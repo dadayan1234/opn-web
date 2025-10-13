@@ -126,7 +126,7 @@ export default function FinancePage() {
   const openDocumentGallery = (transaction: Transaction) => {
     setSelectedFinanceId(transaction.id)
     let documentUrl = transaction.document_url;
-    console.log("Opening document gallery with URL:", documentUrl);
+    // console.log("Opening document gallery with URL:", documentUrl);
     setSelectedDocumentUrl(documentUrl)
     setIsGalleryOpen(true)
   }

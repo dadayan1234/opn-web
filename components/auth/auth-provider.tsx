@@ -40,14 +40,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Skip auth check for login page to prevent loops
     if (pathname === '/login') {
-      console.log('Auth provider: Skipping auth check on login page');
+      // console.log('Auth provider: Skipping auth check on login page');
       return;
     }
 
     const checkAuthentication = () => {
       try {
         const authenticated = isAuthenticated()
-        console.log(`Auth check for path ${pathname}: ${authenticated ? 'Authenticated' : 'Not authenticated'}`);
+        // console.log(`Auth check for path ${pathname}: ${authenticated ? 'Authenticated' : 'Not authenticated'}`);
         setIsLoggedIn(authenticated)
 
         // No automatic redirects - just update state
@@ -86,7 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Note: We're not using router.push here anymore
       // The direct window.location.href in the component will handle redirection
-      console.log('Logout successful, redirection will be handled by component')
+      // console.log('Logout successful, redirection will be handled by component')
     } catch (error) {
       console.error('Logout error:', error)
 
@@ -101,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
 
       // Note: We're not using router.push here anymore
-      console.log('Logout completed with errors, redirection will be handled by component')
+      // console.log('Logout completed with errors, redirection will be handled by component')
     }
   }
 

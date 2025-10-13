@@ -20,7 +20,7 @@ export function useMember(memberId: number | string | null) {
     queryFn: async () => {
       // If memberId is null or undefined, return null
       if (!memberId) {
-        console.log('No member ID provided. Returning null.');
+        // console.log('No member ID provided. Returning null.');
         return null;
       }
 
@@ -31,13 +31,13 @@ export function useMember(memberId: number | string | null) {
         // Handle specific error cases
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 404) {
-            console.log(`Member with ID ${memberId} not found.`);
+            // console.log(`Member with ID ${memberId} not found.`);
             return null;
           }
 
           // Handle timeout errors
           if (error.code === 'ECONNABORTED') {
-            console.log('Timeout error fetching member. Returning null.');
+            // console.log('Timeout error fetching member. Returning null.');
             toast({
               title: "Waktu permintaan habis",
               description: "Tidak dapat memuat data anggota. Silakan coba lagi nanti.",

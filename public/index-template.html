@@ -25,13 +25,13 @@
     
     // If on dashboard page and not authenticated, redirect to login
     if (isDashboardPage && !isAuthenticated()) {
-      console.log('Not authenticated, redirecting to login page');
+      // console.log('Not authenticated, redirecting to login page');
       window.location.href = '/login';
     }
     
     // If on login page and already authenticated, redirect to dashboard
     if ((window.location.pathname === '/login' || window.location.pathname === '/register') && isAuthenticated()) {
-      console.log('Already authenticated, redirecting to dashboard');
+      // console.log('Already authenticated, redirecting to dashboard');
       window.location.href = '/dashboard';
     }
   </script>

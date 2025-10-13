@@ -102,11 +102,11 @@ export function BackendImage({
       return;
     }
 
-    console.log(`[BackendImage] Using direct backend URL: ${directUrl}`);
+    // console.log(`[BackendImage] Using direct backend URL: ${directUrl}`);
     setFullUrl(directUrl);
 
     // Log that we'll be using the API proxy for authentication
-    console.log(`[BackendImage] Will use API proxy for authentication: /api/v1/direct-image?path=${encodeURIComponent(directUrl)}`);
+    // console.log(`[BackendImage] Will use API proxy for authentication: /api/v1/direct-image?path=${encodeURIComponent(directUrl)}`);
 
   }, [src]);
 
@@ -150,7 +150,7 @@ export function BackendImage({
   // Use our API proxy route to handle authentication properly
   // We need to use a proxy route that can add the Authorization header
   // since we can't add headers to <img> tags directly
-  console.log(`[BackendImage] Using API proxy for authentication: ${fullUrl}`);
+  // console.log(`[BackendImage] Using API proxy for authentication: ${fullUrl}`);
   return (
     <div className={className} style={{ width, height, position: 'relative', overflow: 'hidden' }}>
       {/* Add a fallback image that will show if the main image fails to load */}

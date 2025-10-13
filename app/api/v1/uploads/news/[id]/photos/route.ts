@@ -13,11 +13,11 @@ export async function POST(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`Processing POST request for uploading photos to news ${id}`);
+    // console.log(`Processing POST request for uploading photos to news ${id}`);
 
     // Forward the request to the backend API using the correct uploads endpoint
     // The backend expects the URL to be /uploads/news/{id}/photos (without trailing slash)
-    console.log(`[API Route] Forwarding to backend endpoint: /uploads/news/${id}/photos`);
+    // console.log(`[API Route] Forwarding to backend endpoint: /uploads/news/${id}/photos`);
     const response = await handleApiRoute(request, `/uploads/news/${id}/photos`, {
       timeout: 30000, // Increase timeout for uploads
       requireAuth: true

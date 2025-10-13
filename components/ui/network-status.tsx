@@ -20,7 +20,7 @@ export function NetworkStatus() {
 
     // Define event handlers
     const handleOnline = () => {
-      console.log('Network connection restored')
+      // console.log('Network connection restored')
       setIsOnline(true)
       // Show a temporary alert when connection is restored
       setShowAlert(true)
@@ -28,7 +28,7 @@ export function NetworkStatus() {
     }
 
     const handleOffline = () => {
-      console.log('Network connection lost')
+      // console.log('Network connection lost')
       setIsOnline(false)
       setShowAlert(true) // Keep showing when offline
     }
@@ -44,7 +44,7 @@ export function NetworkStatus() {
           setShowAlert(true)
         }
       } catch (error) {
-        console.log('API connection check failed:', error)
+        // console.log('API connection check failed:', error)
       }
     }
 

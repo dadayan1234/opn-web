@@ -14,7 +14,7 @@ export async function GET(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`Processing GET request for meeting minutes ID: ${id}`);
+    // console.log(`Processing GET request for meeting minutes ID: ${id}`);
 
     // Forward the request to the backend API
     return await handleApiRoute(request, `/meeting-minutes/${id}/`, {
@@ -38,11 +38,11 @@ export async function PUT(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`Processing PUT request for meeting minutes ID: ${id}`);
+    // console.log(`Processing PUT request for meeting minutes ID: ${id}`);
 
     // Get the request body as text
     const requestBody = await request.text();
-    console.log(`Request body for meeting minutes update:`, requestBody);
+    // console.log(`Request body for meeting minutes update:`, requestBody);
 
     // Get the authorization header
     const authHeader = request.headers.get('authorization');
@@ -82,7 +82,7 @@ export async function DELETE(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`Processing DELETE request for meeting minutes ID: ${id}`);
+    // console.log(`Processing DELETE request for meeting minutes ID: ${id}`);
 
     // Forward the request to the backend API without trailing slash
     return await handleApiRoute(request, `/meeting-minutes/${id}`, {

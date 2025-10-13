@@ -65,7 +65,7 @@ export function TipTapEditor({ content, onChange, placeholder, className = '' }:
         });
       }
 
-      console.log('Editor content updated:', html);
+      // console.log('Editor content updated:', html);
       onChange(html);
     },
     editorProps: {
@@ -82,7 +82,7 @@ export function TipTapEditor({ content, onChange, placeholder, className = '' }:
 
   useEffect(() => {
     if (editor && content !== editor.getHTML()) {
-      console.log('Setting editor content:', content || '');
+      // console.log('Setting editor content:', content || '');
       editor.commands.setContent(content || '')
     }
   }, [content, editor])
@@ -197,7 +197,7 @@ export function TipTapEditor({ content, onChange, placeholder, className = '' }:
             if (editor?.isActive('orderedList')) {
               // If we just activated an ordered list, make sure it has proper structure
               const html = editor.getHTML();
-              console.log('Ordered list activated, current HTML:', html);
+              // console.log('Ordered list activated, current HTML:', html);
             }
           }}
           title="Daftar Bernomor"
@@ -334,13 +334,13 @@ export function TipTapEditor({ content, onChange, placeholder, className = '' }:
 
 export function TipTapContent({ content }: { content: string }) {
   // Log the content for debugging
-  console.log('[TipTapContent] Received content:', content);
+  // console.log('[TipTapContent] Received content:', content);
 
   // Check if content is empty, null, undefined, or just HTML tags with no text
   const isEmpty = !content || content.trim() === '' || content.replace(/<[^>]*>/g, '').trim() === '';
 
   if (isEmpty) {
-    console.log('[TipTapContent] Content is empty');
+    // console.log('[TipTapContent] Content is empty');
     return (
       <div className="border rounded-md p-4 min-h-[100px] flex items-center justify-center text-gray-400">
         Belum ada deskripsi untuk berita ini
@@ -353,7 +353,7 @@ export function TipTapContent({ content }: { content: string }) {
 
   // Handle plain text content (no HTML tags)
   if (!processedContent.includes('<')) {
-    console.log('[TipTapContent] Content appears to be plain text, wrapping in paragraphs');
+    // console.log('[TipTapContent] Content appears to be plain text, wrapping in paragraphs');
     // Split by newlines and wrap each paragraph
     processedContent = processedContent
       .split('\n')
@@ -369,7 +369,7 @@ export function TipTapContent({ content }: { content: string }) {
   }
   // Ensure ordered lists have the proper structure with <p> tags inside <li> elements
   else if (processedContent.includes('<ol>') || processedContent.includes('<ol ')) {
-    console.log('[TipTapContent] Processing ordered lists');
+    // console.log('[TipTapContent] Processing ordered lists');
     // Use regex to ensure each list item has proper <p> tags
     processedContent = processedContent.replace(/<li>(.*?)<\/li>/g, (match, content) => {
       // If content doesn't already have <p> tags, wrap it
@@ -387,11 +387,11 @@ export function TipTapContent({ content }: { content: string }) {
            !processedContent.includes('<h1>') &&
            !processedContent.includes('<h2>') &&
            !processedContent.includes('<h3>')) {
-    console.log('[TipTapContent] No block elements found, wrapping content in paragraph');
+    // console.log('[TipTapContent] No block elements found, wrapping content in paragraph');
     processedContent = `<p>${processedContent}</p>`;
   }
 
-  console.log('[TipTapContent] Processed content:', processedContent);
+  // console.log('[TipTapContent] Processed content:', processedContent);
 
   // Use a simpler structure without border to match the news card style
   return (

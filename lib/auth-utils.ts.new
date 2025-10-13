@@ -23,7 +23,7 @@ export const isAuthenticated = (): boolean => {
       }
 
       // Log authentication status for debugging
-      if (debugMode) console.log('Auth check: Valid auth_token found in localStorage')
+      if (debugMode) // console.log('Auth check: Valid auth_token found in localStorage')
       return true
     }
 
@@ -35,7 +35,7 @@ export const isAuthenticated = (): boolean => {
       }
 
       // Log authentication status for debugging
-      if (debugMode) console.log('Auth check: Valid token found in localStorage')
+      if (debugMode) // console.log('Auth check: Valid token found in localStorage')
       return true
     }
 
@@ -44,16 +44,16 @@ export const isAuthenticated = (): boolean => {
     const cookieAuthToken = document.cookie.replace(/(?:(?:^|.*;\s*)auth_token\s*\=\s*([^;]*).*$)|^.*$/, "$1")
 
     if (cookieAuthToken && cookieAuthToken.length >= 10) {
-      if (debugMode) console.log('Auth check: Valid auth_token found in cookies')
+      if (debugMode) // console.log('Auth check: Valid auth_token found in cookies')
       return true
     }
 
     if (cookieToken && cookieToken.length >= 10) {
-      if (debugMode) console.log('Auth check: Valid token found in cookies')
+      if (debugMode) // console.log('Auth check: Valid token found in cookies')
       return true
     }
 
-    if (debugMode) console.log('Auth check: No valid token found')
+    if (debugMode) // console.log('Auth check: No valid token found')
     return false
   } catch (error) {
     console.error('Error checking authentication:', error)
@@ -66,7 +66,7 @@ export const setAuthTokens = (token: string, refreshToken?: string): void => {
   if (typeof window === 'undefined') return
 
   const debugMode = false;
-  if (debugMode) console.log('Setting auth tokens:', token ? 'Token present' : 'No token')
+  if (debugMode) // console.log('Setting auth tokens:', token ? 'Token present' : 'No token')
 
   try {
     // Store in localStorage - use both formats for compatibility
@@ -86,7 +86,7 @@ export const setAuthTokens = (token: string, refreshToken?: string): void => {
       document.cookie = `refreshToken=${refreshToken};${cookieOptions}`
     }
 
-    if (debugMode) console.log('Auth tokens set successfully')
+    if (debugMode) // console.log('Auth tokens set successfully')
   } catch (error) {
     console.error('Error setting auth tokens:', error)
   }
@@ -114,68 +114,68 @@ export const getAuthToken = (): string | null => {
   }
 
   const debugMode = false;
-  if (debugMode) console.log('[Auth] Attempting to retrieve auth token...');
+  if (debugMode) // console.log('[Auth] Attempting to retrieve auth token...');
 
   // Check localStorage first for auth_token (new format)
   const authToken = localStorage.getItem('auth_token');
   if (authToken) {
-    if (debugMode) console.log('[Auth] Found auth_token in localStorage');
+    if (debugMode) // console.log('[Auth] Found auth_token in localStorage');
     
     // If the token doesn't have the Bearer prefix, add it
     if (!authToken.startsWith('Bearer ')) {
       const tokenWithPrefix = `Bearer ${authToken}`;
-      if (debugMode) console.log('[Auth] Added Bearer prefix to auth_token');
+      if (debugMode) // console.log('[Auth] Added Bearer prefix to auth_token');
       return tokenWithPrefix;
     }
-    if (debugMode) console.log('[Auth] auth_token already has Bearer prefix');
+    if (debugMode) // console.log('[Auth] auth_token already has Bearer prefix');
     return authToken;
   }
 
   // Check localStorage for token (old format)
   const token = localStorage.getItem('token');
   if (token) {
-    if (debugMode) console.log('[Auth] Found token in localStorage');
+    if (debugMode) // console.log('[Auth] Found token in localStorage');
     
     // If the token doesn't have the Bearer prefix, add it
     if (!token.startsWith('Bearer ')) {
       const tokenWithPrefix = `Bearer ${token}`;
-      if (debugMode) console.log('[Auth] Added Bearer prefix to token');
+      if (debugMode) // console.log('[Auth] Added Bearer prefix to token');
       return tokenWithPrefix;
     }
-    if (debugMode) console.log('[Auth] token already has Bearer prefix');
+    if (debugMode) // console.log('[Auth] token already has Bearer prefix');
     return token;
   }
 
   // Fallback to cookies
   const cookieAuthToken = document.cookie.replace(/(?:(?:^|.*;\s*)auth_token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
   if (cookieAuthToken) {
-    if (debugMode) console.log('[Auth] Found auth_token in cookies');
+    if (debugMode) // console.log('[Auth] Found auth_token in cookies');
     
     // If the token doesn't have the Bearer prefix, add it
     if (!cookieAuthToken.startsWith('Bearer ')) {
       const tokenWithPrefix = `Bearer ${cookieAuthToken}`;
-      if (debugMode) console.log('[Auth] Added Bearer prefix to cookie auth_token');
+      if (debugMode) // console.log('[Auth] Added Bearer prefix to cookie auth_token');
       return tokenWithPrefix;
     }
-    if (debugMode) console.log('[Auth] cookie auth_token already has Bearer prefix');
+    if (debugMode) // console.log('[Auth] cookie auth_token already has Bearer prefix');
     return cookieAuthToken;
   }
 
   const cookieToken = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/, "$1");
   if (cookieToken) {
-    if (debugMode) console.log('[Auth] Found token in cookies');
+    if (debugMode) // console.log('[Auth] Found token in cookies');
     
     // If the token doesn't have the Bearer prefix, add it
     if (!cookieToken.startsWith('Bearer ')) {
       const tokenWithPrefix = `Bearer ${cookieToken}`;
-      if (debugMode) console.log('[Auth] Added Bearer prefix to cookie token');
+      if (debugMode) // console.log('[Auth] Added Bearer prefix to cookie token');
       return tokenWithPrefix;
     }
-    if (debugMode) console.log('[Auth] cookie token already has Bearer prefix');
+    if (debugMode) // console.log('[Auth] cookie token already has Bearer prefix');
     return cookieToken;
   }
 
-  if (debugMode) console.log('[Auth] No token found in localStorage or cookies');
+  if (debugMode) // console.log('[Auth] No token found in localStorage or cookies');
   return null;
 }
 

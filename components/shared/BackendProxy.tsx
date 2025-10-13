@@ -65,7 +65,7 @@ export function BackendProxy({
   // Construct the full URL
   const fullUrl = `${backendUrl}${normalizedPath}`;
 
-  console.log(`[BackendProxy] Using direct backend URL: ${fullUrl}`);
+  // console.log(`[BackendProxy] Using direct backend URL: ${fullUrl}`);
 
   // If there was an error loading the image, show the fallback
   if (error) {

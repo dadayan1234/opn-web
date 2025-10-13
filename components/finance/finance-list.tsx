@@ -265,7 +265,7 @@ export function FinanceList() {
                               onClick={() => {
                                 if (confirm("Apakah Anda yakin ingin menghapus transaksi ini?")) {
                                   // Delete action would go here
-                                  console.log("Delete finance", finance.id)
+                                  // console.log("Delete finance", finance.id)
                                 }
                               }}
                               title="Hapus Transaksi"

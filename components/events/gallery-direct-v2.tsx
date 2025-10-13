@@ -31,7 +31,7 @@ export function GalleryDirectV2({ eventId }: GalleryDirectV2Props) {
     setError(null)
 
     try {
-      console.log(`[GalleryDirectV2] Fetching photos for event ${eventId}`)
+      // console.log(`[GalleryDirectV2] Fetching photos for event ${eventId}`)
 
       // Use direct backend URL instead of local API proxy
       const response = await fetch(`https://beopn.pemudanambangan.site/api/v1/events/${eventId}`, {
@@ -46,10 +46,10 @@ export function GalleryDirectV2({ eventId }: GalleryDirectV2Props) {
       }
 
       const data = await response.json()
-      console.log("[GalleryDirectV2] Event response:", data)
+      // console.log("[GalleryDirectV2] Event response:", data)
 
       if (data && Array.isArray(data.photos)) {
-        console.log("[GalleryDirectV2] Raw photos:", data.photos)
+        // console.log("[GalleryDirectV2] Raw photos:", data.photos)
 
         // Filter and map photos to ensure they have valid URLs
         const validPhotos = data.photos
@@ -59,7 +59,7 @@ export function GalleryDirectV2({ eventId }: GalleryDirectV2Props) {
             // This will handle the event ID prefix and proper URL construction
             const photoUrl = formatImageUrl(photo.photo_url);
 
-            console.log(`[GalleryDirectV2] Processed photo URL: ${photoUrl}`);
+            // console.log(`[GalleryDirectV2] Processed photo URL: ${photoUrl}`);
 
             return {
               id: photo.id || Math.random(),
@@ -68,10 +68,10 @@ export function GalleryDirectV2({ eventId }: GalleryDirectV2Props) {
             };
           })
 
-        console.log("[GalleryDirectV2] Valid photos:", validPhotos)
+        // console.log("[GalleryDirectV2] Valid photos:", validPhotos)
         setPhotos(validPhotos)
       } else {
-        console.log("[GalleryDirectV2] No photos found or invalid photos array")
+        // console.log("[GalleryDirectV2] No photos found or invalid photos array")
         setPhotos([])
       }
     } catch (err) {

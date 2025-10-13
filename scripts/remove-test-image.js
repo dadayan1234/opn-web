@@ -5,12 +5,12 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('Running remove-problematic-pages script...');
+// console.log('Running remove-problematic-pages script...');
 
 // Function to safely remove a directory and its contents
 function removeDirectory(dirPath) {
   if (fs.existsSync(dirPath)) {
-    console.log(`Removing directory: ${dirPath}`);
+    // console.log(`Removing directory: ${dirPath}`);
 
     // Read all files in the directory
     const files = fs.readdirSync(dirPath);
@@ -26,13 +26,13 @@ function removeDirectory(dirPath) {
       } else {
         // Remove file
         fs.unlinkSync(filePath);
-        console.log(`Removed file: ${filePath}`);
+        // console.log(`Removed file: ${filePath}`);
       }
     }
 
     // Remove the empty directory
     fs.rmdirSync(dirPath);
-    console.log(`Removed empty directory: ${dirPath}`);
+    // console.log(`Removed empty directory: ${dirPath}`);
     return true;
   }
   return false;
@@ -52,5 +52,5 @@ for (const dir of problematicDirs) {
   }
 }
 
-console.log(`Removed ${removedCount} problematic directories`);
-console.log('remove-problematic-pages script completed');
+// console.log(`Removed ${removedCount} problematic directories`);
+// console.log('remove-problematic-pages script completed');

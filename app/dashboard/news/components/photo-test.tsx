@@ -29,10 +29,10 @@ export function PhotoTest({ newsId }: { newsId: string }) {
     setResponse(null)
 
     try {
-      console.log(`Uploading file to news ID ${newsId}:`, file)
+      // console.log(`Uploading file to news ID ${newsId}:`, file)
 
       // Display file details
-      console.log('File details:', {
+      // console.log('File details:', {
         name: file.name,
         type: file.type,
         size: `${(file.size / 1024).toFixed(2)} KB`,
@@ -46,7 +46,7 @@ export function PhotoTest({ newsId }: { newsId: string }) {
           const maskedToken = token.length > 20
             ? `${token.substring(0, 10)}...${token.substring(token.length - 10)}`
             : '***';
-          console.log(`Auth token available: ${maskedToken}`);
+          // console.log(`Auth token available: ${maskedToken}`);
         } else {
           console.warn('No auth token found in localStorage');
         }
@@ -56,7 +56,7 @@ export function PhotoTest({ newsId }: { newsId: string }) {
 
       // Attempt to upload the file
       const result = await newsApi.uploadNewsPhoto(newsId, file)
-      console.log("Upload result:", result)
+      // console.log("Upload result:", result)
       setResponse(result)
     } catch (err: any) {
       console.error("Upload error:", err)

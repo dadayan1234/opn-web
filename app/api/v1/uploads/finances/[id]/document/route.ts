@@ -19,7 +19,7 @@ export async function POST(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`Processing POST request for uploading document to finance ${id}`);
+    // console.log(`Processing POST request for uploading document to finance ${id}`);
 
     // Forward the request to the backend API using the correct uploads endpoint
     // Note: The endpoint should start with /uploads/ to trigger the special URL handling in handleApiRoute
@@ -77,7 +77,7 @@ export async function PUT(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`Processing PUT request for updating document for finance ${id}`);
+    // console.log(`Processing PUT request for updating document for finance ${id}`);
 
     // Forward the request to the backend API using the correct uploads endpoint
     // Note: The endpoint should start with /uploads/ to trigger the special URL handling in handleApiRoute
@@ -135,7 +135,7 @@ export async function DELETE(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`Processing DELETE request for document of finance ${id}`);
+    // console.log(`Processing DELETE request for document of finance ${id}`);
 
     // Forward the request to the backend API using the correct uploads endpoint
     // Note: The endpoint should start with /uploads/ to trigger the special URL handling in handleApiRoute

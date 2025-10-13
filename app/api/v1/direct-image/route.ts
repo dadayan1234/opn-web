@@ -50,16 +50,16 @@ export async function GET(request: NextRequest) {
     // If it's a full URL, extract the path part
     if (normalizedPath.startsWith('http')) {
       try {
-        console.log(`[Direct Image] Parsing full URL: ${normalizedPath}`);
+        // console.log(`[Direct Image] Parsing full URL: ${normalizedPath}`);
         const url = new URL(normalizedPath);
 
         // Check if this is a URL to our backend
         if (url.hostname === 'beopn.mysesa.site') {
-          console.log(`[Direct Image] Detected backend URL, extracting path: ${url.pathname}`);
+          // console.log(`[Direct Image] Detected backend URL, extracting path: ${url.pathname}`);
           normalizedPath = url.pathname;
         } else {
           // If it's not our backend, we should use the full URL
-          console.log(`[Direct Image] Using external URL directly: ${normalizedPath}`);
+          // console.log(`[Direct Image] Using external URL directly: ${normalizedPath}`);
           // We'll handle this case below by setting fullUrl directly
         }
       } catch (e) {
@@ -96,14 +96,14 @@ export async function GET(request: NextRequest) {
 
         // If it's our backend URL or any other valid URL, use it directly
         fullUrl = imagePath;
-        console.log(`[Direct Image] Using URL directly: ${fullUrl}`);
+        // console.log(`[Direct Image] Using URL directly: ${fullUrl}`);
 
         // Check if the URL contains the backend URL twice (a common error)
         if (fullUrl.includes('beopn.mysesa.site/beopn.mysesa.site')) {
           console.warn(`[Direct Image] Warning: URL contains backend URL twice: ${fullUrl}`);
           // Fix the URL by removing the duplicate backend URL
           fullUrl = fullUrl.replace('beopn.mysesa.site/beopn.mysesa.site', 'beopn.mysesa.site');
-          console.log(`[Direct Image] Fixed URL: ${fullUrl}`);
+          // console.log(`[Direct Image] Fixed URL: ${fullUrl}`);
         }
       } catch (e) {
         // If there's an error parsing the URL or it's a localhost URL, use the backend URL
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
 
         // Construct the full URL properly to avoid double slashes
         fullUrl = constructFullBackendUrl(baseUrlWithoutApiPath, normalizedPath);
-        console.log(`[Direct Image] Constructed backend URL: ${fullUrl}`);
+        // console.log(`[Direct Image] Constructed backend URL: ${fullUrl}`);
       }
     } else {
       // This is a relative path, construct the full URL using the backend URL
@@ -140,10 +140,10 @@ export async function GET(request: NextRequest) {
 
       // Construct the full URL properly to avoid double slashes
       fullUrl = constructFullBackendUrl(baseUrlWithoutApiPath, normalizedPath);
-      console.log(`[Direct Image] Constructed backend URL from relative path: ${fullUrl}`);
+      // console.log(`[Direct Image] Constructed backend URL from relative path: ${fullUrl}`);
     }
 
-    console.log(`[Direct Image] Using full backend URL: ${fullUrl}`);
+    // console.log(`[Direct Image] Using full backend URL: ${fullUrl}`);
 
     // Get authorization from request headers first
     const headersList = headers();
@@ -158,10 +158,10 @@ export async function GET(request: NextRequest) {
         authHeader = tokenCookie.value.startsWith('Bearer ')
           ? tokenCookie.value
           : `Bearer ${tokenCookie.value}`;
-        console.log('[Direct Image] Using token from cookies');
+        // console.log('[Direct Image] Using token from cookies');
       }
     } else {
-      console.log('[Direct Image] Using authorization from headers');
+      // console.log('[Direct Image] Using authorization from headers');
     }
 
     // Create headers for the backend request
@@ -176,7 +176,7 @@ export async function GET(request: NextRequest) {
       const maskedToken = authHeader.length > 15
         ? `${authHeader.substring(0, 10)}...${authHeader.substring(authHeader.length - 5)}`
         : '***';
-      console.log(`[Direct Image] Added Authorization header: ${maskedToken}`);
+      // console.log(`[Direct Image] Added Authorization header: ${maskedToken}`);
     } else {
       console.warn('[Direct Image] No authorization token found');
     }

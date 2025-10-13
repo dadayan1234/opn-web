@@ -48,7 +48,7 @@ export function BackendFinance() {
 
             if (response.ok) {
               const data = await response.json()
-              console.log('Raw backend finance data:', data)
+              // console.log('Raw backend finance data:', data)
 
               // Calculate summary from transactions if available
               if (data && Array.isArray(data.transactions) && data.transactions.length > 0) {
@@ -74,7 +74,7 @@ export function BackendFinance() {
                   current_balance: currentBalance.toString()
                 };
 
-                console.log('Calculated finance summary:', calculatedSummary);
+                // console.log('Calculated finance summary:', calculatedSummary);
                 setSummary(calculatedSummary);
                 setError(null);
                 return; // Exit early if we have data
@@ -89,7 +89,7 @@ export function BackendFinance() {
 
         // If we get here, either the API failed or returned no data
         // Use sample data instead
-        console.log('Using sample finance summary data')
+        // console.log('Using sample finance summary data')
         setSummary(sampleSummary)
         setError(null)
       } catch (err) {

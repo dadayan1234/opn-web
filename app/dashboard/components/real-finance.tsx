@@ -16,7 +16,7 @@ export function RealFinance() {
     const fetchFinanceSummary = async () => {
       try {
         setIsLoading(true)
-        console.log('Fetching finance summary')
+        // console.log('Fetching finance summary')
 
         // Get token from localStorage
         const token = localStorage.getItem('token')
@@ -39,7 +39,7 @@ export function RealFinance() {
         }
 
         const summary = await response.json()
-        console.log('Fetched finance summary:', summary)
+        // console.log('Fetched finance summary:', summary)
 
         setFinanceSummary({
           total_income: summary.total_income || "0",

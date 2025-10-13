@@ -1,6 +1,6 @@
 // EMERGENCY SCRIPT TO COMPLETELY STOP ALL REDIRECTS
 (function() {
-  console.log('EMERGENCY REDIRECT BLOCKER ACTIVATED');
+  // console.log('EMERGENCY REDIRECT BLOCKER ACTIVATED');
 
   // Clear all storage to reset authentication state
   localStorage.clear();
@@ -22,7 +22,7 @@
   // Block location.href assignments
   Object.defineProperty(window.location, 'href', {
     set: function(value) {
-      console.log('BLOCKED REDIRECT TO: ' + value);
+      // console.log('BLOCKED REDIRECT TO: ' + value);
       return value;
     },
     get: function() {
@@ -32,13 +32,13 @@
 
   // Block location.assign
   window.location.assign = function(url) {
-    console.log('BLOCKED location.assign REDIRECT TO: ' + url);
+    // console.log('BLOCKED location.assign REDIRECT TO: ' + url);
     return;
   };
 
   // Block location.replace
   window.location.replace = function(url) {
-    console.log('BLOCKED location.replace REDIRECT TO: ' + url);
+    // console.log('BLOCKED location.replace REDIRECT TO: ' + url);
     return;
   };
 

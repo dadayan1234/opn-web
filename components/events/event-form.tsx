@@ -182,7 +182,7 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
       }
 
       if (formData.time !== eventTimePart) {
-        console.log(`Time changed from '${eventTimePart}' to '${formData.time}'`);
+        // console.log(`Time changed from '${eventTimePart}' to '${formData.time}'`);
         changedFields.time = formData.time;
       }
 
@@ -526,7 +526,7 @@ export function EventForm({ event, onSuccess }: EventFormProps) {
             <MemberAttendanceForm
               eventId={event.id}
               onAttendanceChange={(records) => {
-                console.log('Attendance records updated:', records);
+                // console.log('Attendance records updated:', records);
               }}
             />
           </CardContent>

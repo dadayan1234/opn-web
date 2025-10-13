@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const backendUrl = getBackendUrl()
     const fullUrl = `${backendUrl}/api/v1/auth/me`
     
-    console.log(`Forwarding auth/me request to: ${fullUrl}`)
+    // console.log(`Forwarding auth/me request to: ${fullUrl}`)
     
     // Forward request to backend API with timeout
     const controller = new AbortController()

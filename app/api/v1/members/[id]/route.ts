@@ -13,7 +13,7 @@ export async function GET(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`[API Route] Processing GET request for member ID: ${id}`);
+    // console.log(`[API Route] Processing GET request for member ID: ${id}`);
 
     // Forward the request to the backend API with trailing slash
     try {
@@ -24,7 +24,7 @@ export async function GET(
 
       // If the response is not OK, try without trailing slash
       if (!response.ok && response.status === 404) {
-        console.log(`[API Route] Member ${id} not found with trailing slash, trying without slash`);
+        // console.log(`[API Route] Member ${id} not found with trailing slash, trying without slash`);
         try {
           const fallbackResponse = await handleApiRoute(request, `/members/${id}`, {
             timeout: 15000,
@@ -32,13 +32,13 @@ export async function GET(
           });
 
           if (fallbackResponse.ok) {
-            console.log(`[API Route] Successfully fetched member ${id} without trailing slash`);
+            // console.log(`[API Route] Successfully fetched member ${id} without trailing slash`);
             return fallbackResponse;
           }
 
           // If both attempts fail with 404, return a friendly error
           if (fallbackResponse.status === 404) {
-            console.log(`[API Route] Member ${id} not found with or without trailing slash`);
+            // console.log(`[API Route] Member ${id} not found with or without trailing slash`);
             return new Response(
               JSON.stringify({ error: 'Member not found', message: 'The requested member does not exist' }),
               { status: 404, headers: { 'Content-Type': 'application/json' } }
@@ -79,7 +79,7 @@ export async function PUT(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`[API Route] Processing PUT request for member ID: ${id}`);
+    // console.log(`[API Route] Processing PUT request for member ID: ${id}`);
 
     // Forward the request to the backend API with trailing slash
     return await handleApiRoute(request, `/members/${id}/`, {
@@ -105,7 +105,7 @@ export async function DELETE(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`[API Route] Processing DELETE request for member ID: ${id}`);
+    // console.log(`[API Route] Processing DELETE request for member ID: ${id}`);
 
     // Forward the request to the backend API with trailing slash
     return await handleApiRoute(request, `/members/${id}/`, {

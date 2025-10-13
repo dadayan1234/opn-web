@@ -108,9 +108,9 @@ export function EventDetailModal({ show, onClose, event, onUpdate }: EventDetail
 
   // Use photos from the event data with proper logging
   const photos = event.photos?.map((photo: EventPhoto) => { // Add type EventPhoto
-    console.log("[EventDetailModal] Processing photo:", photo);
+    // console.log("[EventDetailModal] Processing photo:", photo);
     const photoUrl = photo.photo_url;
-    console.log("[EventDetailModal] Photo URL before formatting:", photoUrl);
+    // console.log("[EventDetailModal] Photo URL before formatting:", photoUrl);
 
     // Create a photo object with proper URL
     const photoObj = {
@@ -121,12 +121,12 @@ export function EventDetailModal({ show, onClose, event, onUpdate }: EventDetail
       date: photo.uploaded_at || event.date
     };
 
-    console.log("[EventDetailModal] Processed photo object:", photoObj);
+    // console.log("[EventDetailModal] Processed photo object:", photoObj);
     return photoObj;
   }) || [];
 
   // Log the final photos array
-  console.log("[EventDetailModal] Final photos array:", photos);
+  // console.log("[EventDetailModal] Final photos array:", photos);
 
   // Handle saving attendance
   const handleSaveAttendance = async () => {
@@ -135,7 +135,7 @@ export function EventDetailModal({ show, onClose, event, onUpdate }: EventDetail
 
     setIsSavingAttendance(true);
     try {
-      console.log(`Saving attendance for member ${attendee.member_id || attendee.id} with status: ${attendanceForm.status}`);
+      // console.log(`Saving attendance for member ${attendee.member_id || attendee.id} with status: ${attendanceForm.status}`);
 
       // Format the data for the API and ensure status is one of the allowed values
       // Only allow the three valid status values from the database schema: Hadir, Izin, Alfa
@@ -159,7 +159,7 @@ export function EventDetailModal({ show, onClose, event, onUpdate }: EventDetail
       // Refresh the attendance data
       eventApi.getEventAttendance(event.id)
         .then(data => {
-          console.log('Fetched updated attendance data:', data);
+          // console.log('Fetched updated attendance data:', data);
           setAttendees(data);
 
           // Update the parent component with the refreshed event data
@@ -235,7 +235,7 @@ export function EventDetailModal({ show, onClose, event, onUpdate }: EventDetail
                 className="rounded-none border-b-2 border-transparent px-4 py-3 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600"
                 onClick={() => {
                   // Log when the minutes tab is clicked
-                  console.log("[EventDetailModal] Notulensi tab clicked");
+                  // console.log("[EventDetailModal] Notulensi tab clicked");
                 }}
               >
                 Notulensi
@@ -515,11 +515,11 @@ export function EventDetailModal({ show, onClose, event, onUpdate }: EventDetail
                     ) : (
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {photos.map((photo: EventPhoto & { url?: string, caption?: string, date?: string }) => { // Add extended type with optional properties
-                          console.log("[EventDetailModal] Rendering photo:", photo);
+                          // console.log("[EventDetailModal] Rendering photo:", photo);
                           const photoUrl = photo.photo_url || photo.url;
-                          console.log("[EventDetailModal] Photo URL:", photoUrl);
+                          // console.log("[EventDetailModal] Photo URL:", photoUrl);
                           const formattedUrl = formatImageUrl(photoUrl);
-                          console.log("[EventDetailModal] Formatted URL:", formattedUrl);
+                          // console.log("[EventDetailModal] Formatted URL:", formattedUrl);
 
                           return (
                             <div
@@ -651,13 +651,13 @@ export function EventDetailModal({ show, onClose, event, onUpdate }: EventDetail
       eventId={event.id}
       onSuccess={() => {
         // Refresh the event data
-        console.log('Photos uploaded successfully')
+        // console.log('Photos uploaded successfully')
         // Update the parent component with the refreshed event data
         if (onUpdate && typeof onUpdate === 'function') {
           // Fetch the latest event data
           eventApi.getEvent(event.id)
             .then(updatedEvent => {
-              console.log('Fetched updated event data:', updatedEvent);
+              // console.log('Fetched updated event data:', updatedEvent);
               onUpdate(updatedEvent);
             })
             .catch(error => {

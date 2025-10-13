@@ -13,7 +13,7 @@ export async function GET(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`Processing GET request for event ID: ${id}`);
+    // console.log(`Processing GET request for event ID: ${id}`);
 
     // Forward the request to the backend API
     return await handleApiRoute(request, `/events/${id}`, {
