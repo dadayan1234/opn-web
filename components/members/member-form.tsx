@@ -313,6 +313,7 @@ export function MemberForm({ defaultValues, onSubmit, isSubmitting = false, isEd
                   <SelectItem value="lingkungan">Divisi Lingkungan</SelectItem>
                   <SelectItem value="perlengkapan">Divisi Perlengkapan</SelectItem>
                   <SelectItem value="media">Divisi Media</SelectItem>
+                  <SelectItem value="anggota">Anggota</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

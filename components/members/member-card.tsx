@@ -11,6 +11,7 @@ export function MemberCard({ member, onEdit, onDelete }) {
       "divisi lingkungan": "Divisi Lingkungan",
       "divisi perlengkapan": "Divisi Perlengkapan",
       "divisi media": "Divisi Media",
+      "anggota": "Anggota",
     };
     return divisionMap[division] || division || "Belum ada divisi";
   };
@@ -23,6 +24,7 @@ export function MemberCard({ member, onEdit, onDelete }) {
       "divisi lingkungan": "bg-emerald-100 text-emerald-700 border-emerald-200", 
       "divisi perlengkapan": "bg-orange-100 text-orange-700 border-orange-200",
       "divisi media": "bg-purple-100 text-purple-700 border-purple-200",
+      "anggota": "bg-gray-100 text-gray-700 border-gray-200",
     };
     return colorMap[division] || "bg-gray-100 text-gray-700 border-gray-200";
   };

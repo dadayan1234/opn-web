@@ -85,68 +85,34 @@ export function TransactionForm({ onSubmit, defaultValues }: TransactionFormProp
         />
 
         {/* Tanggal */}
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tanggal</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full pl-3 text-left font-normal justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? format(field.value, "PPP") : <span>Pilih tanggal</span>}
-                      <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto p-0"
-                  align="start"
-                  sideOffset={4}
-                  
-                >
-                  <div className="w-[280px] p-3">
-                    <DayPicker
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                      className="rdp w-full"
-                      classNames={{
-                        table: "w-full border-collapse",
-                        head_row: "", // biarkan default (table-row)
-                        head_cell:
-                          "text-center text-muted-foreground font-normal text-xs w-9 h-9",
-                        row: "", // biarkan default (table-row)
-                        cell: "text-center align-middle w-9 h-9 relative p-0 flex items-center justify-center",
-                        day: "h-9 w-9 rounded-md hover:bg-accent hover:text-accent-foreground font-normal text-sm transition-colors",
-                        day_selected:
-                          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
-                        day_today:
-                          "bg-accent text-accent-foreground font-semibold",
-                        day_outside:
-                          "text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
-                        day_disabled: "text-muted-foreground opacity-50",
-                      }}
-                    />
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tanggal</FormLabel>
+                <FormControl>
+                  <Input
+                    type="date"
+                    value={
+                      field.value
+                        ? new Date(field.value).toISOString().split("T")[0] // prefill tanggal
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const dateStr = e.target.value
+                      // ubah ke ISO UTC format agar sesuai body request
+                      const isoDate = dateStr ? new Date(dateStr).toISOString() : undefined
+                      field.onChange(isoDate)
+                    }}
+                    className="w-full"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-                  </div>
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         {/* Deskripsi */}
         <FormField

@@ -303,6 +303,7 @@ export default function MembersPage() {
                  division === "divisi lingkungan" ? "Divisi Lingkungan" :
                  division === "divisi perlengkapan" ? "Divisi Perlengkapan" :
                  division === "divisi media" ? "Divisi Media" :
+                 division === "anggota" ? "Anggota" :
                  division}
               </TabsTrigger>
             ))}
