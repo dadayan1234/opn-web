@@ -185,7 +185,9 @@ export function EventsList() {
           console.log('Sorted events (newest first):', sortedEvents.map(e => e.date));
 
           // Set the events data
-          setEvents(sortedEvents);
+          // Batasi ke 10 event pertama
+          setEvents(sortedEvents.slice(0, 10))
+
           setError(null);
         } catch (apiError) {
           console.error("API error:", apiError);
@@ -215,12 +217,13 @@ export function EventsList() {
   }, [toast, refreshKey, currentPage]); // Include currentPage in dependencies
 
   const handleViewEvent = (event: Event) => {
-    router.push(`/dashboard/events/${event.id}`)
+  router.push(`/dashboard/events/${event.id}`)
   }
 
   const handleEditEvent = (event: Event) => {
-    router.push(`/dashboard/events/edit/${event.id}`)
+  router.push(`/dashboard/events/${event.id}/edit`)
   }
+
 
   const handleDeleteEvent = (event: Event) => {
     setSelectedEvent(event)
@@ -330,119 +333,73 @@ export function EventsList() {
         </Button>
       </div>
 
-      <div className="space-y-4">
-        {events.map((event) => (
-          <div
-            key={event.id}
-            className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-          >
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium truncate">{event.title}</h3>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <span className="truncate">
-                  {format(new Date(event.date), 'dd MMM yyyy')} • {event.location}
-                </span>
-              </div>
-              <div className="mt-1">
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-600" style={{ fontWeight: 400 }}>
-                  {event.status === 'akan datang' ? 'Akan Datang' : 'Selesai'}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2 ml-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleViewEvent(event)}
-              >
-                <Eye className="h-4 w-4" />
-                <span className="sr-only">View</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleEditEvent(event)}
-              >
-                <Edit className="h-4 w-4" />
-                <span className="sr-only">Edit</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleDeleteEvent(event)}
-              >
-                <Trash2 className="h-4 w-4" />
-                <span className="sr-only">Delete</span>
-              </Button>
-            </div>
-          </div>
-        ))}
-
-        {/* Pagination UI */}
-        {paginationMeta && paginationMeta.total_pages > 1 && (
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-            <div className="text-sm text-muted-foreground">
-              Halaman {paginationMeta.page} dari {paginationMeta.total_pages}
-              {paginationMeta.total_count !== undefined && ` (Total: ${paginationMeta.total_count} acara)`}
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => changePage(currentPage - 1)}
-                disabled={currentPage <= 1 || isLoading}
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                <span className="hidden sm:inline">Sebelumnya</span>
-              </Button>
-
-              {/* Page numbers */}
-              <div className="flex items-center space-x-1">
-                {Array.from({ length: Math.min(5, paginationMeta.total_pages) }, (_, i) => {
-                  // Show pages around current page
-                  let pageNum;
-                  if (paginationMeta.total_pages <= 5) {
-                    // If 5 or fewer pages, show all
-                    pageNum = i + 1;
-                  } else if (currentPage <= 3) {
-                    // If near start, show first 5
-                    pageNum = i + 1;
-                  } else if (currentPage >= paginationMeta.total_pages - 2) {
-                    // If near end, show last 5
-                    pageNum = paginationMeta.total_pages - 4 + i;
-                  } else {
-                    // Show 2 before and 2 after current
-                    pageNum = currentPage - 2 + i;
-                  }
-
-                  return (
-                    <Button
-                      key={pageNum}
-                      variant={pageNum === currentPage ? "default" : "outline"}
-                      size="sm"
-                      className="w-8 h-8 p-0"
-                      onClick={() => changePage(pageNum)}
-                      disabled={isLoading}
+      <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+              <tr>
+                <th className="px-6 py-4 font-semibold text-gray-800">Nama Acara</th>
+                <th className="px-6 py-4 font-semibold text-gray-800">Tanggal</th>
+                <th className="px-6 py-4 font-semibold text-gray-800">Lokasi</th>
+                <th className="px-6 py-4 font-semibold text-gray-800">Status</th>
+                <th className="px-6 py-4 text-right font-semibold text-gray-800">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {events.map((event) => (
+                <tr key={event.id} className="hover:bg-blue-50/50 transition">
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-gray-800">{event.title}</div>
+                    <div className="text-sm text-gray-600">{event.description}</div>
+                  </td>
+                  <td className="px-6 py-4 text-gray-700">
+                    {format(new Date(event.date), "dd MMMM yyyy")}
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">{event.location}</td>
+                  <td className="px-6 py-4">
+                    <span
+                      className="px-3 py-1 rounded-full text-xs font-medium"
+                      style={{
+                        backgroundColor: event.status === "selesai" ? "#dcfce7" : "#dbeafe",
+                        color: event.status === "selesai" ? "#166534" : "#1e40af",
+                        border: event.status === "selesai" ? "1px solid #bbf7d0" : "1px solid #bfdbfe"
+                      }}
                     >
-                      {pageNum}
-                    </Button>
-                  );
-                })}
-              </div>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => changePage(currentPage + 1)}
-                disabled={currentPage >= paginationMeta.total_pages || isLoading}
-              >
-                <span className="hidden sm:inline">Selanjutnya</span>
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </div>
-          </div>
-        )}
+                      {event.status === "akan datang" ? "Akan Datang" : event.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex justify-end space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => router.push(`/dashboard/events/${event.id}`)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => router.push(`/dashboard/events/${event.id}/edit`)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteEvent(event)}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-600" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+
 
       {/* Delete Confirmation Dialog */}
       {selectedEvent && (
