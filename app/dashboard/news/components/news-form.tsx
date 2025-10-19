@@ -147,41 +147,28 @@ export function NewsForm({ defaultValues, existingPhotos = [], newsId, onSubmit,
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Tanggal</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP", { locale: id })
-                      ) : (
-                        <span>Pilih tanggal</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <FormControl>
+                <input
+                  type="date"
+                  className="border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  value={
+                    field.value
+                      ? new Date(field.value).toISOString().split("T")[0] // tampilkan YYYY-MM-DD
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const dateValue = e.target.value
+                      ? new Date(e.target.value)
+                      : null;
+                    field.onChange(dateValue);
+                  }}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
 
         <FormField
           control={form.control}

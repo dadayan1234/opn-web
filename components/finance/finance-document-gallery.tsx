@@ -206,12 +206,12 @@ async function fetchImage(url: string): Promise<string> {
                 id="document"
                 type="file"
                 onChange={handleFileChange}
-                accept=".jpg,.jpeg,.png,.pdf"
+                accept=".jpg,.jpeg,.png"
                 disabled={isUploading}
                 className="cursor-pointer"
               />
               <p className="text-sm text-muted-foreground">
-                Format yang didukung: JPG, JPEG, PNG, PDF (maks. 5MB)
+                Format yang didukung: JPG, JPEG, PNG(maks. 5MB)
               </p>
             </div>
 
