@@ -38,11 +38,11 @@ export async function GET(request: NextRequest) {
         if (contentType?.includes('application/json')) {
           const responseData = await responseClone.json();
           // console.log('[API Route] Response data (first 100 chars):',
-            JSON.stringify(responseData).substring(0, 100) + '...');
+            // JSON.stringify(responseData).substring(0, 100) + '...');
         } else {
           const responseText = await responseClone.text();
           // console.log('[API Route] Response text (first 100 chars):',
-            responseText.substring(0, 100) + '...');
+            // responseText.substring(0, 100) + '...');
         }
       } catch (readError) {
         console.error('[API Route] Error reading response body:', readError);

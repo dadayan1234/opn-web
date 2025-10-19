@@ -115,10 +115,10 @@ export async function GET(
       // console.log('[API Route] Making fetch request with:');
       // console.log('[API Route] URL:', urlWithNoCacheParam);
       // console.log('[API Route] Headers:', {
-        Authorization: token.substring(0, 20) + '...',
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache',
-      });
+      //   Authorization: token.substring(0, 20) + '...',
+      //   'Cache-Control': 'no-cache',
+      //   'Pragma': 'no-cache',
+      // });
 
       // Make the request
       const response = await fetch(urlWithNoCacheParam, {

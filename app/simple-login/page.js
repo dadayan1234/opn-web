@@ -41,7 +41,7 @@ export default function SimpleLoginPage() {
 
       // Parse response
       const data = await response.json();
-      // console.log('Login successful:', {
+      console.log('Login successful:', {
         access_token: data.access_token ? '[PRESENT]' : '[MISSING]',
         token_type: data.token_type
       });
