@@ -12,32 +12,32 @@ import { getAuthToken } from '@/lib/auth-utils';
 export function formatImageUrl(url: string | null | undefined, contextId?: string | number): string {
   // If the URL is null or undefined, return empty string to prevent infinite loops
   if (!url) {
-    console.log('[formatImageUrl] URL is null or undefined');
+    // console.log('[formatImageUrl] URL is null or undefined');
     return '';
   }
 
   // If the URL is a placeholder, return empty string to prevent infinite loops
   if (url.includes('placeholder')) {
-    console.log('[formatImageUrl] URL is a placeholder, returning empty string to prevent loops');
+    // console.log('[formatImageUrl] URL is a placeholder, returning empty string to prevent loops');
     return '';
   }
 
   try {
     // Log the original URL for debugging
-    console.log(`[formatImageUrl] Original URL: ${url}`);
+    // console.log(`[formatImageUrl] Original URL: ${url}`);
 
     // Log additional details about the URL format
     if (url.includes('uploads')) {
-      console.log(`[formatImageUrl] URL contains 'uploads' path: ${url}`);
+      // console.log(`[formatImageUrl] URL contains 'uploads' path: ${url}`);
     }
 
     if (url.includes('//')) {
-      console.log(`[formatImageUrl] URL contains double slashes: ${url}`);
+      // console.log(`[formatImageUrl] URL contains double slashes: ${url}`);
     }
 
     // If it's already a complete URL, return it as is
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
-      console.log(`[formatImageUrl] URL is already complete: ${url}`);
+      // console.log(`[formatImageUrl] URL is already complete: ${url}`);
       return url;
     }
 
@@ -58,7 +58,7 @@ export function formatImageUrl(url: string | null | undefined, contextId?: strin
 
     // Remove /api/v1 from the backend URL if present
     const baseUrl = backendBaseUrl.replace(/\/api\/v1$/, '');
-    console.log(`[formatImageUrl] Base URL: ${baseUrl}`);
+    // console.log(`[formatImageUrl] Base URL: ${baseUrl}`);
 
     // For URLs from the backend API that start with /uploads or contain /uploads/
     if (url.startsWith('/uploads') || url.includes('/uploads/')) {
@@ -79,10 +79,10 @@ export function formatImageUrl(url: string | null | undefined, contextId?: strin
 
       // Preserve double slashes as required by the backend
       // The backend expects URLs like https://beopn.pemudanambangan.site//uploads/...
-      console.log(`[formatImageUrl] Using double slash format for uploads`);
+      // console.log(`[formatImageUrl] Using double slash format for uploads`);
       const fullUrl = `${baseUrl}//uploads/${pathAfterUploads}`;
 
-      console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
+      // console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
       return fullUrl;
     }
 
@@ -109,9 +109,9 @@ export function formatImageUrl(url: string | null | undefined, contextId?: strin
 
       // Preserve double slashes as required by the backend
       // The backend expects URLs like https://beopn.pemudanambangan.site//uploads/...
-      console.log(`[formatImageUrl] Using double slash format for clean URL`);
+      // console.log(`[formatImageUrl] Using double slash format for clean URL`);
       const fullUrl = `${baseUrl}//${cleanUrl}`;
-      console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
+      // console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
       return fullUrl;
     }
 
@@ -119,9 +119,9 @@ export function formatImageUrl(url: string | null | undefined, contextId?: strin
     if (url.startsWith('/')) {
       // Preserve double slashes as required by the backend
       // The backend expects URLs like https://beopn.pemudanambangan.site//uploads/...
-      console.log(`[formatImageUrl] Using double slash format for relative URL`);
+      // console.log(`[formatImageUrl] Using double slash format for relative URL`);
       const fullUrl = `${baseUrl}//${url.startsWith('/') ? url.substring(1) : url}`;
-      console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
+      // console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
       return fullUrl;
     }
 
@@ -130,18 +130,18 @@ export function formatImageUrl(url: string | null | undefined, contextId?: strin
       // Assume it's a filename that should be in the uploads directory
       // Preserve double slashes as required by the backend
       // The backend expects URLs like https://beopn.pemudanambangan.site//uploads/...
-      console.log(`[formatImageUrl] Using double slash format for uploads without slash`);
+      // console.log(`[formatImageUrl] Using double slash format for uploads without slash`);
       const fullUrl = `${baseUrl}//uploads/${url}`;
-      console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
+      // console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
       return fullUrl;
     }
 
     // For any other URL, assume it's a relative path and add the base URL
     // Preserve double slashes as required by the backend
     // The backend expects URLs like https://beopn.pemudanambangan.site//uploads/...
-    console.log(`[formatImageUrl] Using double slash format for uploads with slash`);
+    // console.log(`[formatImageUrl] Using double slash format for uploads with slash`);
     const fullUrl = `${baseUrl}//uploads/${url}`;
-    console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
+    // console.log(`[formatImageUrl] Returning direct full URL with double slash: ${fullUrl}`);
     return fullUrl;
   } catch (error) {
     console.error('[formatImageUrl] Error formatting URL:', error);
@@ -160,7 +160,7 @@ export function getAuthenticatedImageUrl(url: string | null | undefined): string
 
   // If the URL is a placeholder, return empty string to prevent infinite loops
   if (url.includes('placeholder')) {
-    console.log('[getAuthenticatedImageUrl] URL is a placeholder, returning empty string to prevent loops');
+    // console.log('[getAuthenticatedImageUrl] URL is a placeholder, returning empty string to prevent loops');
     return '';
   }
 
@@ -172,7 +172,7 @@ export function getAuthenticatedImageUrl(url: string | null | undefined): string
   if (!url.startsWith('http')) {
     // Format the URL using our utility function
     fullUrl = formatImageUrl(url);
-    console.log(`[getAuthenticatedImageUrl] Formatted URL: ${fullUrl}`);
+    // console.log(`[getAuthenticatedImageUrl] Formatted URL: ${fullUrl}`);
   }
 
   // Verify the URL doesn't contain localhost
@@ -183,12 +183,12 @@ export function getAuthenticatedImageUrl(url: string | null | undefined): string
 
   // Ensure double slashes are preserved for the backend
   if (fullUrl.includes('beopn.pemudanambangan.site/') && !fullUrl.includes('beopn.pemudanambangan.site//')) {
-    console.log(`[formatImageUrl] Fixing single slash to double slash`);
+    // console.log(`[formatImageUrl] Fixing single slash to double slash`);
     fullUrl = fullUrl.replace('beopn.pemudanambangan.site/', 'beopn.pemudanambangan.site//');
   }
 
   // Return the direct URL - the component should handle authentication
-  console.log(`[getAuthenticatedImageUrl] Using direct URL: ${fullUrl}`);
+  // console.log(`[getAuthenticatedImageUrl] Using direct URL: ${fullUrl}`);
 
   return fullUrl;
 }
@@ -228,7 +228,7 @@ export async function loadBackendImage(path: string): Promise<Blob | null> {
   try {
     // Format the URL using our utility function
     const url = formatImageUrl(path);
-    console.log(`[loadBackendImage] Formatted URL: ${url}`);
+    // console.log(`[loadBackendImage] Formatted URL: ${url}`);
 
     // IMPORTANT: Never use localhost, always use the backend URL directly
     if (url.includes('localhost')) {
@@ -248,10 +248,10 @@ export async function loadBackendImage(path: string): Promise<Blob | null> {
 
     // Add a timestamp to prevent caching
     const urlWithTimestamp = `${url}${url.includes('?') ? '&' : '?'}_t=${Date.now()}`;
-    console.log(`[loadBackendImage] Using URL with timestamp: ${urlWithTimestamp}`);
+    // console.log(`[loadBackendImage] Using URL with timestamp: ${urlWithTimestamp}`);
 
     // Make the request to the backend - explicitly use GET method
-    console.log(`[loadBackendImage] Fetching with auth token: ${authHeader.substring(0, 15)}...`);
+    // console.log(`[loadBackendImage] Fetching with auth token: ${authHeader.substring(0, 15)}...`);
     const response = await fetch(urlWithTimestamp, {
       method: 'GET', // Explicitly use GET method, not OPTIONS
       headers: {
@@ -281,21 +281,21 @@ export async function loadBackendImage(path: string): Promise<Blob | null> {
  */
 export async function fetchImageAsBlob(path: string): Promise<string | null> {
   try {
-    console.log(`[fetchImageAsBlob] Starting with original path: ${path}`);
+    // console.log(`[fetchImageAsBlob] Starting with original path: ${path}`);
 
     // Format the URL using our utility function
     const url = formatImageUrl(path);
-    console.log(`[fetchImageAsBlob] Formatted URL: ${url}`);
+    // console.log(`[fetchImageAsBlob] Formatted URL: ${url}`);
 
     // Additional logging for URL structure
     if (url.includes('uploads')) {
-      console.log(`[fetchImageAsBlob] URL contains 'uploads' path: ${url}`);
+      // console.log(`[fetchImageAsBlob] URL contains 'uploads' path: ${url}`);
 
       // Check if the URL has the correct structure
       if (url.includes('beopn.pemudanambangan.site//uploads')) {
-        console.log(`[fetchImageAsBlob] URL has correct double-slash structure`);
+        // console.log(`[fetchImageAsBlob] URL has correct double-slash structure`);
       } else if (url.includes('beopn.pemudanambangan.site/uploads')) {
-        console.log(`[fetchImageAsBlob] URL has incorrect single-slash structure`);
+        // console.log(`[fetchImageAsBlob] URL has incorrect single-slash structure`);
       }
     }
 
@@ -314,15 +314,15 @@ export async function fetchImageAsBlob(path: string): Promise<string | null> {
 
     // Make sure token has Bearer prefix
     const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
-    console.log(`[fetchImageAsBlob] Using auth token: ${authHeader.substring(0, 15)}...`);
+    // console.log(`[fetchImageAsBlob] Using auth token: ${authHeader.substring(0, 15)}...`);
 
     // Add a timestamp to prevent caching
     const urlWithTimestamp = `${url}${url.includes('?') ? '&' : '?'}_t=${Date.now()}`;
-    console.log(`[fetchImageAsBlob] Using direct URL with timestamp: ${urlWithTimestamp}`);
+    // console.log(`[fetchImageAsBlob] Using direct URL with timestamp: ${urlWithTimestamp}`);
 
     // Direct fetch with proper headers
     try {
-      console.log(`[fetchImageAsBlob] Fetching image with auth token: ${authHeader.substring(0, 15)}...`);
+      // console.log(`[fetchImageAsBlob] Fetching image with auth token: ${authHeader.substring(0, 15)}...`);
       const response = await fetch(urlWithTimestamp, {
         method: 'GET', // Explicitly use GET method, not OPTIONS
         headers: {
@@ -343,7 +343,7 @@ export async function fetchImageAsBlob(path: string): Promise<string | null> {
 
       // Create a blob URL
       const objectUrl = URL.createObjectURL(blob);
-      console.log(`[fetchImageAsBlob] Created blob URL from direct fetch: ${objectUrl}`);
+      // console.log(`[fetchImageAsBlob] Created blob URL from direct fetch: ${objectUrl}`);
 
       return objectUrl;
     } catch (fetchError) {
@@ -351,7 +351,7 @@ export async function fetchImageAsBlob(path: string): Promise<string | null> {
 
       // If direct fetch fails, try using the Image element approach
       // This approach avoids OPTIONS preflight requests
-      console.log(`[fetchImageAsBlob] Trying Image element approach`);
+      // console.log(`[fetchImageAsBlob] Trying Image element approach`);
 
       // Create a new XMLHttpRequest to avoid CORS issues
       const xhr = new XMLHttpRequest();
@@ -379,7 +379,7 @@ export async function fetchImageAsBlob(path: string): Promise<string | null> {
 
         // Create a blob URL
         const objectUrl = URL.createObjectURL(blob);
-        console.log(`[fetchImageAsBlob] Created blob URL from XHR: ${objectUrl}`);
+        // console.log(`[fetchImageAsBlob] Created blob URL from XHR: ${objectUrl}`);
 
         return objectUrl;
       } catch (xhrError) {

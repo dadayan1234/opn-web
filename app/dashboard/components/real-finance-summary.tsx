@@ -48,7 +48,7 @@ export function RealFinanceSummary() {
 
             if (response.ok) {
               const data = await response.json()
-              console.log('Finance summary data from backend:', data)
+              // console.log('Finance summary data from backend:', data)
 
               if (data && typeof data === 'object') {
                 setSummary(data)
@@ -64,7 +64,7 @@ export function RealFinanceSummary() {
 
         // If we get here, either the API failed or returned no data
         // Use sample data instead
-        console.log('Using sample finance summary data')
+        // console.log('Using sample finance summary data')
         setSummary(sampleSummary)
         setError(null)
       } catch (err) {

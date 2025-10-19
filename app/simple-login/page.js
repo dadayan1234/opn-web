@@ -15,7 +15,7 @@ export default function SimpleLoginPage() {
     setError('');
 
     try {
-      console.log('Logging in with:', { username, password: '********' });
+      // console.log('Logging in with:', { username, password: '********' });
 
       // Create form data
       const formData = new URLSearchParams();
@@ -41,7 +41,7 @@ export default function SimpleLoginPage() {
 
       // Parse response
       const data = await response.json();
-      console.log('Login successful:', {
+      // console.log('Login successful:', {
         access_token: data.access_token ? '[PRESENT]' : '[MISSING]',
         token_type: data.token_type
       });
@@ -55,7 +55,7 @@ export default function SimpleLoginPage() {
       setDirectAuth(data.access_token);
 
       // Redirect to dashboard
-      console.log('Redirecting to dashboard...');
+      // console.log('Redirecting to dashboard...');
       window.location.href = '/dashboard';
     } catch (error) {
       console.error('Login error:', error);

@@ -13,18 +13,18 @@ export function useFinanceData() {
   return useQuery<FinanceSummary>({
     queryKey: ['finance-summary'],
     queryFn: async (): Promise<FinanceSummary> => {
-      console.log('Fetching finance summary from:', `${API_CONFIG.BASE_URL}/finance/summary`);
+      // console.log('Fetching finance summary from:', `${API_CONFIG.BASE_URL}/finance/summary`);
 
       try {
         // Check network connectivity
         if (!navigator.onLine) {
-          console.log('No internet connection, using cached data if available');
+          // console.log('No internet connection, using cached data if available');
           throw new Error('No internet connection');
         }
 
         // Use financeApi instead of apiClient
         const data = await financeApi.getFinanceSummary();
-        console.log('Finance summary response data:', data);
+        // console.log('Finance summary response data:', data);
 
         if (!data || typeof data !== 'object') {
           console.error('Invalid finance summary data received:', data);
@@ -40,7 +40,7 @@ export function useFinanceData() {
         const calculatedBalance = Number(totalIncome) - Number(totalExpense);
         if (!currentBalance || Math.abs(Number(currentBalance) - calculatedBalance) > 0.01) {
           currentBalance = String(calculatedBalance);
-          console.log('Recalculated current balance:', currentBalance);
+          // console.log('Recalculated current balance:', currentBalance);
         }
 
         return {
@@ -61,7 +61,7 @@ export function useFinanceData() {
         try {
           // Use financeApi instead of apiClient
           const historyResponse = await financeApi.getFinanceHistory();
-          console.log('Fallback to finance history:', historyResponse);
+          // console.log('Fallback to finance history:', historyResponse);
 
           if (historyResponse?.transactions?.length > 0) {
             const { totalIncome, totalExpense } = historyResponse.transactions.reduce(
@@ -79,9 +79,9 @@ export function useFinanceData() {
 
             const currentBalance = totalIncome - totalExpense;
 
-            console.log('Calculated from transactions:', {
-              totalIncome, totalExpense, currentBalance
-            });
+            // console.log('Calculated from transactions:', {
+            //   totalIncome, totalExpense, currentBalance
+            // });
 
             return {
               total_income: String(totalIncome),

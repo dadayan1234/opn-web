@@ -1,27 +1,34 @@
 "use client";
 
-import { useFinanceData } from "@/lib/hooks/use-finance-data";
-import { useState } from "react"
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { PlusCircle, Edit, Trash2, ArrowUp, ArrowDown, Image, TrendingUp, TrendingDown, Wallet } from "lucide-react"
-import { TransactionForm } from "./components/transaction-form"
-import { useFinanceHistory, useFinanceMutations, type FinanceData, type FinanceTransaction } from "@/hooks/useFinance"
-import { formatRupiah } from "@/lib/utils"
 import { format } from "date-fns"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { FinanceDocumentGallery } from "./components/finance-document-gallery"
 import { TipTapContent } from "@/components/ui/tiptap-editor"
-import { TruncatedDescription } from "@/components/finance/truncated-description"
-import "./finance.css"
-import { useQueryClient } from "@tanstack/react-query";
+import { TransactionForm } from "./components/transaction-form";
+import { FinanceDocumentGallery } from "./components/finance-document-gallery";
+import { TruncatedDescription } from "@/components/finance/truncated-description";
+import { formatRupiah } from "@/lib/utils";
+import { useFinanceData } from "@/lib/hooks/use-finance-data";
+import {
+  useFinanceHistoryPage,
+  useFinanceMutations,
+  type FinanceData,
+  type FinanceTransaction
+} from "@/hooks/useFinance";
+import "./finance.css";
 
-// Local interface for displaying transactions in the UI
+// -----------------------------
+// INTERFACES
+// -----------------------------
 interface Transaction extends FinanceTransaction {
-  type?: "income" | "expense"
+  type?: "income" | "expense";
 }
 
 interface TransactionFormData {
@@ -32,210 +39,155 @@ interface TransactionFormData {
   description: string;
 }
 
+// -----------------------------
+// MAIN COMPONENT
+// -----------------------------
 export default function FinancePage() {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null)
-  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false)
-  const [transactionToDelete, setTransactionToDelete] = useState<number | null>(null)
-  const [isGalleryOpen, setIsGalleryOpen] = useState(false)
-  const [selectedFinanceId, setSelectedFinanceId] = useState<number | null>(null)
-  const [selectedDocumentUrl, setSelectedDocumentUrl] = useState<string | null>(null)
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const [dialog, setDialog] = useState({
+    add: false,
+    edit: false,
+    delete: false,
+    gallery: false,
+  });
+  const [selected, setSelected] = useState<Transaction | null>(null);
 
   const queryClient = useQueryClient();
-
   const { data: financeSummary, isLoading } = useFinanceData();
-  const {
-    data: transactionsData,
-    isLoading: isLoadingTransactions,
-  } = useFinanceHistory();
-
-  const transactions: Transaction[] = (transactionsData?.transactions || []).map(t => ({
-    ...t,
-    type: t.category === "Pemasukan" ? "income" : "expense"
-  }));
+  const { data: transactionsData, isLoading: isLoadingTransactions } = useFinanceHistoryPage(page, limit);
   const { createFinance, updateFinance, deleteFinance } = useFinanceMutations();
 
-  const invalidateFinanceQueries = () => {
-    queryClient.invalidateQueries({ queryKey: ['finance-summary'] });
-    queryClient.invalidateQueries({ queryKey: ['finance-history'] });
-  }
+  const transactions: Transaction[] = (transactionsData?.data || []).map((t) => ({
+    ...t,
+    type: t.category === "Pemasukan" ? "income" : "expense",
+  }));
 
-  const handleAddTransaction = (data: TransactionFormData) => {
-    const financeData: FinanceData = {
+  const meta = transactionsData?.meta || { page: 1, total_pages: 1, total: 0 };
+
+  // -----------------------------
+  // ACTION HANDLERS
+  // -----------------------------
+  const invalidateFinance = () => {
+    queryClient.invalidateQueries({ queryKey: ["finance-summary"] });
+    queryClient.invalidateQueries({ queryKey: ["finance-history"] });
+  };
+
+  const handleAdd = (data: TransactionFormData) => {
+    const payload: FinanceData = {
       amount: Number(data.amount),
       category: data.type === "income" ? "Pemasukan" : "Pengeluaran",
       date: data.date.toISOString(),
       title: data.title,
-      description: data.description
-    }
+      description: data.description,
+    };
 
-    createFinance.mutate(financeData, {
+    createFinance.mutate(payload, {
       onSuccess: () => {
-        setIsDialogOpen(false)
-        invalidateFinanceQueries()
-      }
-    })
-  }
+        setDialog((d) => ({ ...d, add: false }));
+        invalidateFinance();
+      },
+    });
+  };
 
-  const handleEditTransaction = (data: TransactionFormData) => {
-    if (!transactionToEdit) return
-
-    const financeData: FinanceData = {
+  const handleEdit = (data: TransactionFormData) => {
+    if (!selected) return;
+    const payload: FinanceData = {
       amount: Number(data.amount),
       category: data.type === "income" ? "Pemasukan" : "Pengeluaran",
       date: data.date.toISOString(),
       title: data.title,
-      description: data.description
-    }
+      description: data.description,
+    };
 
-    updateFinance.mutate({
-      id: transactionToEdit.id,
-      data: financeData
-    }, {
+    updateFinance.mutate({ id: selected.id, data: payload }, {
       onSuccess: () => {
-        setIsEditDialogOpen(false)
-        setTransactionToEdit(null)
-        invalidateFinanceQueries()
-      }
-    })
-  }
+        setDialog((d) => ({ ...d, edit: false }));
+        setSelected(null);
+        invalidateFinance();
+      },
+    });
+  };
 
-  const handleDeleteTransaction = () => {
-    if (!transactionToDelete) return
-
-    deleteFinance.mutate(transactionToDelete, {
+  const handleDelete = () => {
+    if (!selected) return;
+    deleteFinance.mutate(selected.id, {
       onSuccess: () => {
-        setIsDeleteAlertOpen(false)
-        setTransactionToDelete(null)
-        invalidateFinanceQueries()
-      }
-    })
-  }
+        setDialog((d) => ({ ...d, delete: false }));
+        setSelected(null);
+        invalidateFinance();
+      },
+    });
+  };
 
-  const openEditDialog = (transaction: Transaction) => {
-    setTransactionToEdit(transaction)
-    setIsEditDialogOpen(true)
-  }
+  const changePage = (newPage: number) => {
+    if (newPage >= 1 && newPage <= meta.total_pages) setPage(newPage);
+  };
 
-  const openDeleteAlert = (id: number) => {
-    setTransactionToDelete(id)
-    setIsDeleteAlertOpen(true)
-  }
-
-  const openDocumentGallery = (transaction: Transaction) => {
-    setSelectedFinanceId(transaction.id)
-    let documentUrl = transaction.document_url;
-    console.log("Opening document gallery with URL:", documentUrl);
-    setSelectedDocumentUrl(documentUrl)
-    setIsGalleryOpen(true)
-  }
-
+  // -----------------------------
+  // UI RENDER
+  // -----------------------------
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 md:p-8">
-      {/* ✨ Container dengan width yang lebih luas */}
       <div className="max-w-[1600px] mx-auto space-y-6">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white rounded-2xl p-6 shadow-sm border">
+
+        {/* HEADER */}
+        <div className="flex justify-between items-center bg-white p-6 rounded-2xl border shadow-sm">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               Manajemen Keuangan
             </h1>
-            <p className="text-slate-600 mt-1">Kelola keuangan Anda dengan mudah dan efisien</p>
+            <p className="text-slate-600 text-sm mt-1">Kelola keuangan Anda dengan mudah</p>
           </div>
-          
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+
+          <Dialog open={dialog.add} onOpenChange={(v) => setDialog({ ...dialog, add: v })}>
             <DialogTrigger asChild>
-              <Button 
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl px-6 py-3 h-auto"
-              >
-                <PlusCircle className="mr-2 h-5 w-5" />
-                <span className="font-medium">Tambah Transaksi</span>
+              <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg px-6 py-3 rounded-xl">
+                <PlusCircle className="mr-2 h-5 w-5" /> Tambah Transaksi
               </Button>
             </DialogTrigger>
-            <DialogContent
-              className="sm:max-w-md rounded-2xl border-0 shadow-2xl"
-              onPointerDownOutside={(e) => {
-                if (e.target && (e.target as HTMLElement).closest('.tiptap')) {
-                  e.preventDefault();
-                }
-              }}
-            >
-              <DialogHeader className="space-y-3">
-                <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <DialogContent className="sm:max-w-md rounded-2xl border-0 shadow-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-center text-2xl font-bold text-blue-600">
                   Tambah Transaksi Baru
                 </DialogTitle>
               </DialogHeader>
-              <TransactionForm onSubmit={handleAddTransaction} />
+              <TransactionForm onSubmit={handleAdd} />
             </DialogContent>
           </Dialog>
         </div>
 
-        {/* Summary Cards - ✨ Perbaikan warna dan kontras */}
+        {/* SUMMARY */}
         <div className="grid gap-6 md:grid-cols-3">
-          {/* Card Saldo - Warna Biru */}
-          <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-br from-blue-500 to-blue-600 text-white pb-4 pt-5 px-6">
-              <CardTitle className="flex items-center text-lg font-semibold">
-                <Wallet className="mr-3 h-5 w-5" />
-                Saldo Saat Ini
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {isLoading ? (
-                <Skeleton className="h-10 w-full rounded-lg" />
-              ) : (
-                <p className="text-3xl font-bold text-blue-600">
-                  {formatRupiah(financeSummary?.current_balance || "0")}
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Card Pemasukan - Warna Hijau */}
-          <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white pb-4 pt-5 px-6">
-              <CardTitle className="flex items-center text-lg font-semibold">
-                <TrendingUp className="mr-3 h-5 w-5" />
-                Total Pemasukan
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {isLoading ? (
-                <Skeleton className="h-10 w-full rounded-lg" />
-              ) : (
-                <p className="text-3xl font-bold text-emerald-600">
-                  {formatRupiah(financeSummary?.total_income || "0")}
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Card Pengeluaran - Warna Merah */}
-          <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-br from-rose-500 to-rose-600 text-white pb-4 pt-5 px-6">
-              <CardTitle className="flex items-center text-lg font-semibold">
-                <TrendingDown className="mr-3 h-5 w-5" />
-                Total Pengeluaran
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {isLoading ? (
-                <Skeleton className="h-10 w-full rounded-lg" />
-              ) : (
-                <p className="text-3xl font-bold text-rose-600">
-                  {formatRupiah(financeSummary?.total_expense || "0")}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          {[
+            { title: "Saldo Saat Ini", value: financeSummary?.current_balance, icon: Wallet, color: "blue" },
+            { title: "Total Pemasukan", value: financeSummary?.total_income, icon: TrendingUp, color: "emerald" },
+            { title: "Total Pengeluaran", value: financeSummary?.total_expense, icon: TrendingDown, color: "rose" },
+          ].map(({ title, value, icon: Icon, color }) => (
+            <Card key={title} className="shadow-lg rounded-2xl">
+              <CardHeader className={`bg-gradient-to-br from-${color}-500 to-${color}-600 text-white`}>
+                <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                  <Icon className="h-5 w-5" /> {title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                {isLoading ? (
+                  <Skeleton className="h-10 w-full rounded-lg" />
+                ) : (
+                  <p className={`text-3xl font-bold text-${color}-600`}>
+                    {formatRupiah(value || "0")}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Transaction History */}
+        {/* TRANSACTION TABLE */}
         <Card className="bg-white border-0 shadow-lg rounded-2xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-100 p-6">
+          <CardHeader className="bg-slate-50 border-b p-6">
             <CardTitle className="text-2xl font-bold text-slate-800">Riwayat Transaksi</CardTitle>
-            <p className="text-slate-600 text-sm mt-1">Semua aktivitas keuangan Anda</p>
           </CardHeader>
           <CardContent className="p-0">
             {isLoadingTransactions ? (
@@ -244,148 +196,177 @@ export default function FinancePage() {
                   <Skeleton key={i} className="h-16 w-full rounded-xl" />
                 ))}
               </div>
-            ) : !transactions || transactions.length === 0 ? (
+            ) : transactions.length === 0 ? (
               <div className="text-center py-16 text-slate-500">
-                <div className="w-24 h-24 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center">
-                  <Wallet className="w-12 h-12 text-slate-400" />
-                </div>
+                <Wallet className="mx-auto mb-4 h-12 w-12 text-slate-400" />
                 <p className="text-lg font-medium">Belum ada transaksi</p>
-                <p className="text-sm text-slate-400">Mulai dengan menambahkan transaksi pertama Anda</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-b border-slate-100 hover:bg-transparent">
-                      <TableHead className="font-semibold text-slate-700 py-4 px-6">Tanggal</TableHead>
-                      <TableHead className="font-semibold text-slate-700 px-6">Deskripsi</TableHead>
-                      <TableHead className="font-semibold text-slate-700 px-6">Kategori</TableHead>
-                      <TableHead className="text-right font-semibold text-slate-700 px-6">Jumlah</TableHead>
-                      <TableHead className="text-right font-semibold text-slate-700 px-6">Aksi</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {transactions.map((transaction: Transaction) => (
-                      <TableRow 
-                        key={transaction.id} 
-                        className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors duration-200 align-middle"
-                      >
-                        <TableCell className="py-4 px-6">
-                          <div className="font-medium text-slate-700">
-                            {format(new Date(transaction.date), "dd MMM yyyy")}
-                          </div>
-                        </TableCell>
-                        <TableCell className="min-w-[200px] max-w-[300px] px-6">
-                          <div className="space-y-1">
-                            <div className="font-semibold text-slate-800 text-sm">
-                              {transaction.title || "Tanpa Judul"}
-                            </div>
+              <>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Tanggal</TableHead>
+                        <TableHead>Deskripsi</TableHead>
+                        <TableHead>Kategori</TableHead>
+                        <TableHead className="text-right">Jumlah</TableHead>
+                        <TableHead className="text-right">Aksi</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {transactions.map((t) => (
+                        <TableRow key={t.id}>
+                          <TableCell>{format(new Date(t.date), "dd MMM yyyy")}</TableCell>
+                          <TableCell>
+                            <div className="font-semibold">{t.title || "Tanpa Judul"}</div>
                             <TruncatedDescription
-                              description={transaction.description}
+                              description={t.description}
                               maxLength={20}
                               isRichText={true}
-                              title={`Deskripsi Transaksi - ${format(new Date(transaction.date), "dd MMM yyyy")}`}
                             />
-                          </div>
-                        </TableCell>
-                        <TableCell className="px-6">
-                          <div className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 ${
-                            transaction.category === "Pemasukan" 
-                              ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200" 
-                              : "bg-rose-100 text-rose-800 hover:bg-rose-200"
-                          }`}>
-                            {transaction.category === "Pemasukan" ? (
-                              <ArrowDown className="mr-1.5 h-4 w-4" />
-                            ) : (
-                              <ArrowUp className="mr-1.5 h-4 w-4" />
-                            )}
-                            {transaction.category}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right px-6">
-                          <span className={`font-bold text-base ${
-                            transaction.category === "Pemasukan" ? "text-emerald-700" : "text-rose-700"
-                          }`}>
-                            {formatRupiah(Number(transaction.amount))}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right px-6">
-                          <div className="flex justify-end space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openEditDialog(transaction)}
-                              className="rounded-xl border-slate-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all duration-200"
-                              title="Edit Transaksi"
+                          </TableCell>
+                          <TableCell>
+                            <div
+                              className={`inline-flex items-center px-3 py-1 rounded-xl text-xs font-medium ${
+                                t.category === "Pemasukan"
+                                  ? "bg-emerald-100 text-emerald-800"
+                                  : "bg-rose-100 text-rose-800"
+                              }`}
                             >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openDocumentGallery(transaction)}
-                              className="rounded-xl border-slate-200 hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-700 transition-all duration-200"
-                              title={transaction.document_url ? "Lihat Bukti Transaksi" : "Unggah Bukti Transaksi"}
-                            >
-                              <Image className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openDeleteAlert(transaction.id)}
-                              className="rounded-xl border-slate-200 hover:bg-rose-50 hover:border-rose-300 hover:text-rose-700 transition-all duration-200"
-                              title="Hapus Transaksi"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                              {t.category === "Pemasukan" ? (
+                                <ArrowDown className="mr-1 h-4 w-4" />
+                              ) : (
+                                <ArrowUp className="mr-1 h-4 w-4" />
+                              )}
+                              {t.category}
+                            </div>
+                          </TableCell>
+                          <TableCell
+                            className={`text-right font-bold ${
+                              t.category === "Pemasukan"
+                                ? "text-emerald-700"
+                                : "text-rose-700"
+                            }`}
+                          >
+                            {formatRupiah(Number(t.amount))}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              {/* 🟢 Edit Button */}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelected(t);
+                                  setDialog((d) => ({ ...d, edit: true }));
+                                }}
+                                className="rounded-xl border-slate-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
+                                title="Edit Transaksi"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+
+                              {/* 🟣 Document Gallery */}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelected(t);
+                                  setDialog((d) => ({ ...d, gallery: true }));
+                                }}
+                                className="rounded-xl border-slate-200 hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-700"
+                                title={
+                                  t.document_url
+                                    ? "Lihat Bukti Transaksi"
+                                    : "Unggah Bukti Transaksi"
+                                }
+                              >
+                                <Image className="h-4 w-4" />
+                              </Button>
+
+                              {/* 🔴 Delete Button */}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelected(t);
+                                  setDialog((d) => ({ ...d, delete: true }));
+                                }}
+                                className="rounded-xl border-slate-200 hover:bg-rose-50 hover:border-rose-300 hover:text-rose-700"
+                                title="Hapus Transaksi"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* PAGINATION */}
+                <div className="flex justify-between items-center py-4 px-6 border-t bg-slate-50">
+                  <span className="text-sm text-slate-600">
+                    Halaman {meta.page} dari {meta.total_pages} | Total {meta.total} transaksi
+                  </span>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={page === 1}
+                      onClick={() => changePage(page - 1)}
+                    >
+                      Sebelumnya
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={page === meta.total_pages}
+                      onClick={() => changePage(page + 1)}
+                    >
+                      Selanjutnya
+                    </Button>
+                  </div>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
-
-        {/* Edit Transaction Dialog */}
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent
-            className="sm:max-w-md rounded-2xl border-0 shadow-2xl"
-            onPointerDownOutside={(e) => {
-              if (e.target && (e.target as HTMLElement).closest('.tiptap')) {
-                e.preventDefault();
-              }
-            }}
-          >
+        {/* ✳️ Edit Transaction Dialog */}
+        <Dialog open={dialog.edit} onOpenChange={(v) => setDialog({ ...dialog, edit: v })}>
+          <DialogContent className="sm:max-w-md rounded-2xl border-0 shadow-2xl">
             <DialogHeader className="space-y-3">
               <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 Edit Transaksi
               </DialogTitle>
             </DialogHeader>
-            {transactionToEdit && (
+            {selected && (
               <TransactionForm
-                onSubmit={handleEditTransaction}
+                onSubmit={handleEdit}
                 defaultValues={{
-                  date: new Date(transactionToEdit.date),
-                  description: transactionToEdit.description,
-                  title: transactionToEdit.title,
-                  amount: String(transactionToEdit.amount),
-                  type: transactionToEdit.category === "Pemasukan" ? "income" : "expense"
+                  date: new Date(selected.date),
+                  description: selected.description,
+                  title: selected.title,
+                  amount: String(selected.amount),
+                  type: selected.category === "Pemasukan" ? "income" : "expense",
                 }}
               />
             )}
           </DialogContent>
         </Dialog>
 
-        {/* Delete Transaction Alert */}
-        <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
+        {/* 🔴 Delete Alert */}
+        <AlertDialog open={dialog.delete} onOpenChange={(v) => setDialog({ ...dialog, delete: v })}>
           <AlertDialogContent className="rounded-2xl border-0 shadow-2xl">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-xl font-bold text-slate-800">Hapus Transaksi</AlertDialogTitle>
+              <AlertDialogTitle className="text-xl font-bold text-slate-800">
+                Hapus Transaksi
+              </AlertDialogTitle>
               <AlertDialogDescription className="text-slate-600">
-                Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.
+                Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat
+                dibatalkan.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="gap-3">
@@ -393,7 +374,7 @@ export default function FinancePage() {
                 Batal
               </AlertDialogCancel>
               <AlertDialogAction
-                onClick={handleDeleteTransaction}
+                onClick={handleDelete}
                 className="bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 rounded-xl"
               >
                 Hapus
@@ -402,19 +383,17 @@ export default function FinancePage() {
           </AlertDialogContent>
         </AlertDialog>
 
-        {/* Document Gallery */}
-        {selectedFinanceId && (
+        {/* 🟣 Document Gallery */}
+        {dialog.gallery && selected && (
           <FinanceDocumentGallery
-            open={isGalleryOpen}
-            onOpenChange={setIsGalleryOpen}
-            financeId={selectedFinanceId}
-            documentUrl={selectedDocumentUrl}
-            onSuccess={() => {
-              invalidateFinanceQueries()
-            }}
+            open={dialog.gallery}
+            onOpenChange={(v) => setDialog({ ...dialog, gallery: v })}
+            financeId={selected.id}
+            documentUrl={selected.document_url}
+            onSuccess={() => invalidateFinance()}
           />
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -7,7 +7,7 @@
   // Check if the break-loop parameter is present
   const params = new URLSearchParams(window.location.search);
   if (params.has('break-loop')) {
-    console.log('BREAKING REDIRECT LOOP: Clearing all tokens and redirect counts');
+    // console.log('BREAKING REDIRECT LOOP: Clearing all tokens and redirect counts');
     
     // Clear localStorage
     localStorage.clear();

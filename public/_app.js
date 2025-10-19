@@ -2,11 +2,11 @@
 // This script has been disabled to prevent redirect loops
 
 (function() {
-  console.log('_app.js: Static redirects disabled to prevent redirect loops');
+  // console.log('_app.js: Static redirects disabled to prevent redirect loops');
   
   // Check if our disable flag is set
   if (window.disableStaticRedirects) {
-    console.log('Static redirects already disabled by _disable-redirects.js');
+    // console.log('Static redirects already disabled by _disable-redirects.js');
     return;
   }
   

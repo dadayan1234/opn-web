@@ -23,7 +23,7 @@ export function useDashboardEventAttendance(events: any[] = []) {
             if (event.id) {
               const attendees = await eventApi.getEventAttendance(event.id)
               counts[event.id] = attendees.length
-              console.log(`Fetched ${attendees.length} attendees for event ${event.id}`)
+              // console.log(`Fetched ${attendees.length} attendees for event ${event.id}`)
             }
           } catch (error) {
             console.error(`Error fetching attendance for event ${event.id}:`, error)

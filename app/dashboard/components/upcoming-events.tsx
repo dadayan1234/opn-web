@@ -26,7 +26,7 @@ export function UpcomingEvents() {
         setIsLoading(true)
         // Use the eventApi from lib/api-service instead of direct fetch
         const data = await eventApi.getEvents(1, 10)
-        console.log('Fetched events from backend:', data)
+        // console.log('Fetched events from backend:', data)
 
         // Sort events by date (newest first)
         const sortedEvents = data.sort((a: Event, b: Event) => {

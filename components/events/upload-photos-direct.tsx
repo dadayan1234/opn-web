@@ -80,7 +80,7 @@ export function UploadPhotosDirect({ open, onClose, eventId, onSuccess }: Upload
     }
 
     // Log the eventId for debugging
-    console.log('[UploadPhotosDirect] Event ID received:', eventId, 'Type:', typeof eventId)
+    // console.log('[UploadPhotosDirect] Event ID received:', eventId, 'Type:', typeof eventId)
 
     // Validate eventId
     if (!eventId) {
@@ -91,7 +91,7 @@ export function UploadPhotosDirect({ open, onClose, eventId, onSuccess }: Upload
 
     // Ensure eventId is a number
     const numericEventId = Number(eventId)
-    console.log('[UploadPhotosDirect] Converted event ID:', numericEventId, 'isNaN:', isNaN(numericEventId))
+    // console.log('[UploadPhotosDirect] Converted event ID:', numericEventId, 'isNaN:', isNaN(numericEventId))
 
     if (isNaN(numericEventId) || numericEventId <= 0) {
       console.error('[UploadPhotosDirect] Invalid numeric event ID:', numericEventId)
@@ -142,7 +142,7 @@ export function UploadPhotosDirect({ open, onClose, eventId, onSuccess }: Upload
 
         // If we have mock photos but they're not showing up, force a refresh
         if (existingPhotos.length > 0) {
-          console.log(`[UploadPhotosDirect] Found ${existingPhotos.length} mock photos in localStorage, ensuring they're visible`);
+          // console.log(`[UploadPhotosDirect] Found ${existingPhotos.length} mock photos in localStorage, ensuring they're visible`);
 
           // Add a timestamp to force a refresh
           localStorage.setItem('lastPhotoUpload', Date.now().toString());
@@ -159,12 +159,12 @@ export function UploadPhotosDirect({ open, onClose, eventId, onSuccess }: Upload
       // IMPORTANT: Call onSuccess callback IMMEDIATELY to refresh the gallery
       // This ensures the gallery refreshes as soon as the upload is complete
       if (onSuccess) {
-        console.log('[UploadPhotosDirect] Immediately triggering onSuccess callback to refresh gallery');
+        // console.log('[UploadPhotosDirect] Immediately triggering onSuccess callback to refresh gallery');
         onSuccess();
       }
 
       // Emit event to notify all components that photos have been uploaded
-      console.log(`[UploadPhotosDirect] Emitting PHOTO_UPLOADED event for event ID ${numericEventId}`);
+      // console.log(`[UploadPhotosDirect] Emitting PHOTO_UPLOADED event for event ID ${numericEventId}`);
       eventBus.emit(EVENTS.PHOTO_UPLOADED, {
         eventId: numericEventId,
         timestamp: uploadTimestamp,
@@ -203,14 +203,14 @@ export function UploadPhotosDirect({ open, onClose, eventId, onSuccess }: Upload
       // This helps when the backend takes a moment to process the upload
       setTimeout(() => {
         if (onSuccess) {
-          console.log('[UploadPhotosDirect] Triggering delayed refresh 1 (500ms)');
+          // console.log('[UploadPhotosDirect] Triggering delayed refresh 1 (500ms)');
           onSuccess();
         }
       }, 500);
 
       setTimeout(() => {
         if (onSuccess) {
-          console.log('[UploadPhotosDirect] Triggering delayed refresh 2 (1500ms)');
+          // console.log('[UploadPhotosDirect] Triggering delayed refresh 2 (1500ms)');
           onSuccess();
         }
       }, 1500);

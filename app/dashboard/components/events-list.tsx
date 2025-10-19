@@ -77,7 +77,7 @@ export function EventsList() {
     const fetchEvents = async () => {
       try {
         setIsLoading(true)
-        console.log("Fetching events for dashboard...")
+        // console.log("Fetching events for dashboard...")
 
         // Get token from localStorage
         const token = localStorage.getItem('token')
@@ -106,13 +106,13 @@ export function EventsList() {
 
           // Get the raw text first to inspect it
           const rawText = await response.text();
-          console.log('Raw API response:', rawText);
+          // console.log('Raw API response:', rawText);
 
           // Try to parse as JSON
           let responseData;
           try {
             responseData = JSON.parse(rawText);
-            console.log('Parsed events data:', responseData);
+            // console.log('Parsed events data:', responseData);
           } catch (parseError) {
             console.error('Failed to parse JSON response:', parseError);
             throw new Error('Invalid JSON response from server');
@@ -122,51 +122,51 @@ export function EventsList() {
           let eventsData = [];
           let paginationMeta = null;
 
-          console.log('Response structure:', Object.keys(responseData));
+          // console.log('Response structure:', Object.keys(responseData));
 
           // The new format should have data array and meta object
           if (responseData && typeof responseData === 'object') {
             // Check if the response has the expected structure
             if (Array.isArray(responseData)) {
               // If it's directly an array (old format)
-              console.log('Response is an array with', responseData.length, 'items (old format)');
+              // console.log('Response is an array with', responseData.length, 'items (old format)');
               eventsData = responseData;
             } else {
               // New format with data and meta
               if (Array.isArray(responseData.data)) {
-                console.log('Response has data array with', responseData.data.length, 'items');
+                // console.log('Response has data array with', responseData.data.length, 'items');
                 eventsData = responseData.data;
 
                 // Extract pagination metadata if available
                 if (responseData.meta && typeof responseData.meta === 'object') {
                   paginationMeta = responseData.meta;
-                  console.log('Pagination metadata:', paginationMeta);
+                  // console.log('Pagination metadata:', paginationMeta);
 
                   // Save pagination metadata to state
                   setPaginationMeta(paginationMeta);
                 }
               } else {
                 // If data is not an array, look for any array in the response
-                console.log('Looking for arrays in response object');
+                // console.log('Looking for arrays in response object');
                 const arrayProps = Object.entries(responseData)
                   .filter(([_, value]) => Array.isArray(value))
                   .map(([key, value]) => ({ key, length: (value as any[]).length }));
 
-                console.log('Found array properties:', arrayProps);
+                // console.log('Found array properties:', arrayProps);
 
                 if (arrayProps.length > 0) {
                   // Use the first array found
                   const firstArrayKey = arrayProps[0].key;
                   eventsData = responseData[firstArrayKey];
-                  console.log(`Using array from property '${firstArrayKey}' with ${eventsData.length} items`);
+                  // console.log(`Using array from property '${firstArrayKey}' with ${eventsData.length} items`);
                 } else {
-                  console.log('No arrays found in response');
+                  // console.log('No arrays found in response');
                 }
               }
             }
           }
 
-          console.log('Final processed events data:', eventsData);
+          // console.log('Final processed events data:', eventsData);
 
           // Sort events by date (newest first)
           const sortedEvents = [...eventsData].sort((a, b) => {
@@ -182,7 +182,7 @@ export function EventsList() {
             }
           });
 
-          console.log('Sorted events (newest first):', sortedEvents.map(e => e.date));
+          // console.log('Sorted events (newest first):', sortedEvents.map(e => e.date));
 
           // Set the events data
           // Batasi ke 10 event pertama

@@ -55,7 +55,7 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
       const storedMinutesString = localStorage.getItem(`event_${eventId}_minutes`)
       if (storedMinutesString) {
         const parsedMinutes = JSON.parse(storedMinutesString)
-        console.log('%c Loaded local storage minutes:', 'background: #00f; color: #fff', parsedMinutes)
+        // console.log('%c Loaded local storage minutes:', 'background: #00f; color: #fff', parsedMinutes)
         setLocalStorageMinutes(parsedMinutes)
       }
     } catch (error) {
@@ -67,11 +67,11 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
   const combinedMinutes = useMemo(() => {
     // Get meeting minutes from API
     const apiMinutes = meetingMinutes || []
-    console.log('API minutes for event ID', eventId, ':', apiMinutes)
+    // console.log('API minutes for event ID', eventId, ':', apiMinutes)
 
     // Filter minutes to ensure they belong to this event
     const filteredMinutes = apiMinutes.filter(minute => minute.event_id === Number(eventId))
-    console.log('Filtered minutes for event ID', eventId, ':', filteredMinutes)
+    // console.log('Filtered minutes for event ID', eventId, ':', filteredMinutes)
 
     return filteredMinutes;
   }, [meetingMinutes, eventId])
@@ -89,7 +89,7 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
     )
 
     if (allInApi) {
-      console.log('%c All local minutes now in API, clearing local storage', 'background: #0f0; color: #000')
+      // console.log('%c All local minutes now in API, clearing local storage', 'background: #0f0; color: #000')
       localStorage.removeItem(`event_${eventId}_minutes`)
       // Update local storage minutes state to empty array
       setLocalStorageMinutes([])
@@ -100,9 +100,9 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
   const handleRefresh = async () => {
     setIsRefreshing(true)
     try {
-      console.log('Manually refreshing meeting minutes for event ID:', eventId)
+      // console.log('Manually refreshing meeting minutes for event ID:', eventId)
       await refetch()
-      console.log('Manual refresh completed')
+      // console.log('Manual refresh completed')
       toast({
         title: "Berhasil",
         description: "Data notulensi berhasil diperbarui",
@@ -131,8 +131,8 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
   // Handle form submission for creating new meeting minutes
   const handleCreateMinutes = (data: any) => {
     try {
-      console.log('Creating meeting minutes with data:', data)
-      console.log('Event ID:', eventId, 'Type:', typeof eventId)
+      // console.log('Creating meeting minutes with data:', data)
+      // console.log('Event ID:', eventId, 'Type:', typeof eventId)
 
       // Format the data as expected by the API
       const formattedData = {
@@ -147,10 +147,10 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
         description: data.description || ''
       }
 
-      console.log('Formatted data:', formattedData)
-      console.log('Event ID in formatted data:', formattedData.event_id, 'Type:', typeof formattedData.event_id)
-      console.log('%c Current event ID from component prop:', 'background: #ff0; color: #000', eventId, 'Type:', typeof eventId)
-      console.log('%c Date in formatted data:', 'background: #ff0; color: #000', formattedData.date, 'Type:', typeof formattedData.date)
+      // console.log('Formatted data:', formattedData)
+      // console.log('Event ID in formatted data:', formattedData.event_id, 'Type:', typeof formattedData.event_id)
+      // console.log('%c Current event ID from component prop:', 'background: #ff0; color: #000', eventId, 'Type:', typeof eventId)
+      // console.log('%c Date in formatted data:', 'background: #ff0; color: #000', formattedData.date, 'Type:', typeof formattedData.date)
 
       // Immediately add to local storage for instant display (only in browser environment)
       if (typeof window !== 'undefined') {
@@ -179,7 +179,7 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
 
           // Save back to local storage
           localStorage.setItem(`event_${eventId}_minutes`, JSON.stringify(storedMinutes));
-          console.log('%c Added temporary meeting minutes to local storage:', 'background: #0f0; color: #000', tempMinute);
+          // console.log('%c Added temporary meeting minutes to local storage:', 'background: #0f0; color: #000', tempMinute);
         } catch (error) {
           console.error('%c Error adding temporary meeting minutes to local storage:', 'background: #f00; color: #fff', error);
         }
@@ -210,8 +210,8 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
       // Then create the meeting minutes
       createMeetingMinutes.mutate(formattedData, {
         onSuccess: async (data) => {
-          console.log('%c Meeting minutes created successfully:', 'background: #0f0; color: #000', data)
-          console.log('%c Created meeting minutes for event ID:', 'background: #0f0; color: #000', data.event_id)
+          // console.log('%c Meeting minutes created successfully:', 'background: #0f0; color: #000', data)
+          // console.log('%c Created meeting minutes for event ID:', 'background: #0f0; color: #000', data.event_id)
 
           // Show success toast
           toast({
@@ -220,7 +220,7 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
           })
 
           // Refetch the data instead of reloading the page
-          console.log('%c Meeting minutes created successfully, refetching data', 'background: #0f0; color: #000');
+          // console.log('%c Meeting minutes created successfully, refetching data', 'background: #0f0; color: #000');
           refetch();
 
           // Clear local storage entries for this event
@@ -263,7 +263,7 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
 
   // Handle editing meeting minutes
   const handleEditMinutes = (minute: any) => {
-    console.log('Editing meeting minute with ID:', minute.id, 'and data:', minute)
+    // console.log('Editing meeting minute with ID:', minute.id, 'and data:', minute)
     setEditingMinute(minute)
     setIsEditDialogOpen(true)
   }
@@ -273,8 +273,8 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
     try {
       if (!editingMinute) return;
 
-      console.log('Updating meeting minutes with description:', data.description)
-      console.log('Minute ID:', editingMinute.id)
+      // console.log('Updating meeting minutes with description:', data.description)
+      // console.log('Minute ID:', editingMinute.id)
 
       // Show loading toast
       toast({
@@ -291,7 +291,7 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
 
         // Make sure we have the correct ID
         const minuteId = editingMinute.id;
-        console.log('Using meeting minute ID for update:', minuteId);
+        // console.log('Using meeting minute ID for update:', minuteId);
 
         // Create a new meeting minute with the updated data
         const createResponse = await fetch(`/api/v1/meeting-minutes/`, {
@@ -317,7 +317,7 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
 
         // Parse the response
         const createResponseData = await createResponse.json();
-        console.log('Create successful, response:', createResponseData);
+        // console.log('Create successful, response:', createResponseData);
 
         // Now delete the old meeting minute
         const deleteResponse = await fetch(`/api/v1/meeting-minutes/${minuteId}`, {
@@ -331,7 +331,7 @@ function MeetingMinutesListContent({ eventId }: MeetingMinutesListProps) {
           console.error(`Error response from server when deleting: ${deleteResponse.status} ${deleteResponse.statusText}`);
           // Even if delete fails, we've still created a new one, so we can continue
         } else {
-          console.log('Delete successful');
+          // console.log('Delete successful');
         }
 
         // Close the dialog and show success message

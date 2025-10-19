@@ -30,7 +30,7 @@ export function GalleryDirect({ eventId }: GalleryDirectProps) {
     setError(null)
 
     try {
-      console.log(`Fetching photos for event ${eventId}`)
+      // console.log(`Fetching photos for event ${eventId}`)
 
       // Use direct backend URL instead of local API proxy
       const response = await fetch(`https://beopn.pemudanambangan.site/api/v1/events/${eventId}`, {
@@ -45,7 +45,7 @@ export function GalleryDirect({ eventId }: GalleryDirectProps) {
       }
 
       const data = await response.json()
-      console.log("Event response:", data)
+      // console.log("Event response:", data)
 
       if (data && data.photos) {
         // Make sure we have valid photo objects
@@ -59,7 +59,7 @@ export function GalleryDirect({ eventId }: GalleryDirectProps) {
             uploaded_at: photo.uploaded_at || new Date().toISOString()
           }))
 
-        console.log("Valid photos:", validPhotos)
+        // console.log("Valid photos:", validPhotos)
         setPhotos(validPhotos)
       } else {
         setPhotos([])

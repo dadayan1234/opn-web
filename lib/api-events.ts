@@ -27,13 +27,13 @@ export const eventApi = {
       if (status) queryParams.append('status', status);
       if (search) queryParams.append('search', search);
 
-      console.log(`[API] Fetching events with params:`, params);
+      // console.log(`[API] Fetching events with params:`, params);
 
       const response = await withRetry(() =>
         apiClient.get<Event[]>(`/events?${queryParams.toString()}`, { signal })
       );
 
-      console.log(`[API] Successfully fetched ${response.data.length} events`);
+      // console.log(`[API] Successfully fetched ${response.data.length} events`);
       return response.data;
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -44,7 +44,7 @@ export const eventApi = {
   // Get single event
   getEvent: async (id: number | string, signal?: AbortSignal): Promise<Event> => {
     try {
-      console.log(`[API] Fetching event with ID: ${id}`);
+      // console.log(`[API] Fetching event with ID: ${id}`);
 
       // Make sure the ID is properly formatted
       const eventId = String(id).trim();
@@ -60,12 +60,12 @@ export const eventApi = {
         })
       );
 
-      console.log(`[API] Successfully fetched event ${eventId}:`, response.data);
+      // console.log(`[API] Successfully fetched event ${eventId}:`, response.data);
       return response.data;
     } catch (error) {
       // Handle canceled requests gracefully
       if (axios.isCancel(error)) {
-        console.log('Event request was cancelled');
+        // console.log('Event request was cancelled');
         // Instead of throwing an error, return a default event object
         // This prevents the UI from breaking when a request is cancelled
         return {
@@ -115,7 +115,7 @@ export const eventApi = {
   // Get event photos
   getEventPhotos: async (eventId: number | string, signal?: AbortSignal): Promise<EventPhoto[]> => {
     try {
-      console.log(`[API] Fetching photos for event ID: ${eventId}`);
+      // console.log(`[API] Fetching photos for event ID: ${eventId}`);
 
       // Make sure the ID is properly formatted
       const id = String(eventId).trim();
@@ -125,7 +125,7 @@ export const eventApi = {
         const cacheBuster = Date.now();
 
         // Get the event details which include photos
-        console.log(`[API] Getting event details for ID: ${id} to extract photos (cache buster: ${cacheBuster})`);
+        // console.log(`[API] Getting event details for ID: ${id} to extract photos (cache buster: ${cacheBuster})`);
         const eventResponse = await withRetry(() =>
           apiClient.get<Event>(`/events/${id}?_=${cacheBuster}`, {
             signal,
@@ -140,7 +140,7 @@ export const eventApi = {
 
         // If the event has photos, return them
         if (eventResponse.data && eventResponse.data.photos && Array.isArray(eventResponse.data.photos)) {
-          console.log(`[API] Found ${eventResponse.data.photos.length} photos in event ${id} details`);
+          // console.log(`[API] Found ${eventResponse.data.photos.length} photos in event ${id} details`);
 
           // Add a timestamp to each photo to help with debugging
           const photosWithTimestamp = eventResponse.data.photos.map(photo => ({
@@ -151,7 +151,7 @@ export const eventApi = {
           return photosWithTimestamp;
         } else {
           // If the event doesn't have photos, return an empty array
-          console.log(`[API] No photos found in event ${id} details`);
+          // console.log(`[API] No photos found in event ${id} details`);
           return [];
         }
       } catch (apiError) {
@@ -159,7 +159,7 @@ export const eventApi = {
         if (axios.isAxiosError(apiError)) {
           // For 404 errors, return an empty array - this is normal for events that don't exist
           if (apiError.response?.status === 404) {
-            console.log(`[API] Event ${id} not found (404 response)`);
+            // console.log(`[API] Event ${id} not found (404 response)`);
             return [];
           }
 
@@ -178,7 +178,7 @@ export const eventApi = {
     } catch (error) {
       // Handle canceled requests gracefully
       if (axios.isCancel(error)) {
-        console.log('[API] Event photos request was cancelled');
+        // console.log('[API] Event photos request was cancelled');
         return [];
       }
 
@@ -196,7 +196,7 @@ export const eventApi = {
   // Delete an event photo
   deleteEventPhoto: async (eventId: number | string, photoId: number | string): Promise<boolean> => {
     try {
-      console.log(`[API] Deleting photo ${photoId} from event ${eventId}`);
+      // console.log(`[API] Deleting photo ${photoId} from event ${eventId}`);
 
       // Make sure the IDs are properly formatted
       const formattedEventId = String(eventId).trim();
@@ -211,7 +211,7 @@ export const eventApi = {
         })
       );
 
-      console.log(`[API] Successfully deleted photo ${photoId} from event ${eventId}:`, response.data);
+      // console.log(`[API] Successfully deleted photo ${photoId} from event ${eventId}:`, response.data);
       return true;
     } catch (error) {
       // Log detailed error information

@@ -86,7 +86,7 @@ export function saveAttendanceData(
     
     // Save to localStorage
     localStorage.setItem(`event_${eventId}_attendance`, JSON.stringify(validData));
-    console.log(`[attendance-utils] Saved ${validData.length} attendance records for event ${eventId}`);
+    // console.log(`[attendance-utils] Saved ${validData.length} attendance records for event ${eventId}`);
     return true;
   } catch (error) {
     console.error(`[attendance-utils] Error saving attendance data for event ${eventId}:`, error);

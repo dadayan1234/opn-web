@@ -31,7 +31,7 @@ export function NotulensiEditorSimple({ eventId, initialContent, onSaved }: Notu
     setError(null)
 
     try {
-      console.log(`[NotulensiEditorSimple] Saving notulensi for event ${eventId}:`, content)
+      // console.log(`[NotulensiEditorSimple] Saving notulensi for event ${eventId}:`, content)
 
       // Get token from localStorage
       const token = localStorage.getItem("token")
@@ -56,7 +56,7 @@ export function NotulensiEditorSimple({ eventId, initialContent, onSaved }: Notu
         // If PATCH succeeds, use its response
         if (patchResponse.ok) {
           const data = await patchResponse.json()
-          console.log(`[NotulensiEditorSimple] PATCH response:`, data)
+          // console.log(`[NotulensiEditorSimple] PATCH response:`, data)
 
           toast({
             title: "Berhasil",
@@ -73,10 +73,10 @@ export function NotulensiEditorSimple({ eventId, initialContent, onSaved }: Notu
         }
 
         // If we get here, PATCH failed but didn't throw - fall through to PUT
-        console.log(`[NotulensiEditorSimple] PATCH failed with status ${patchResponse.status}, falling back to PUT`)
+        // console.log(`[NotulensiEditorSimple] PATCH failed with status ${patchResponse.status}, falling back to PUT`)
       } catch (patchError) {
         // PATCH endpoint might not exist, fall back to PUT
-        console.log(`[NotulensiEditorSimple] PATCH error, falling back to PUT:`, patchError)
+        // console.log(`[NotulensiEditorSimple] PATCH error, falling back to PUT:`, patchError)
       }
 
       // Fall back to the PUT endpoint with just the minutes field
@@ -100,7 +100,7 @@ export function NotulensiEditorSimple({ eventId, initialContent, onSaved }: Notu
       }
 
       const data = await response.json()
-      console.log(`[NotulensiEditorSimple] PUT response:`, data)
+      // console.log(`[NotulensiEditorSimple] PUT response:`, data)
 
       toast({
         title: "Berhasil",

@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse('URLs containing localhost are not allowed', { status: 400 });
     }
 
-    console.log(`[Proxy Image] Proxying request to: ${url}`);
+    // console.log(`[Proxy Image] Proxying request to: ${url}`);
 
     // Get authorization from request headers first
     const headersList = headers();
@@ -39,10 +39,10 @@ export async function GET(request: NextRequest) {
         authHeader = tokenCookie.value.startsWith('Bearer ')
           ? tokenCookie.value
           : `Bearer ${tokenCookie.value}`;
-        console.log('[Proxy Image] Using token from cookies');
+        // console.log('[Proxy Image] Using token from cookies');
       }
     } else {
-      console.log('[Proxy Image] Using authorization from headers');
+      // console.log('[Proxy Image] Using authorization from headers');
     }
 
     // Create headers for the backend request
@@ -57,14 +57,14 @@ export async function GET(request: NextRequest) {
       const maskedToken = authHeader.length > 15
         ? `${authHeader.substring(0, 10)}...${authHeader.substring(authHeader.length - 5)}`
         : '***';
-      console.log(`[Proxy Image] Added Authorization header: ${maskedToken}`);
+      // console.log(`[Proxy Image] Added Authorization header: ${maskedToken}`);
     } else {
       console.warn('[Proxy Image] No authorization token found');
     }
 
     // Log the request details
-    console.log(`[Proxy Image] Making request to: ${url}`);
-    console.log(`[Proxy Image] Request headers:`, requestHeaders);
+    // console.log(`[Proxy Image] Making request to: ${url}`);
+    // console.log(`[Proxy Image] Request headers:`, requestHeaders);
 
     // Make the request to the backend
     const response = await fetch(url, {
@@ -74,8 +74,8 @@ export async function GET(request: NextRequest) {
     });
 
     // Log the response details
-    console.log(`[Proxy Image] Response status: ${response.status} ${response.statusText}`);
-    console.log(`[Proxy Image] Response headers:`, Object.fromEntries([...response.headers.entries()]));
+    // console.log(`[Proxy Image] Response status: ${response.status} ${response.statusText}`);
+    // console.log(`[Proxy Image] Response headers:`, Object.fromEntries([...response.headers.entries()]));
 
     // Check if the response is successful
     if (!response.ok) {

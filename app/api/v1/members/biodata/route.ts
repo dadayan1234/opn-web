@@ -8,7 +8,7 @@ import { handleApiRoute } from '../../_helpers/api-route-handler';
 // POST /api/v1/members/biodata
 export async function POST(request: NextRequest) {
   try {
-    console.log('[API Route] Processing POST request for member biodata');
+    // console.log('[API Route] Processing POST request for member biodata');
     return await handleApiRoute(request, '/members/biodata', {
       timeout: 15000,
       requireAuth: true
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 // PUT /api/v1/members/biodata
 export async function PUT(request: NextRequest) {
   try {
-    console.log('[API Route] Processing PUT request for member biodata');
+    // console.log('[API Route] Processing PUT request for member biodata');
     return await handleApiRoute(request, '/members/biodata', {
       timeout: 15000,
       requireAuth: true

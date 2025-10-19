@@ -27,7 +27,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
 
   // Memoize the fetchPhotos function to prevent infinite loops
   const fetchPhotos = useCallback(async (retryCount = 0, maxRetries = 3, delay = 500) => {
-    console.log(`[GallerySimple] fetchPhotos called for event ${eventId} (retry: ${retryCount}/${maxRetries})`);
+    // console.log(`[GallerySimple] fetchPhotos called for event ${eventId} (retry: ${retryCount}/${maxRetries})`);
 
     // Only show loading indicator on first attempt to avoid flickering during retries
     if (retryCount === 0) {
@@ -36,15 +36,15 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
     setError(null);
 
     try {
-      console.log(`[GallerySimple] Fetching photos for event ${eventId}`);
+      // console.log(`[GallerySimple] Fetching photos for event ${eventId}`);
 
       try {
         // Use the event API to get photos
         const eventPhotos = await eventApi.getEventPhotos(eventId);
-        console.log(`[GallerySimple] Fetched ${eventPhotos.length} photos for event ${eventId}`);
+        // console.log(`[GallerySimple] Fetched ${eventPhotos.length} photos for event ${eventId}`);
 
         if (eventPhotos && eventPhotos.length > 0) {
-          console.log("[GallerySimple] Raw photos from API:", eventPhotos);
+          // console.log("[GallerySimple] Raw photos from API:", eventPhotos);
 
           // Process photos to ensure they have the correct URL format
           const processedPhotos = eventPhotos
@@ -52,7 +52,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
             .map(photo => {
               // Get the photo URL (handle both photo_url and url properties)
               const photoUrl = photo.photo_url || photo.url || '';
-              console.log("[GallerySimple] Processing photo URL:", photoUrl);
+              // console.log("[GallerySimple] Processing photo URL:", photoUrl);
 
               // Ensure the URL is properly formatted
               let processedUrl = photoUrl;
@@ -60,7 +60,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
               // Make sure the URL starts with a slash if it's a relative path
               if (processedUrl && !processedUrl.startsWith('http') && !processedUrl.startsWith('/')) {
                 processedUrl = `/${processedUrl}`;
-                console.log(`[GallerySimple] Added leading slash to URL: ${processedUrl}`);
+                // console.log(`[GallerySimple] Added leading slash to URL: ${processedUrl}`);
               }
 
               // Handle different URL formats
@@ -68,7 +68,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
                 // Check if the URL is a full path with date format from the backend
                 // Example: /uploads/events/2025-04-14/2025-04/1744619396045_0.png
                 if (processedUrl.match(/\/uploads\/events\/\d{4}-\d{2}-\d{2}\/\d{4}-\d{2}\/\d+_\d+\.\w+$/)) {
-                  console.log(`[GallerySimple] Detected date-based URL pattern: ${processedUrl}`);
+                  // console.log(`[GallerySimple] Detected date-based URL pattern: ${processedUrl}`);
                   // This is already a correctly formatted URL, just use it as is
                 }
                 // If the path doesn't start with /uploads/ but contains 'uploads', fix it
@@ -76,7 +76,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
                   const uploadsPart = processedUrl.split('uploads/');
                   if (uploadsPart.length > 1) {
                     processedUrl = `/uploads/${uploadsPart[1]}`;
-                    console.log(`[GallerySimple] Fixed uploads path: ${processedUrl}`);
+                    // console.log(`[GallerySimple] Fixed uploads path: ${processedUrl}`);
                   }
                 }
                 // Check if the URL needs the event ID prefix
@@ -92,7 +92,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
                         /\/photos\/([^\/]+)/,
                         `/events/${eventId}/photos/${photoIdOrFilename}`
                       );
-                      console.log(`[GallerySimple] Added event ID to photo URL: ${processedUrl}`);
+                      // console.log(`[GallerySimple] Added event ID to photo URL: ${processedUrl}`);
                     }
                   }
                 }
@@ -107,20 +107,20 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
                 id: photo.id || `photo-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
               };
 
-              console.log("[GallerySimple] Processed photo:", processedPhoto);
+              // console.log("[GallerySimple] Processed photo:", processedPhoto);
               return processedPhoto;
             });
 
-          console.log("[GallerySimple] Final processed photos:", processedPhotos);
+          // console.log("[GallerySimple] Final processed photos:", processedPhotos);
           // Store the processed photos array
           setPhotos(processedPhotos);
         } else {
-          console.log("[GallerySimple] No photos found in response");
+          // console.log("[GallerySimple] No photos found in response");
 
           // If we just uploaded photos but none were returned, retry a few times
           // This handles the case where the backend needs a moment to process the upload
           if (retryCount < maxRetries) {
-            console.log(`[GallerySimple] No photos found after upload, retrying in ${delay}ms (${retryCount + 1}/${maxRetries})`);
+            // console.log(`[GallerySimple] No photos found after upload, retrying in ${delay}ms (${retryCount + 1}/${maxRetries})`);
 
             // Wait for the specified delay before retrying
             setTimeout(() => {
@@ -139,7 +139,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
 
         // If there's an error and we haven't exceeded max retries, try again
         if (retryCount < maxRetries) {
-          console.log(`[GallerySimple] Error fetching photos, retrying in ${delay}ms (${retryCount + 1}/${maxRetries})`);
+          // console.log(`[GallerySimple] Error fetching photos, retrying in ${delay}ms (${retryCount + 1}/${maxRetries})`);
 
           // Wait for the specified delay before retrying
           setTimeout(() => {
@@ -164,7 +164,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
 
   // Listen for photo upload events using the event bus
   useEffect(() => {
-    console.log(`[GallerySimple] Setting up event listeners for event ID ${eventId}`);
+    // console.log(`[GallerySimple] Setting up event listeners for event ID ${eventId}`);
 
     // Listen for photo uploaded events
     const photoUploadedUnsubscribe = eventBus.on(EVENTS.PHOTO_UPLOADED, (data) => {
@@ -172,7 +172,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
 
       // Check if this event is for our event ID
       if (data.eventId === Number(eventId) || data.eventId === eventId) {
-        console.log(`[GallerySimple] Received PHOTO_UPLOADED event for event ID ${eventId}, refreshing photos`);
+        // console.log(`[GallerySimple] Received PHOTO_UPLOADED event for event ID ${eventId}, refreshing photos`);
         // Use setTimeout with 0 delay to ensure this runs in the next event loop
         // This helps with React's batching of state updates
         setTimeout(() => {
@@ -189,7 +189,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
 
       // Check if this event is for our event ID or if it's a global refresh
       if (!data.eventId || data.eventId === Number(eventId) || data.eventId === eventId) {
-        console.log(`[GallerySimple] Received GALLERY_REFRESH event, refreshing photos`);
+        // console.log(`[GallerySimple] Received GALLERY_REFRESH event, refreshing photos`);
         // Use setTimeout with 0 delay to ensure this runs in the next event loop
         setTimeout(() => {
           if (isMounted.current) {
@@ -206,7 +206,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
       // Check if there's a lastPhotoUpload in localStorage
       const lastUpload = localStorage.getItem('lastPhotoUpload');
       if (lastUpload) {
-        console.log(`[GallerySimple] Detected photo upload timestamp: ${lastUpload}`);
+        // console.log(`[GallerySimple] Detected photo upload timestamp: ${lastUpload}`);
         // We don't need to call fetchPhotos() here since it's already called in the eventId useEffect
       }
 
@@ -215,7 +215,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
         if (!isMounted.current) return;
 
         if (e.key === 'lastPhotoUpload' && e.newValue) {
-          console.log(`[GallerySimple] Storage event: photo upload timestamp changed to ${e.newValue}`);
+          // console.log(`[GallerySimple] Storage event: photo upload timestamp changed to ${e.newValue}`);
           // Use setTimeout with 0 delay to ensure this runs in the next event loop
           setTimeout(() => {
             if (isMounted.current) {
@@ -231,7 +231,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
 
     // Clean up all event listeners on unmount
     return () => {
-      console.log(`[GallerySimple] Cleaning up event listeners for event ID ${eventId}`);
+      // console.log(`[GallerySimple] Cleaning up event listeners for event ID ${eventId}`);
       isMounted.current = false;
       photoUploadedUnsubscribe();
       galleryRefreshUnsubscribe();
@@ -244,7 +244,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
 
   // Fetch photos when the event ID changes
   useEffect(() => {
-    console.log(`[GallerySimple] Event ID changed to ${eventId}, fetching photos`);
+    // console.log(`[GallerySimple] Event ID changed to ${eventId}, fetching photos`);
     fetchPhotos();
   }, [eventId, fetchPhotos]);
 
@@ -314,7 +314,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
                           onClick={async () => {
                             try {
                               // Download the photo using the protected file API
-                              console.log(`[GallerySimple] Downloading photo: ${photo.photo_url}`);
+                              // console.log(`[GallerySimple] Downloading photo: ${photo.photo_url}`);
 
                               // Normalize the file path
                               let normalizedPath = photo.photo_url;
@@ -332,7 +332,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
                                 }
                               }
 
-                              console.log(`[GallerySimple] Using normalized path: ${normalizedPath}`);
+                              // console.log(`[GallerySimple] Using normalized path: ${normalizedPath}`);
 
                               // Fetch the file as a blob directly from the backend
                               const blob = await fileApi.getProtectedFile(normalizedPath);
@@ -375,7 +375,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
 
                             try {
                               // Delete the photo using the API
-                              console.log(`[GallerySimple] Deleting photo: ${photo.id} from event ${eventId}`);
+                              // console.log(`[GallerySimple] Deleting photo: ${photo.id} from event ${eventId}`);
 
                               // In development mode, handle mock data in localStorage
                               if (process.env.NODE_ENV === 'development' && typeof window !== 'undefined') {
@@ -390,14 +390,14 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
 
                               // Call the API to delete the photo
                               await eventApi.deleteEventPhoto(eventId, photo.id);
-                              console.log(`[GallerySimple] Successfully deleted photo ${photo.id}`);
+                              // console.log(`[GallerySimple] Successfully deleted photo ${photo.id}`);
 
                               // Update the photos state directly instead of fetching again
                               setPhotos(prevPhotos => prevPhotos.filter(p => p.id !== photo.id));
-                              console.log(`[GallerySimple] Removed photo ${photo.id} from state`);
+                              // console.log(`[GallerySimple] Removed photo ${photo.id} from state`);
 
                               // Emit event to notify other components that a photo has been deleted
-                              console.log(`[GallerySimple] Emitting PHOTO_DELETED event for event ID ${eventId}`);
+                              // console.log(`[GallerySimple] Emitting PHOTO_DELETED event for event ID ${eventId}`);
                               eventBus.emit(EVENTS.PHOTO_DELETED, {
                                 eventId: eventId,
                                 photoId: photo.id,
@@ -442,7 +442,7 @@ export function GallerySimple({ eventId }: GallerySimpleProps) {
         eventId={eventId}
         onSuccess={() => {
           // Refetch photos after successful upload with retry mechanism
-          console.log('[GallerySimple] onSuccess callback triggered from UploadPhotosDirect, refreshing photos with retry mechanism');
+          // console.log('[GallerySimple] onSuccess callback triggered from UploadPhotosDirect, refreshing photos with retry mechanism');
 
           // Start with immediate refresh attempt
           fetchPhotos(0, 5, 300); // Use 5 retries with shorter initial delay for faster response

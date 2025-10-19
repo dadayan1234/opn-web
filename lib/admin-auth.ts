@@ -15,7 +15,7 @@ const ADMIN_TOKEN_KEY = 'admin_token';
  */
 export async function authenticateAsAdmin(): Promise<{ success: boolean; message: string }> {
   try {
-    console.log('Authenticating as admin...');
+    // console.log('Authenticating as admin...');
 
     // Make the authentication request
     const response = await axios.post(`${API_BASE_URL}/auth/token`, {
@@ -33,7 +33,7 @@ export async function authenticateAsAdmin(): Promise<{ success: boolean; message
         }
       }
 
-      console.log('Admin authentication successful');
+      // console.log('Admin authentication successful');
       return { success: true, message: 'Admin authentication successful' };
     } else {
       console.error('Admin authentication failed: No token in response', response.data);

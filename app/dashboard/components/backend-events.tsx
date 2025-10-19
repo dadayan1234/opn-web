@@ -45,7 +45,7 @@ export function BackendEvents() {
         }
 
         const data = await response.json()
-        console.log('Raw backend events data:', data)
+        // console.log('Raw backend events data:', data)
 
         // Use the data exactly as it comes from the backend
         if (Array.isArray(data) && data.length > 0) {

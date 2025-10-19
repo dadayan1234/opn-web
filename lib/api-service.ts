@@ -11,7 +11,7 @@ async function withRetry<T>(
   initialDelay = API_CONFIG?.RETRY?.DELAY || 1000,
 ): Promise<AxiosResponse<T>> {
   try {
-    console.log('Making API call with retry mechanism')
+    // console.log('Making API call with retry mechanism')
     return await apiCall()
   } catch (error: any) {
     if (!retries) {
@@ -40,7 +40,7 @@ async function withRetry<T>(
 
     // Don't retry canceled requests
     if (axios.isCancel(error)) {
-      console.log('Request was cancelled, not retrying')
+      // console.log('Request was cancelled, not retrying')
       throw error
     }
 
@@ -91,11 +91,11 @@ async function withRetry<T>(
                    error.message?.includes('network') ||
                    error.message?.includes('timeout') ||
                    error.message?.includes('connection')
-      console.log('Non-Axios error:', error.message)
+      // console.log('Non-Axios error:', error.message)
     }
 
     if (!shouldRetry) {
-      console.log(`Error is not retryable, throwing error`)
+      // console.log(`Error is not retryable, throwing error`)
       throw error
     }
 
@@ -107,7 +107,7 @@ async function withRetry<T>(
       30000 // Max delay of 30 seconds
     )
 
-    console.log(`Request failed, retrying in ${delay}ms... (${retries} attempts remaining)`)
+    // console.log(`Request failed, retrying in ${delay}ms... (${retries} attempts remaining)`)
     await new Promise(resolve => setTimeout(resolve, delay))
 
     return withRetry(apiCall, retries - 1, initialDelay)
@@ -122,7 +122,7 @@ const eventApiOriginal = {
   // Get events with pagination - updated to use new API format
   getEvents: async (page = 1, limit = 10, signal?: AbortSignal): Promise<Event[]> => {
     try {
-      console.log(`[API] Fetching events with page=${page} and limit=${limit}`)
+      // console.log(`[API] Fetching events with page=${page} and limit=${limit}`)
       const response = await withRetry(() =>
         apiClient.get<any>("/events/", { // Use imported apiClient
           params: { page, limit }, // Updated to use page instead of skip
@@ -132,11 +132,11 @@ const eventApiOriginal = {
 
       // Check if the response has the new format with data and meta
       if (response.data && typeof response.data === 'object' && Array.isArray(response.data.data)) {
-        console.log(`[API] Received events in new format with meta:`, response.data.meta)
+        // console.log(`[API] Received events in new format with meta:`, response.data.meta)
         return response.data.data
       } else if (Array.isArray(response.data)) {
         // Fallback for old format
-        console.log(`[API] Received events in old array format`)
+        // console.log(`[API] Received events in old array format`)
         return response.data
       } else {
         console.error(`[API] Unexpected events response format:`, response.data)
@@ -144,7 +144,7 @@ const eventApiOriginal = {
       }
     } catch (error) {
       if (axios.isCancel(error)) {
-        console.log('[API] Events request was cancelled - returning empty array')
+        // console.log('[API] Events request was cancelled - returning empty array')
         return []
       }
       console.error('[API] Error fetching events:', error)
@@ -179,7 +179,7 @@ const eventApiOriginal = {
       if (params.startDate) apiParams.start_date = params.startDate;
       if (params.endDate) apiParams.end_date = params.endDate;
 
-      console.log(`[API] Searching events with params:`, apiParams);
+      // console.log(`[API] Searching events with params:`, apiParams);
 
       const response = await withRetry(() =>
         apiClient.get<any>("/events/search", { // Use imported apiClient
@@ -190,11 +190,11 @@ const eventApiOriginal = {
 
       // Check if the response has the new format with data and meta
       if (response.data && typeof response.data === 'object' && Array.isArray(response.data.data)) {
-        console.log(`[API] Received search results in new format with meta:`, response.data.meta);
+        // console.log(`[API] Received search results in new format with meta:`, response.data.meta);
         return response.data.data;
       } else if (Array.isArray(response.data)) {
         // Fallback for old format
-        console.log(`[API] Received search results in old array format`);
+        // console.log(`[API] Received search results in old array format`);
         return response.data;
       } else {
         console.error(`[API] Unexpected search response format:`, response.data);
@@ -202,7 +202,7 @@ const eventApiOriginal = {
       }
     } catch (error) {
       if (axios.isCancel(error)) {
-        console.log('[API] Search request was cancelled - returning empty array')
+        // console.log('[API] Search request was cancelled - returning empty array')
         return []
       }
       console.error('[API] Error searching events:', error)
@@ -223,7 +223,7 @@ const eventApiOriginal = {
       return response.data;
     } catch (error) {
       if (axios.isCancel(error)) {
-        console.log('Event request was cancelled');
+        // console.log('Event request was cancelled');
         throw new Error('Request was cancelled');
       }
       console.error(`Error fetching event ${id}:`, error);
@@ -242,7 +242,7 @@ export const eventApi = {
     signal?: AbortSignal
   ): Promise<EventsResponse> => {
     // panggil eventApiOriginal.getEvents tapi ambil langsung response.data
-    console.log(`[API] Fetching events with page=${page} and limit=${limit}`);
+    // console.log(`[API] Fetching events with page=${page} and limit=${limit}`);
     const response = await withRetry(() =>
       apiClient.get<any>("/events/", {
         params: { page, limit },
@@ -255,12 +255,12 @@ export const eventApi = {
       typeof response.data === 'object' &&
       Array.isArray(response.data.data)
     ) {
-      console.log(`[API] Received events with meta:`, response.data.meta);
+      // console.log(`[API] Received events with meta:`, response.data.meta);
       return response.data as EventsResponse; // return full object
     }
 
     if (Array.isArray(response.data)) {
-      console.log(`[API] Received events in old array format`);
+      // console.log(`[API] Received events in old array format`);
       return {
         data: response.data as Event[],
         meta: { page, limit, total_pages: 1 },
@@ -365,7 +365,7 @@ export const eventApi = {
            const response = await withRetry(() => apiClient.patch<Event>(`/events/${id}/minutes`, { minutes: eventData.minutes })); // Use imported apiClient
            return response.data;
          } catch (patchError) {
-           console.log(`PATCH endpoint not available, falling back to PUT for minutes update of event ${id}`);
+           // console.log(`PATCH endpoint not available, falling back to PUT for minutes update of event ${id}`);
            const response = await withRetry(() => apiClient.put<Event>(`/events/${id}`, { minutes: eventData.minutes })); // Use imported apiClient
            return response.data;
          }
@@ -401,7 +401,7 @@ export const eventApi = {
   // Get event attendance
   getEventAttendance: async (eventId: number | string, signal?: AbortSignal): Promise<EventAttendance[]> => {
     try {
-      console.log(`[API] Fetching attendance for event ID: ${eventId}`);
+      // console.log(`[API] Fetching attendance for event ID: ${eventId}`);
 
       // Skip the event existence check and directly try to fetch attendance
       // If the event doesn't exist, the attendance endpoint will return 404 anyway
@@ -410,11 +410,11 @@ export const eventApi = {
         const response = await withRetry(() =>
           apiClient.get<EventAttendance[]>(`/events/${eventId}/attendance/`, { signal })
         );
-        console.log(`[API] Successfully fetched attendance for event ID: ${eventId}`);
+        // console.log(`[API] Successfully fetched attendance for event ID: ${eventId}`);
 
         // If the response is empty or not an array, return an empty array
         if (!response.data || !Array.isArray(response.data) || response.data.length === 0) {
-          console.log(`[API] No attendance records found for event ID: ${eventId}, returning empty array`);
+          // console.log(`[API] No attendance records found for event ID: ${eventId}, returning empty array`);
           return [];
         }
 
@@ -422,19 +422,19 @@ export const eventApi = {
       } catch (attendanceError) {
         // Handle specific errors for attendance
         if (axios.isCancel(attendanceError)) {
-          console.log('[API] Attendance request was cancelled');
+          // console.log('[API] Attendance request was cancelled');
           return [];
         }
         if (axios.isAxiosError(attendanceError)) {
           // For 404 errors, return empty array
           if (attendanceError.response?.status === 404) {
-            console.log(`[API] No attendance found for event ID: ${eventId} (404 response)`);
+            // console.log(`[API] No attendance found for event ID: ${eventId} (404 response)`);
             return [];
           }
           // For server errors, return empty array
           if (attendanceError.response?.status === 502 || attendanceError.response?.status === 504 ||
               (attendanceError.response?.status && attendanceError.response.status >= 500)) {
-            console.log(`[API] Server error (${attendanceError.response.status}) fetching attendance for event ID: ${eventId}`);
+            // console.log(`[API] Server error (${attendanceError.response.status}) fetching attendance for event ID: ${eventId}`);
             return [];
           }
         }
@@ -452,7 +452,7 @@ export const eventApi = {
   // Create or update event attendance
   createUpdateAttendance: async (eventId: number | string, attendanceData: AttendanceFormData[]): Promise<EventAttendance[]> => {
     try {
-      console.log(`[API] Creating/updating attendance for event ${eventId} with data:`, attendanceData);
+      // console.log(`[API] Creating/updating attendance for event ${eventId} with data:`, attendanceData);
 
       // Validate the data before sending to the API
       const validatedData = attendanceData.map(record => {
@@ -470,7 +470,7 @@ export const eventApi = {
         apiClient.post<EventAttendance[]>(`/events/${eventId}/attendance/`, validatedData)
       );
 
-      console.log(`[API] Successfully created/updated attendance for event ${eventId}:`, response.data);
+      // console.log(`[API] Successfully created/updated attendance for event ${eventId}:`, response.data);
       return response.data;
     } catch (error) {
       console.error(`[API] Error creating/updating attendance for event ${eventId}:`, error);
@@ -523,7 +523,7 @@ export const eventApi = {
 
       // Use the correct endpoint for uploading photos
       const endpoint = `/uploads/events/${numericEventId}/photos`;
-      console.log(`[API] Uploading photos to: ${endpoint}`);
+      // console.log(`[API] Uploading photos to: ${endpoint}`);
 
       const response = await apiClient.post(
         endpoint,
@@ -540,7 +540,7 @@ export const eventApi = {
         }
       );
 
-      console.log(`[API] Successfully uploaded photos for event ${numericEventId}:`, response.data);
+      // console.log(`[API] Successfully uploaded photos for event ${numericEventId}:`, response.data);
       return response.data;
 
     } catch (error) {
@@ -793,7 +793,7 @@ export const newsApi = {
     try {
       // Check if the signal is already aborted
       if (signal?.aborted) {
-        console.log('Request was aborted before execution')
+        // console.log('Request was aborted before execution')
         return []
       }
 
@@ -842,7 +842,7 @@ export const newsApi = {
     } catch (error) {
       // Handle cancellation gracefully
       if (axios.isCancel(error)) {
-        console.log('News request was cancelled')
+        // console.log('News request was cancelled')
         return []
       }
 
@@ -890,7 +890,7 @@ export const newsApi = {
   // Get single news item
   getNewsItem: async (id: number | string, signal?: AbortSignal): Promise<NewsItem> => {
     try {
-      console.log(`Fetching news item with ID: ${id}`)
+      // console.log(`Fetching news item with ID: ${id}`)
 
       // Add a timestamp to prevent caching issues
       const timestamp = Date.now();
@@ -905,16 +905,16 @@ export const newsApi = {
       }
 
       // Log the raw data for debugging
-      console.log(`Raw news item data:`, response.data)
+      // console.log(`Raw news item data:`, response.data)
 
       // Validate the photos array
       if (response.data.photos && Array.isArray(response.data.photos)) {
-        console.log(`News item has ${response.data.photos.length} photos`)
+        // console.log(`News item has ${response.data.photos.length} photos`)
 
         // Log each photo URL for debugging
         response.data.photos.forEach((photo, index) => {
           if (photo && photo.photo_url) {
-            console.log(`Photo ${index + 1} URL: ${photo.photo_url}`)
+            // console.log(`Photo ${index + 1} URL: ${photo.photo_url}`)
           } else {
             console.warn(`Photo ${index + 1} has no URL or is invalid`)
           }
@@ -947,7 +947,7 @@ export const newsApi = {
         photos: Array.isArray(response.data.photos) ? response.data.photos.map(photo => {
           // Log each photo URL for debugging
           if (photo && photo.photo_url) {
-            console.log(`[getNewsItem] Photo URL from API: ${photo.photo_url}`);
+            // console.log(`[getNewsItem] Photo URL from API: ${photo.photo_url}`);
           }
           return photo;
         }) : []
@@ -955,19 +955,19 @@ export const newsApi = {
 
       // Log the photos array for debugging
       if (validatedData.photos && validatedData.photos.length > 0) {
-        console.log(`[getNewsItem] News has ${validatedData.photos.length} photos`);
+        // console.log(`[getNewsItem] News has ${validatedData.photos.length} photos`);
         validatedData.photos.forEach((photo, index) => {
-          console.log(`[getNewsItem] Photo ${index + 1}: ${photo.photo_url}`);
+          // console.log(`[getNewsItem] Photo ${index + 1}: ${photo.photo_url}`);
         });
       } else {
-        console.log(`[getNewsItem] News has no photos`);
+        // console.log(`[getNewsItem] News has no photos`);
       }
 
-      console.log(`Validated news item data:`, validatedData)
+      // console.log(`Validated news item data:`, validatedData)
       return validatedData
     } catch (error) {
       if (axios.isCancel(error)) {
-        console.log('News item request was cancelled')
+        // console.log('News item request was cancelled')
         throw new Error('Request was cancelled')
       }
       console.error(`Error fetching news item ${id}:`, error)
@@ -1017,7 +1017,7 @@ export const newsApi = {
   // Upload news photo (Modified to use apiClient)
   uploadNewsPhoto: async (id: number | string, file: File): Promise<NewsPhoto> => {
     try {
-      console.log(`Uploading photo for news ID ${id}`)
+      // console.log(`Uploading photo for news ID ${id}`)
 
       // Get the auth token - apiClient will automatically add this in its interceptor
       // but we'll check it here for validation
@@ -1027,7 +1027,7 @@ export const newsApi = {
         throw new Error('Authentication required. Please log in again.')
       }
 
-      console.log(`Auth token available for upload: ${authToken.substring(0, 15)}...`)
+      // console.log(`Auth token available for upload: ${authToken.substring(0, 15)}...`)
 
       // Create FormData object
       const formData = new FormData()
@@ -1038,7 +1038,7 @@ export const newsApi = {
 
       // Use the correct endpoint URL format for uploads
       const endpoint = `/uploads/news/${id}/photos`
-      console.log(`Using endpoint: ${endpoint}`)
+      // console.log(`Using endpoint: ${endpoint}`)
 
       // Use apiClient directly instead of axios to ensure consistent headers and error handling
       const response = await apiClient.post<any>(
@@ -1052,7 +1052,7 @@ export const newsApi = {
         }
       );
 
-      console.log(`Upload response:`, response.data)
+      // console.log(`Upload response:`, response.data)
 
       // Process the response to match the expected NewsPhoto format
       if (response.data && response.data.uploaded_files && Array.isArray(response.data.uploaded_files)) {
@@ -1070,7 +1070,7 @@ export const newsApi = {
           formattedPhotoUrl = `${API_CONFIG.BACKEND_URL}//uploads/${cleanPhotoUrl.includes('uploads/') ? cleanPhotoUrl.split('uploads/')[1] : cleanPhotoUrl}`;
         }
 
-        console.log(`Formatted photo URL: ${formattedPhotoUrl}`)
+        // console.log(`Formatted photo URL: ${formattedPhotoUrl}`)
 
         // Return in the expected format
         return {
@@ -1175,7 +1175,7 @@ export const meetingMinutesApi = {
 
       // Double-check that all returned minutes are for this event
       const filteredData = response.data.filter(minute => minute.event_id === numericEventId);
-      console.log(`Filtered ${response.data.length} minutes to ${filteredData.length} for event ID ${numericEventId}`);
+      // console.log(`Filtered ${response.data.length} minutes to ${filteredData.length} for event ID ${numericEventId}`);
       return filteredData;
     } catch (error) {
       if (axios.isCancel(error) || (error instanceof Error && error.name === 'CanceledError') || signal?.aborted) return [];
@@ -1228,7 +1228,7 @@ export const meetingMinutesApi = {
       // Let's use the description field as the string content
       const stringContent = data.description || '';
 
-      console.log(`Updating meeting minutes ${id} with string content`);
+      // console.log(`Updating meeting minutes ${id} with string content`);
 
       // Use fetch API directly instead of axios
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -1337,7 +1337,7 @@ export const memberApi = {
   // Upload member photo
   uploadMemberPhoto: async (memberId: number | string, file: File): Promise<any> => {
     try {
-      console.log(`[API] Uploading photo for user ID ${memberId}`);
+      // console.log(`[API] Uploading photo for user ID ${memberId}`);
 
       // Ambil auth token (walau apiClient sudah ada interceptor)
       const authToken = getAuthToken();
@@ -1346,7 +1346,7 @@ export const memberApi = {
         throw new Error('Authentication required. Please log in again.');
       }
 
-      console.log(`[API] Auth token available: ${authToken.substring(0, 15)}...`);
+      // console.log(`[API] Auth token available: ${authToken.substring(0, 15)}...`);
 
       // Buat FormData
       const formData = new FormData();
@@ -1354,7 +1354,7 @@ export const memberApi = {
 
       // Endpoint sesuai backend
       const endpoint = `/uploads/users/${memberId}/photo`;
-      console.log(`[API] Using endpoint: ${endpoint}`);
+      // console.log(`[API] Using endpoint: ${endpoint}`);
 
       // POST ke backend
       const response = await apiClient.post<any>(endpoint, formData, {
@@ -1364,7 +1364,7 @@ export const memberApi = {
         timeout: 60000,
       });
 
-      console.log(`[API] User photo upload response:`, response.data);
+      // console.log(`[API] User photo upload response:`, response.data);
       return response.data;
     } catch (error) {
       console.error(`[API] Error uploading user photo:`, error);
@@ -1377,7 +1377,7 @@ export const memberApi = {
   // Create a new user with username and password
   createUser: async (userData: { user_data: { username: string; password: string }; biodata: BiodataFormData }): Promise<any> => {
     try {
-      console.log('[API] Creating a new user with username and password');
+      // console.log('[API] Creating a new user with username and password');
 
       // Format the data according to the API schema with exact field order
       const apiData = {
@@ -1397,16 +1397,16 @@ export const memberApi = {
         }
       };
 
-      console.log('[API] User creation data being sent:', {
-        ...apiData,
-        user_data: { ...apiData.user_data, password: '******' } // Mask password in logs
-      });
+      // console.log('[API] User creation data being sent:', {
+      //   ...apiData,
+      //   user_data: { ...apiData.user_data, password: '******' } // Mask password in logs
+      // });
 
       const response = await withRetry(() =>
         apiClient.post('/members/create_user', apiData)
       );
 
-      console.log('[API] Successfully created new user');
+      // console.log('[API] Successfully created new user');
       return response.data;
     } catch (error) {
       console.error('[API] Error creating new user:', error);
@@ -1427,7 +1427,7 @@ export const memberApi = {
   // Get all members
   getMembers: async (signal?: AbortSignal, filters?: { age_gt?: number }): Promise<MemberResponse> => {
     try {
-      console.log('[API] Fetching members data with filters:', filters);
+      // console.log('[API] Fetching members data with filters:', filters);
 
       // Add a timestamp to prevent caching
       const timestamp = new Date().getTime();
@@ -1438,8 +1438,8 @@ export const memberApi = {
         _t: timestamp
       };
 
-      console.log('[API] Request params:', params);
-      console.log('[API] Request URL:', apiClient.defaults.baseURL + '/members/');
+      // console.log('[API] Request params:', params);
+      // console.log('[API] Request URL:', apiClient.defaults.baseURL + '/members/');
 
       // Log the auth token (redacted for security)
       const authHeader = apiClient.defaults.headers.common['Authorization'] as string;
@@ -1449,12 +1449,12 @@ export const memberApi = {
           const token = tokenParts[1];
           const firstChars = token.substring(0, 10);
           const lastChars = token.substring(token.length - 10);
-          console.log(`[API] Using auth token: ${firstChars}...${lastChars}`);
+          // console.log(`[API] Using auth token: ${firstChars}...${lastChars}`);
         } else {
-          console.log('[API] Auth header present but not in expected format');
+          // console.log('[API] Auth header present but not in expected format');
         }
       } else {
-        console.log('[API] No auth token found in request headers');
+        // console.log('[API] No auth token found in request headers');
       }
 
       const response = await withRetry(() =>
@@ -1465,9 +1465,9 @@ export const memberApi = {
         })
       );
 
-      console.log('[API] Raw members response status:', response.status);
-      console.log('[API] Raw members response headers:', response.headers);
-      console.log('[API] Raw members response data:', response.data);
+      // console.log('[API] Raw members response status:', response.status);
+      // console.log('[API] Raw members response headers:', response.headers);
+      // console.log('[API] Raw members response data:', response.data);
 
       // Ensure we return a properly structured MemberResponse
       if (!response.data || typeof response.data !== 'object') {
@@ -1480,7 +1480,7 @@ export const memberApi = {
 
       // If the response is an array, convert it to a division-based structure
       if (Array.isArray(response.data)) {
-        console.log('[API] Converting array response to division-based structure');
+        // console.log('[API] Converting array response to division-based structure');
 
         response.data.forEach((member: any) => {
           if (member && typeof member === 'object') {
@@ -1603,11 +1603,11 @@ export const memberApi = {
         }
       });
 
-      console.log('[API] Normalized members response:', normalizedResponse);
+      // console.log('[API] Normalized members response:', normalizedResponse);
       return normalizedResponse;
     } catch (error) {
       if (axios.isCancel(error)) {
-        console.log('[API] Members request was cancelled');
+        // console.log('[API] Members request was cancelled');
         return {};
       }
 
@@ -1715,15 +1715,15 @@ export const memberApi = {
   // Get current user's profile
   getMyProfile: async (signal?: AbortSignal): Promise<Member> => {
     try {
-      console.log('[API] Fetching current user profile');
+      // console.log('[API] Fetching current user profile');
       const response = await withRetry(() =>
         apiClient.get<Member>('/members/me', { signal })
       )
-      console.log('[API] Successfully fetched current user profile');
+      // console.log('[API] Successfully fetched current user profile');
       return response.data;
     } catch (error) {
       if (axios.isCancel(error)) {
-        console.log('[API] Profile request was cancelled');
+        // console.log('[API] Profile request was cancelled');
         throw new Error('Request was cancelled');
       }
       console.error('[API] Error fetching profile:', error);
@@ -1734,7 +1734,7 @@ export const memberApi = {
   // Create or update member biodata
   createMember: async (memberData: MemberFormData): Promise<Member> => {
     try {
-      console.log('[API] Creating or updating member biodata');
+      // console.log('[API] Creating or updating member biodata');
 
       // Create biodata object exactly matching the API schema - ONLY include fields in the schema
       const biodataData = {
@@ -1749,30 +1749,30 @@ export const memberApi = {
       };
 
       // Log the data being sent to the API
-      console.log('[API] Member data being sent:', biodataData);
+      // console.log('[API] Member data being sent:', biodataData);
 
       // First, check if the user already has biodata by fetching their profile
       try {
-        console.log('[API] Checking if user already has biodata');
+        // console.log('[API] Checking if user already has biodata');
         const profileResponse = await withRetry(() =>
           apiClient.get<Member>('/members/me')
         );
 
-        console.log('[API] User profile:', profileResponse.data);
+        // console.log('[API] User profile:', profileResponse.data);
 
         // Check if the user already has biodata
         if (profileResponse.data.member_info) {
-          console.log('[API] User already has biodata, updating instead of creating');
+          // console.log('[API] User already has biodata, updating instead of creating');
 
           // Use PUT to update existing biodata
-          console.log('[API] Updating biodata with formatted data:', biodataData);
-          console.log('[API] Request payload:', JSON.stringify(biodataData));
+          // console.log('[API] Updating biodata with formatted data:', biodataData);
+          // console.log('[API] Request payload:', JSON.stringify(biodataData));
 
           const updateResponse = await withRetry(() =>
             apiClient.put<MemberInfo>('/members/biodata/', biodataData)
           );
 
-          console.log('[API] Successfully updated member biodata');
+          // console.log('[API] Successfully updated member biodata');
 
           // Return a response based on the updated biodata
           return {
@@ -1785,24 +1785,24 @@ export const memberApi = {
             member_info: updateResponse.data
           } as Member;
         } else {
-          console.log('[API] User does not have biodata, creating new biodata');
+          // console.log('[API] User does not have biodata, creating new biodata');
         }
       } catch (profileError) {
         console.error('[API] Error checking user profile:', profileError);
-        console.log('[API] Proceeding with biodata creation attempt');
+        // console.log('[API] Proceeding with biodata creation attempt');
       }
 
       // If we reach here, either the user doesn't have biodata or we couldn't check
       // Try to create new biodata
-      console.log('[API] Creating biodata with formatted data:', biodataData);
-      console.log('[API] Request payload:', JSON.stringify(biodataData));
+      // console.log('[API] Creating biodata with formatted data:', biodataData);
+      // console.log('[API] Request payload:', JSON.stringify(biodataData));
 
       try {
         const createResponse = await withRetry(() =>
           apiClient.post<MemberInfo>('/members/biodata/', biodataData)
         );
 
-        console.log('[API] Successfully created member with biodata');
+        // console.log('[API] Successfully created member with biodata');
 
         // Return a response based on the created biodata
         return {
@@ -1817,14 +1817,14 @@ export const memberApi = {
       } catch (createError: any) {
         // Check if the error is "Biodata already exists"
         if (createError.response?.data?.detail === "Biodata already exists") {
-          console.log('[API] Biodata already exists, trying to update instead');
+          // console.log('[API] Biodata already exists, trying to update instead');
 
           // Use PUT to update existing biodata
           const updateResponse = await withRetry(() =>
             apiClient.put<MemberInfo>('/members/biodata/', biodataData)
           );
 
-          console.log('[API] Successfully updated member biodata after creation failed');
+          // console.log('[API] Successfully updated member biodata after creation failed');
 
           // Return a response based on the updated biodata
           return {
@@ -1875,13 +1875,13 @@ export const memberApi = {
         birth_date: biodataData.birth_date
       };
 
-      console.log('[API] Creating biodata with formatted data:', apiData);
-      console.log('[API] Request payload:', JSON.stringify(apiData));
+      // console.log('[API] Creating biodata with formatted data:', apiData);
+      // console.log('[API] Request payload:', JSON.stringify(apiData));
 
       const response = await withRetry(() =>
         apiClient.post<MemberInfo>('/members/biodata/', apiData)
       )
-      console.log('[API] Successfully created biodata');
+      // console.log('[API] Successfully created biodata');
 
       // Return the response data
       const responseData = response.data;
@@ -1925,7 +1925,7 @@ export const memberApi = {
         apiData.photo_url = biodataData.photo_url
       }
 
-      console.log("[API] Updating biodata with data:", apiData)
+      // console.log("[API] Updating biodata with data:", apiData)
 
       const response = await withRetry(() =>
         apiClient.put<MemberInfo>(`/members/biodata/${memberId}`, apiData)
@@ -1941,7 +1941,7 @@ export const memberApi = {
   // Delete user
   deleteUser: async (userId: number | string): Promise<void> => {
     try {
-      console.log(`[API] Deleting user with ID: ${userId}`);
+      // console.log(`[API] Deleting user with ID: ${userId}`);
 
       // Add a timeout to the delete request to prevent it from hanging
       await withRetry(() =>
@@ -1950,14 +1950,14 @@ export const memberApi = {
         })
       );
 
-      console.log(`[API] Successfully deleted user with ID: ${userId}`);
+      // console.log(`[API] Successfully deleted user with ID: ${userId}`);
 
       // Add a small delay to ensure the backend has time to process the deletion
       await new Promise(resolve => setTimeout(resolve, 300));
 
     } catch (error) {
       if (axios.isCancel(error)) {
-        console.log(`[API] Delete user request was cancelled for ID: ${userId}`);
+        // console.log(`[API] Delete user request was cancelled for ID: ${userId}`);
         // Don't throw for cancellation, just return
         return;
       }

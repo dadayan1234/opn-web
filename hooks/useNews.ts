@@ -25,17 +25,17 @@ export function useNews(params?: {
   const { toast } = useToast()
 
   // Log the params for debugging
-  console.log('useNews hook called with params:', params)
+  // console.log('useNews hook called with params:', params)
 
   return useQuery<NewsItem[], Error>({
     queryKey: newsKeys.list(params || {}),
     queryFn: async ({ signal }) => {
-      console.log('useNews queryFn executing with params:', params)
+      // console.log('useNews queryFn executing with params:', params)
 
       try {
         // Check if the signal is aborted before making the request
         if (signal?.aborted) {
-          console.log('Request was aborted before execution')
+          // console.log('Request was aborted before execution')
           return []
         }
 
@@ -45,9 +45,9 @@ export function useNews(params?: {
           _t: Date.now()
         }
 
-        console.log('Calling newsApi.getNews with params:', paramsWithTimestamp)
+        // console.log('Calling newsApi.getNews with params:', paramsWithTimestamp)
         const data = await newsApi.getNews(paramsWithTimestamp, signal)
-        console.log('newsApi.getNews returned data:', data)
+        // console.log('newsApi.getNews returned data:', data)
 
         // Additional validation at the hook level
         if (!Array.isArray(data)) {
@@ -71,7 +71,7 @@ export function useNews(params?: {
 
         // Filter out invalid items instead of throwing an error
         const validItems = data.filter(isValidNewsItem)
-        console.log(`Filtered ${data.length} news items to ${validItems.length} valid items`)
+        // console.log(`Filtered ${data.length} news items to ${validItems.length} valid items`)
 
         if (validItems.length < data.length) {
           console.warn('Some news items had invalid format and were filtered out')
@@ -81,7 +81,7 @@ export function useNews(params?: {
       } catch (error) {
         // Handle axios cancellation errors silently
         if (axios.isCancel(error)) {
-          console.log('Request was cancelled')
+          // console.log('Request was cancelled')
           return []
         }
 
@@ -136,14 +136,14 @@ export function useNewsItem(id: number | string) {
   return useQuery({
     queryKey: newsKeys.detail(id),
     queryFn: async ({ signal }) => {
-      console.log(`[useNewsItem] Fetching news item with ID: ${id}`);
+      // console.log(`[useNewsItem] Fetching news item with ID: ${id}`);
       try {
         // Add a timestamp to prevent caching issues
         const timestamp = Date.now();
-        console.log(`[useNewsItem] Adding timestamp to prevent caching: ${timestamp}`);
+        // console.log(`[useNewsItem] Adding timestamp to prevent caching: ${timestamp}`);
 
         const data = await newsApi.getNewsItem(id, signal);
-        console.log(`[useNewsItem] Successfully fetched news item:`, data);
+        // console.log(`[useNewsItem] Successfully fetched news item:`, data);
 
         // Validate the data structure
         if (!data) {
@@ -156,24 +156,24 @@ export function useNewsItem(id: number | string) {
           console.warn(`[useNewsItem] News item has no description, setting empty string`);
           data.description = '';
         } else {
-          console.log(`[useNewsItem] Description type: ${typeof data.description}, length: ${data.description.length}`);
+          // console.log(`[useNewsItem] Description type: ${typeof data.description}, length: ${data.description.length}`);
 
           // Check if the description is valid HTML or just plain text
           if (typeof data.description === 'string' && !data.description.includes('<')) {
-            console.log(`[useNewsItem] Description appears to be plain text, not HTML`);
+            // console.log(`[useNewsItem] Description appears to be plain text, not HTML`);
           }
 
           // Log a sample of the description for debugging
           if (typeof data.description === 'string' && data.description.length > 0) {
-            console.log(`[useNewsItem] Description sample: ${data.description.substring(0, 100)}...`);
+            // console.log(`[useNewsItem] Description sample: ${data.description.substring(0, 100)}...`);
           }
         }
 
         // Log the photos for debugging
         if (data.photos && data.photos.length > 0) {
-          console.log(`[useNewsItem] News has ${data.photos.length} photos`);
+          // console.log(`[useNewsItem] News has ${data.photos.length} photos`);
           data.photos.forEach((photo, index) => {
-            console.log(`[useNewsItem] Photo ${index + 1}: ${photo.photo_url}`);
+            // console.log(`[useNewsItem] Photo ${index + 1}: ${photo.photo_url}`);
 
             // Validate photo URL
             if (!photo.photo_url) {
@@ -183,7 +183,7 @@ export function useNewsItem(id: number | string) {
             }
           });
         } else {
-          console.log(`[useNewsItem] News has no photos`);
+          // console.log(`[useNewsItem] News has no photos`);
         }
 
         return data;

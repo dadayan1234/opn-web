@@ -8,7 +8,7 @@ import { handleApiRoute } from '../../_helpers/api-route-handler';
 // GET /api/v1/members/me
 export async function GET(request: NextRequest) {
   try {
-    console.log('[API Route] Processing GET request for current user profile');
+    // console.log('[API Route] Processing GET request for current user profile');
     
     // Forward the request to the backend API
     const response = await handleApiRoute(request, '/members/me', {

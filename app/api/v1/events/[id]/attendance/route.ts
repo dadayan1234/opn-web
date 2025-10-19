@@ -13,10 +13,10 @@ export async function GET(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`[API Route] GET /api/v1/events/${id}/attendance/ - Forwarding request to backend`);
+    // console.log(`[API Route] GET /api/v1/events/${id}/attendance/ - Forwarding request to backend`);
 
     // Skip the event existence check and directly fetch attendance
-    console.log(`[API Route] Proceeding to fetch attendance for event ID ${id}`);
+    // console.log(`[API Route] Proceeding to fetch attendance for event ID ${id}`);
 
     // Now try to get the attendance - make sure to add trailing slash to match backend API
     try {
@@ -26,7 +26,7 @@ export async function GET(
       });
 
       if (attendanceResponse.status === 404) {
-        console.log(`[API Route] No attendance found for event ID ${id}, returning empty array`);
+        // console.log(`[API Route] No attendance found for event ID ${id}, returning empty array`);
         // Return the actual 404 response to the client
         return attendanceResponse;
       }
@@ -58,7 +58,7 @@ export async function POST(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`[API Route] POST /api/v1/events/${id}/attendance/ - Forwarding request to backend`);
+    // console.log(`[API Route] POST /api/v1/events/${id}/attendance/ - Forwarding request to backend`);
 
     // Try to create/update attendance - make sure to add trailing slash to match backend API
     const response = await handleApiRoute(request, `/events/${id}/attendance/`, {

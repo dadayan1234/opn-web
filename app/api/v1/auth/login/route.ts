@@ -23,7 +23,7 @@ function addCorsHeaders(response: Response | NextResponse) {
 
 // OPTIONS handler for CORS preflight requests
 export async function OPTIONS() {
-  console.log('Handling OPTIONS request for auth login endpoint')
+  // console.log('Handling OPTIONS request for auth login endpoint')
   
   // Create a new response with 200 status
   const response = new NextResponse(null, {
@@ -41,13 +41,13 @@ export async function POST(request: NextRequest) {
     const body = await request.text()
     
     // Log the request (without sensitive data)
-    console.log('Auth login request received')
+    // console.log('Auth login request received')
     
     // Get backend URL
     const backendUrl = getBackendUrl()
     const fullUrl = `${backendUrl}/api/v1/auth/login`
     
-    console.log(`Forwarding auth login request to: ${fullUrl}`)
+    // console.log(`Forwarding auth login request to: ${fullUrl}`)
     
     // Forward request to backend API with timeout
     const controller = new AbortController()

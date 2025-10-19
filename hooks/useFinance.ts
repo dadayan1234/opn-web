@@ -1,8 +1,30 @@
 import { title } from 'process';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Finance, financeApi, FinanceHistoryResponse as ApiFinanceHistoryResponse } from '@/lib/api-service'; // Updated path
-import { uploadsApi } from '@/lib/api-uploads';
+import { uploadsApi } from '@/lib/api-uploads'
+import axios from "axios";
 
+export function useFinanceHistoryPage(page = 1, limit = 10) {
+  return useQuery({
+    queryKey: ["finance-history", page, limit],
+    queryFn: async () => {
+      // base URL langsung ditulis di sini
+      const baseURL = "https://beopn.pemudanambangan.site";
+
+      const token = localStorage.getItem("token"); // ambil token dari localStorage (atau session)
+
+      const res = await axios.get(`${baseURL}/api/v1/finance/history/page`, {
+        params: { page, limit },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }), // kalau ada token, sertakan
+        },
+      });
+
+      return res.data;
+    },
+  });
+}
 
 // This interface matches the transaction object in the API response
 export interface FinanceTransaction {
@@ -44,12 +66,12 @@ export function useFinance(id: string | number) {
   return useQuery<Finance>({
     queryKey: ['finance', id],
     queryFn: async () => {
-      console.log(`Fetching finance record with ID ${id}`);
+      // console.log(`Fetching finance record with ID ${id}`);
       // Use the statically imported financeApi
       try {
         // Removed dynamic import: const { financeApi } = await import('@/lib/api');
         const financeRecord = await financeApi.getFinance(id);
-        console.log('Finance record response:', financeRecord);
+        // console.log('Finance record response:', financeRecord);
         return financeRecord;
       } catch (error) {
         console.error('Error fetching finance record:', error);
@@ -69,12 +91,12 @@ export function useFinanceHistory() {
   return useQuery<FinanceHistoryResponse>({
     queryKey: ['finance-history'],
     queryFn: async () => {
-      console.log('Fetching finance history');
+      // console.log('Fetching finance history');
       // Use the statically imported financeApi
       try {
         // Removed dynamic import: const { financeApi } = await import('@/lib/api');
         const historyResponse = await financeApi.getFinanceHistory();
-        console.log('Finance history response:', historyResponse);
+        // console.log('Finance history response:', historyResponse);
         return historyResponse;
       } catch (error) {
         console.error('Error fetching finance history:', error);
@@ -93,7 +115,7 @@ export function useFinanceHistory() {
 export function useFinanceMutations() {
   const createFinance = useMutation<Finance, Error, FinanceData>({
     mutationFn: async (data: FinanceData) => {
-      console.log('Creating finance record:', data);
+      // console.log('Creating finance record:', data);
       // Use the statically imported financeApi
       try {
         // Removed dynamic import: const { financeApi } = await import('@/lib/api');
@@ -107,7 +129,7 @@ export function useFinanceMutations() {
 
   const updateFinance = useMutation<Finance, Error, UpdateFinanceParams>({
     mutationFn: async ({ id, data }: UpdateFinanceParams) => {
-      console.log(`Updating finance record ${id}:`, data);
+      // console.log(`Updating finance record ${id}:`, data);
       // Use the statically imported financeApi
       try {
         // Removed dynamic import: const { financeApi } = await import('@/lib/api');
@@ -130,12 +152,12 @@ export function useFinanceMutations() {
   // Upload document mutation using the proper API function with PUT method
   const uploadDocument = useMutation<any, Error, { financeId: number | string, file: File }>({
     mutationFn: async ({ financeId, file }: { financeId: number | string, file: File }) => {
-      console.log(`Uploading document for finance record ${financeId} using PUT method`);
+      // console.log(`Uploading document for finance record ${financeId} using PUT method`);
       try {
         // Use the uploadsApi to upload the document with PUT method
         // Note: We use PUT for both new uploads and updates as per backend requirements
         const response = await uploadsApi.uploadFinanceDocument(financeId, file);
-        console.log('Document upload response:', response);
+        // console.log('Document upload response:', response);
         return response;
       } catch (error) {
         console.error('Error uploading document:', error);

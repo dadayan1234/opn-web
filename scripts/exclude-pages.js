@@ -5,7 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('Running exclude-pages script...');
+// console.log('Running exclude-pages script...');
 
 // Pages to exclude from static generation
 const pagesToExclude = [
@@ -21,7 +21,7 @@ function safeDeleteFile(filePath) {
   try {
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
-      console.log(`Deleted: ${filePath}`);
+      // console.log(`Deleted: ${filePath}`);
     }
   } catch (error) {
     console.error(`Error deleting ${filePath}:`, error);
@@ -33,7 +33,7 @@ function safeDeleteDir(dirPath) {
   try {
     if (fs.existsSync(dirPath)) {
       fs.rmdirSync(dirPath, { recursive: true });
-      console.log(`Deleted directory: ${dirPath}`);
+      // console.log(`Deleted directory: ${dirPath}`);
     }
   } catch (error) {
     console.error(`Error deleting directory ${dirPath}:`, error);
@@ -51,4 +51,4 @@ pagesToExclude.forEach(pagePath => {
   safeDeleteDir(staticPageDir);
 });
 
-console.log('Exclude-pages script completed');
+// console.log('Exclude-pages script completed');

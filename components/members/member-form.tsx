@@ -73,7 +73,7 @@ export function MemberForm({ defaultValues, onSubmit, isSubmitting = false, isEd
     },
   })
 
-  console.log(form.formState.errors)
+  // console.log(form.formState.errors)
 
 
   // We're now using text inputs for division and position instead of dropdowns
@@ -93,7 +93,7 @@ export function MemberForm({ defaultValues, onSubmit, isSubmitting = false, isEd
         address: values.address
       }
 
-      console.log("Submitting biodata update:", biodataData)
+      // console.log("Submitting biodata update:", biodataData)
       onSubmit(biodataData)
     } else {
       const userData: MemberFormData = {
@@ -113,10 +113,10 @@ export function MemberForm({ defaultValues, onSubmit, isSubmitting = false, isEd
         }
       }
 
-      console.log("Submitting new user data:", {
-        ...userData,
-        user_data: { ...userData.user_data, password: "******" }
-      })
+      // console.log("Submitting new user data:", {
+      //   ...userData,
+      //   user_data: { ...userData.user_data, password: "******" }
+      // })
       onSubmit(userData)
     }
   }

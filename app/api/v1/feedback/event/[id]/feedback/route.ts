@@ -13,7 +13,7 @@ export async function GET(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`Processing GET request for event ${id} feedback`);
+    // console.log(`Processing GET request for event ${id} feedback`);
 
     // Forward the request to the backend API
     return await handleApiRoute(request, `/feedback/event/${id}/feedback`, {
@@ -37,7 +37,7 @@ export async function POST(
   try {
     // Extract the ID from params - use Promise.resolve to handle async params
     const { id } = await Promise.resolve(params);
-    console.log(`Processing POST request for creating feedback for event ${id}`);
+    // console.log(`Processing POST request for creating feedback for event ${id}`);
 
     // Forward the request to the backend API
     return await handleApiRoute(request, `/feedback/event/${id}/feedback`, {

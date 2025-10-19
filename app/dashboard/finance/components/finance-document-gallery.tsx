@@ -45,7 +45,7 @@ export function FinanceDocumentGallery({
       setShowUploadView(!documentUrl || documentUrl === "" || documentUrl === "null")
 
       // Log for debugging
-      console.log("Document gallery opened with URL:", documentUrl)
+      // console.log("Document gallery opened with URL:", documentUrl)
     }
   }, [open, documentUrl])
 

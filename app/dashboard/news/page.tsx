@@ -45,7 +45,7 @@ export default function NewsPage() {
     search: debouncedSearchQuery || undefined
   }
 
-  console.log('News page using filter params:', filterParams)
+  // console.log('News page using filter params:', filterParams)
 
   // Fetch news with filters
   const { data: newsItems = [], isLoading, error, refetch } = useNews(filterParams)
@@ -146,7 +146,7 @@ export default function NewsPage() {
         // Use setTimeout to delay refetch to avoid race conditions
         setTimeout(() => {
           refetch().catch(err => {
-            console.log("Error refetching after delete:", err)
+            // console.log("Error refetching after delete:", err)
             // Silently handle refetch errors to prevent UI errors
           })
         }, 500)
