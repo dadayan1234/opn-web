@@ -41,12 +41,24 @@ const transactionFormSchema = z.object({
       (value) => !isNaN(Number(value)) && Number(value) > 0,
       "Jumlah harus berupa angka positif"
     ),
-  type: z.enum(["income", "expense"], {
+  type: z.enum(["Pemasukan", "Pengeluaran"], {
     required_error: "Silakan pilih jenis transaksi",
   }),
 })
 
+
 type TransactionFormValues = z.infer<typeof transactionFormSchema>
+
+// Helper function untuk transform ke API format
+const transformToApiPayload = (data: TransactionFormValues) => {
+  return {
+    title: data.title,
+    description: data.description,
+    amount: Number(data.amount),
+    category: data.type,
+    date: data.date.toISOString(),
+  }
+}
 
 interface TransactionFormProps {
   onSubmit: (data: TransactionFormValues) => void
@@ -61,14 +73,17 @@ export function TransactionForm({ onSubmit, defaultValues }: TransactionFormProp
       title: "",
       description: "",
       amount: "",
-      type: "income",
+      type: "Pemasukan",
       ...defaultValues,
     },
   })
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit((data) => {
+            const apiPayload = transformToApiPayload(data)
+            onSubmit(apiPayload as any)
+          })} className="space-y-4">
         {/* Judul Transaksi */}
         <FormField
           control={form.control}
@@ -85,33 +100,33 @@ export function TransactionForm({ onSubmit, defaultValues }: TransactionFormProp
         />
 
         {/* Tanggal */}
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tanggal</FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    value={
-                      field.value
-                        ? new Date(field.value).toISOString().split("T")[0] // prefill tanggal
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const dateStr = e.target.value
-                      // ubah ke ISO UTC format agar sesuai body request
-                      const isoDate = dateStr ? new Date(dateStr).toISOString() : undefined
-                      field.onChange(isoDate)
-                    }}
-                    className="w-full"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <FormField
+          control={form.control}
+          name="date"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tanggal</FormLabel>
+              <FormControl>
+                <Input
+                  type="date"
+                  value={
+                    field.value
+                      ? new Date(field.value).toISOString().split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) => {
+                    const dateStr = e.target.value
+                    // Simpan sebagai Date object
+                    const dateObj = dateStr ? new Date(dateStr) : undefined
+                    field.onChange(dateObj)
+                  }}
+                  className="w-full"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
 
         {/* Deskripsi */}
@@ -170,8 +185,8 @@ export function TransactionForm({ onSubmit, defaultValues }: TransactionFormProp
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="income">Pemasukan</SelectItem>
-                  <SelectItem value="expense">Pengeluaran</SelectItem>
+                  <SelectItem value="Pemasukan">Pemasukan</SelectItem>
+                  <SelectItem value="Pengeluaran">Pengeluaran</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

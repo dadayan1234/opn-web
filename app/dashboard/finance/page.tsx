@@ -28,12 +28,12 @@ import "./finance.css";
 // INTERFACES
 // -----------------------------
 interface Transaction extends FinanceTransaction {
-  type?: "income" | "expense";
+  type?: "Pemasukan" | "pengeluaran";
 }
 
 interface TransactionFormData {
   amount: string;
-  type: "income" | "expense";
+  type: "Pemasukan" | "pengeluaran";
   date: Date;
   title: string;
   description: string;
@@ -61,7 +61,7 @@ export default function FinancePage() {
 
   const transactions: Transaction[] = (transactionsData?.data || []).map((t) => ({
     ...t,
-    type: t.category === "Pemasukan" ? "income" : "expense",
+    type: t.category === "Pemasukan" ? "Pemasukan" : "Pengeluaran",
   }));
 
   const meta = transactionsData?.meta || { page: 1, total_pages: 1, total: 0 };
@@ -74,11 +74,11 @@ export default function FinancePage() {
     queryClient.invalidateQueries({ queryKey: ["finance-history"] });
   };
 
-  const handleAdd = (data: TransactionFormData) => {
+  const handleAdd = (data: any) => {
     const payload: FinanceData = {
       amount: Number(data.amount),
-      category: data.type === "income" ? "Pemasukan" : "Pengeluaran",
-      date: data.date.toISOString(),
+      category: data.category, // sudah dalam format "Pemasukan" / "Pengeluaran"
+      date: data.date, // sudah ISO string
       title: data.title,
       description: data.description,
     };
@@ -91,12 +91,12 @@ export default function FinancePage() {
     });
   };
 
-  const handleEdit = (data: TransactionFormData) => {
+  const handleEdit = (data: any) => {
     if (!selected) return;
     const payload: FinanceData = {
       amount: Number(data.amount),
-      category: data.type === "income" ? "Pemasukan" : "Pengeluaran",
-      date: data.date.toISOString(),
+      category: data.category, // sudah dalam format "Pemasukan" / "Pengeluaran"
+      date: data.date, // sudah ISO string
       title: data.title,
       description: data.description,
     };
@@ -350,7 +350,7 @@ export default function FinancePage() {
                   description: selected.description,
                   title: selected.title,
                   amount: String(selected.amount),
-                  type: selected.category === "Pemasukan" ? "income" : "expense",
+                  type: selected.category === "Pemasukan" ? "Pemasukan" : "Pengeluaran",
                 }}
               />
             )}
